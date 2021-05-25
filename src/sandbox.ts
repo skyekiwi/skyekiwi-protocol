@@ -1,195 +1,207 @@
-// import {randomBytes} from 'tweetnacl'
+import {Blockchain} from './index'
+require('dotenv').config();
+// import { randomBytes} from 'tweetnacl'
 
-// const main = () => {
-
-//   const key = randomBytes(32)
-//   const key_string = Buffer.from(key).toString('hex')
-
-//   let ident = Uint8Array.from(Buffer.from('244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619', 'hex'))
-
-//   let result = new Uint8Array(32 + ident.length)
-
-//   result.set(key, 0)
-//   result.set(ident, 32)
-
-//   console.log(key.length)
-//   console.log(key_string)
-//   console.log(key)
-
-//   console.log(result.length)
-//   console.log(Buffer.from(result).toString('hex'))
-//   console.log(result)
-
-//   console.log(result.slice(0, 32))
-
-//   console.log(result.slice(32, result.length))
-//   console.log(ident)
-// }
-
-// main()
-
-// // import {
-// //   File,
-// //   RawFileMetadata
-// // } from './index'
-
-// // import { Writable } from 'stream'
-// // import fs from 'fs'
-
-// // class pipe1 extends Writable {
-
-// //   _write(chunk, next) {
-// //     console.log(chunk.length);
-// //     next()
-// //   }
-// // }
-
-// // const main = async() => {
-
-// //   const fileHandle = new RawFileMetadata(
-// //     __dirname + '/test.mp4',
-// //     'test.mp4', 'a testing movie'
-// //   )
-
-// //   const file = new File(fileHandle)
-// //   const sourceStream = file.getReadStream()
-
-// //   sourceStream
-// //     .pipe(pipe1)
-// //     .pipe(fs.createWriteStream(__dirname + '/out.mp4'))
-// // }
-
-// // main()
-
-import {
-  Driver, RawFile, Seal, EncryptionSchema, IPFS
-} from './index'
-import { mnemonicGenerate } from '@polkadot/util-crypto'
-
+const abi = require('../contract/artifacts/skyekiwi.json')
 const main = async() => {
-  const mnemonic = mnemonicGenerate()
-  console.log('mnemonic', mnemonic)
 
+  const seed = process.env.SEED_PHRASE
 
-  const author = Seal.getPublicAuthorKey(mnemonic)
-
-  const ipfs = new IPFS({
-    host: 'localhost',
-    port: 5001,
-    protocol: 'http'
-  })
-
-  const encryptionSchema = new EncryptionSchema(
-    2, 2, author,
-    1,
-    ipfs,
-    ipfs,
-    ipfs
-  )
-
-  encryptionSchema.addMember(author, ipfs)
-
-  const key = new Seal(encryptionSchema, mnemonic)
-  const fileHandle = new RawFile(
-    __dirname + '/test.png',
-    'test.png', 'a testing file'
-  )
+  const blockchain = new Blockchain(
+    seed,
+    '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+    'wss://jupiter-poa.elara.patract.io',
+    'wss://rocky-api.crust.network/',
+    abi)
   
-  const skyekiwi = new Driver(encryptionSchema, fileHandle, key)
-  await skyekiwi.upstream()
+  await blockchain.init()
 
-  console.log()
-  // const result = Buffer.from(chunkMetadata).toString('hex')
+  // const storage = blockchain.storage
+  // const instance = blockchain.instance
+
+
+  // let content = []
+  // for (let i = 0; i < 3; i++) {
+  //   content.push(randomBytes(1000))
+  // }
+
+  // const result = await storage.placeBatchOrder(content)
   // console.log(result)
-  // console.log(result.length)
-  
+
+  // const result = await instance.execContract(
+  //   'createVault', ['QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm'])
+  // console.log(result)
+
+
+
 }
 main()
 
+// import IPFS from 'ipfs-core';
+// // import {
+// //   IPFSClient
+// //   // Driver, RawFile, Seal, EncryptionSchema,
+// // } from './index'
+// import {waitReady} from '@polkadot/wasm-crypto'
+// import { ApiPromise, WsProvider } from '@polkadot/api';
+// import { typesBundleForPolkadot } from '@crustio/type-definitions';
+// import { Keyring } from '@polkadot/keyring';
+// // import { randomBytes } from 'tweetnacl'
 
+// // SubmitTx ported from crustio codebase
+// const submitTx = async (extrinsic, signer) => {
+//   return new Promise((resolve, reject) => {
+//     extrinsic.signAndSend(signer, ({ events = [], status }) => {
+//       console.log(
+//         `  ↪ 💸  Transaction status: ${status.type}, nonce: ${extrinsic.nonce}`
+//       );
 
+//       if (
+//         status.isInvalid ||
+//         status.isDropped ||
+//         status.isUsurped ||
+//         status.isRetracted
+//       ) {
+//         reject(new Error('Invalid transaction'));
+//       } else {
+//         // Pass it
+//       }
 
-// import {File} from './File/File'
-// import zlib from 'zlib'
-// import {promisify} from 'util'
-// import crypto from 'crypto'
-// import fs from 'fs'
-
-// import {IPFS} from './IPFS/IPFS'
-// // const deflate = promisify(zlib.deflate)
-// // const inflate = promisify(zlib.inflate)
-
-// const main = async() => {
-
-//   const ipfs = new IPFS({
-//     host: 'ipfs.infura.io',
-//     port: 5001,
-//     protocol: 'https'
-//   })
-
-//   const result = await ipfs.add("a random string")
-//   console.log()
-//   // const filePath = __dirname + '/test.mp4'
-
-//   // const file = new File(filePath)
-//   // let chunk: Uint8Array
-
-//   // // const write = fs.createWriteStream(__dirname + '/out.mp4')
-//   // while (null != (chunk = await file.readNextChunk())) {
-
-//   //   // File.writeChunk(chunk, write)
-//   //   console.log('hash', File.getChunkHash(chunk))
-//   //   console.log('hash', File.getChunkHash(chunk).length)
-//   //   // const compressedChunk = await deflate(chunk)
-//   //   // console.log(chunk.length)
-//   //   // console.log(compressedChunk.length)
-//   //   // console.log(await inflate(compressedChunk))
-
-//   //   // let hashSum = crypto.createHash('sha256')
-//   //   // hashSum.update(chunk)
-//   //   // console.log( hashSum.digest('hex') )
-
-//   //   // process.exit(0)
-//   // }
+//       if (status.isInBlock) {
+//         events.forEach(({ event: { method, section } }) => {
+//           if (section === 'system' && method === 'ExtrinsicFailed') {
+//             // Error with no detail, just return error
+//             console.error(`  ↪ ❌  Send transaction(${extrinsic.type}) failed.`);
+//             resolve(false);
+//           } else if (method === 'ExtrinsicSuccess') {
+//             console.log(`  ↪ ✅  Send transaction(${extrinsic.type}) success.`);
+//             resolve(true);
+//           }
+//         });
+//       } else {
+//         // Pass it
+//       }
+//     }).catch(e => {
+//       reject(e);
+//     });
+//   });
 // }
 
-// main()
+// const main = async () => {
+
+//   await waitReady();
+
+//   const ipfs = await IPFS.create();
+  
+//   const cid = await ipfs.add(
+//     "a testing string",
+//     {
+//       progress: (prog) => console.log(`Add received: ${prog}`)
+//     }
+//   );
+
+//   const fileStat = await ipfs.files.stat("/ipfs/" + cid.path);
+
+//   const chain_ws_url = "wss://rocky-api.crust.network"
+//   let api = new ApiPromise({
+//     provider: new WsProvider(chain_ws_url),
+//     typesBundle: typesBundleForPolkadot,
+//   });
+
+//   api = await api.isReadyOrError;
+
+//   const seeds = "riot hand shuffle card company must rocket jealous present hurt lava multiply";
+
+//   const keyring = (new Keyring({
+//     type: 'sr25519',
+//   })).addFromUri(seeds);
+
+//   console.log(cid.path, fileStat.cumulativeSize)
+//   const extrinsic = api.tx.market.placeStorageOrder(
+//     cid.path, fileStat.cumulativeSize,
+//     0
+//   );
+
+//   const tx = await submitTx(extrinsic, keyring)
+//   console.log(tx)
+
+// }
 
 
-// // import crypto from 'eth-crypto'
+// main().catch(e => {
+//   console.log(e);
+// });
 
 // // const main = async () => {
 
-// //   const { publicKey, privateKey } = crypto.createIdentity()
-// //   console.log(publicKey)
-// //   console.log(privateKey)
+// //   await waitReady()
 
-// //   const encryptionSchema = new EncryptionSchema(
-// //     2, // pieces
-// //     2, // quorum
-// //     1, // publicPieceCount
-// //     new IPFS(new IPFSConfig("ipfs.infura.io", 5001, "https")), // metadata_ipfs
-// //     new IPFS(new IPFSConfig("ipfs.infura.io", 5001, "https")), // public_pieces_ipfs
+// //   const chain_ws_url = "wss://rocky-api.crust.network"
+// //   let api = new ApiPromise({
+// //     provider: new WsProvider(chain_ws_url),
+// //     typesBundle: typesBundleForPolkadot,
+// //   });
+// //   api = await api.isReadyOrError;
 
-// //     // members
-// //     {}
-// //   )
+// //   const seeds = "riot hand shuffle card company must rocket jealous present hurt lava multiply";
 
-// //   encryptionSchema.members[publicKey] =
-// //     new IPFS(new IPFSConfig("ipfs.infura.io", 5001, "https"))
+// //   const keyring = (new Keyring({
+// //     type: 'sr25519',
+// //   })).addFromUri(seeds);
 
-// //   const file = new File(__dirname + '/passwords.json')
-// //   const driver = new Driver(encryptionSchema)
+// //   const crust = new Crust(keyring, api)
 
-// //   const result = await driver.encryptChuncks(file)
-// //   console.log('result', result)
-// //   const ipfs_client = new IPFS(new IPFSConfig("ipfs.infura.io", 5001, "https"))
-// //   const cids = await ipfs_client.cat(result)
+// //   let content = []
+// //   for (let i = 0; i < 100; i++) {
+// //     content.push(randomBytes(1000))
+// //   }
 
-// //   console.log(cids)
-// //   await driver.decryptChunks(__dirname + 'out.json', cids, publicKey, privateKey)
+// //   //https://apps.crust.network/?rpc=wss%3A%2F%2Frocky-api.crust.network%2F#/explorer/query/0x7bd4c5353dd1ca4f025d1bf0cdda69f7b0ba98c99c3133ff7f5a02e9f3df12be 
+// //   const result = await crust.placeBatchOrder(content)
+// //   console.log(result)
+// //   // console.log(await crust.getStoragePrice(1000) * 1000)
 
+// //   // 9677.734375
+// //   // 9677734.375
 // // }
 // // main()
 
-// // export { IPFS }
+
+// // import {
+// //   Driver, RawFile, Seal, EncryptionSchema, IPFSClient
+// // } from './index'
+// // import { mnemonicGenerate } from '@polkadot/util-crypto'
+
+// // const upstream = async() => {
+// //   const mnemonic = mnemonicGenerate()
+// //   console.log('mnemonic', mnemonic)
+
+
+// //   const author = Seal.getPublicAuthorKey(mnemonic)
+
+// //   const ipfs = new IPFS({
+// //     host: 'localhost',
+// //     port: 5001,
+// //     protocol: 'http'
+// //   })
+
+// //   const encryptionSchema = new EncryptionSchema(
+// //     2, 2, author,
+// //     1,
+// //     ipfs,
+// //     ipfs,
+// //     ipfs
+// //   )
+
+// //   encryptionSchema.addMember(author, ipfs)
+
+// //   const key = new Seal(encryptionSchema, mnemonic)
+// //   const fileHandle = new RawFile(
+// //     __dirname + '/test.png',
+// //     'test.png', 'a testing file'
+// //   )
+  
+// //   const skyekiwi = new Driver(encryptionSchema, fileHandle, key)
+// //   await skyekiwi.upstream()
+// // }
+// // upstream()

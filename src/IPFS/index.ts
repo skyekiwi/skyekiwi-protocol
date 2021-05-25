@@ -1,3 +1,3 @@
-import {IPFS} from './IPFS'
+import { IPFS } from './IPFS'
 
-export {IPFS}
+export { IPFS}

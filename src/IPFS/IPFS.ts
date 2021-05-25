@@ -2,7 +2,7 @@ import createClient from 'ipfs-http-client'
 import { IPFSConfig } from '../types'
 
 
-class IPFS {
+export class IPFS {
 	private client: any
 	private config: IPFSConfig
 
@@ -45,4 +45,3 @@ class IPFS {
 		return this.config.toString()
 	}
 }
-export {IPFS}

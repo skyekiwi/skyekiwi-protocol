@@ -3,8 +3,7 @@ import { randomBytes } from 'tweetnacl'
 import { mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto'
 
 // 32 bytes
-const SKYEKIWI_SECRETS_ENDING = Uint8Array.from(Buffer.from
-  (
+const SKYEKIWI_SECRETS_ENDING = Uint8Array.from(Buffer.from(
     '244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619', 
     'hex'
   )

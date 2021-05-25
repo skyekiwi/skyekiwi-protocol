@@ -35,11 +35,14 @@ export class Chunks {
     }
   }
 
-  public getCIDList(): string[] {
-    const cids:string[] = [];
+  public getCIDList() {
+    let cids = [];
 
     for (let chunksId in this.chunkList) {
-      cids.push(this.chunkList[chunksId].ipfsCID);
+      cids.push({
+        'cid': this.chunkList[chunksId].ipfsCID,
+        'size': this.chunkList[chunksId].ipfsChunkSize
+      });
     }
 
     return cids;

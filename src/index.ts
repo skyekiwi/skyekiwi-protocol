@@ -10,11 +10,16 @@ import {
   SecretBox, 
   TSS 
 } from './Encryption'
+import {
+  Blockchain,
+  Crust,
+  Contract
+} from './Blockchain'
 
 export {
   Driver,
 
-  IPFS, 
+  IPFS,
   
   File, 
   
@@ -26,5 +31,9 @@ export {
   EncryptionSchema,
   Box,
   SecretBox,
-  TSS
+  TSS,
+
+  Blockchain,
+  Crust,
+  Contract
 }
