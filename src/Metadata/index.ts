@@ -41,8 +41,8 @@ export class Metadata {
   }
 
   public generateSealedMetadata() {
-    const sealing = this.seal.encrypt(
-      this.hexToU8a(
+    const sealing = this.seal.seal(
+      this.stringToU8a(
         JSON.stringify(this.generatePreSealingMetadata())
       )
     )
@@ -64,7 +64,7 @@ export class Metadata {
   private u8aToHex(x: Uint8Array) {
     return Buffer.from(x).toString('hex')
   }
-  private hexToU8a(x: string) {
+  private stringToU8a(x: string) {
     const encoder = new TextEncoder();
     return encoder.encode(x);
   }

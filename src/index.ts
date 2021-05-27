@@ -3,18 +3,20 @@ import { Driver } from './driver'
 import { File } from './File'
 import {
   Chunks, RawFile, Seal, Metadata
-} from './Metadata/index'
+} from './Metadata'
 import { 
   EncryptionSchema, 
   Box, 
   SecretBox, 
-  TSS 
+  TSS,
+  SKYEKIWI_SECRETS_ENDING
 } from './Encryption'
 import {
   Blockchain,
   Crust,
   Contract
 } from './Blockchain'
+import { hexToU8a, u8aToHex } from './Util'
 
 export {
   Driver,
@@ -32,8 +34,12 @@ export {
   Box,
   SecretBox,
   TSS,
+  SKYEKIWI_SECRETS_ENDING,
 
   Blockchain,
   Crust,
-  Contract
+  Contract,
+  
+  hexToU8a,
+  u8aToHex
 }

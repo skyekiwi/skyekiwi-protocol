@@ -15,8 +15,6 @@ class Box {
   }
 
   public encrypt(message: Uint8Array, receiverPublicKey: Uint8Array): Uint8Array {
-
-    console.log(message.length, receiverPublicKey.length, this.key.length)
     const nonce = randomBytes(box.nonceLength);
     const encrypted = box(message, nonce, receiverPublicKey, this.key);
 

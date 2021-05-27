@@ -17,14 +17,14 @@ class SecretBox {
     return fullMessage
   }
 
-  public decrypt (messageWithNonce: Uint8Array): Uint8Array {
+  public static decrypt (key: Uint8Array, messageWithNonce: Uint8Array): Uint8Array {
     const nonce = messageWithNonce.slice(0, secretbox.nonceLength);
     const message = messageWithNonce.slice(
       secretbox.nonceLength,
       messageWithNonce.length
     );
     
-    const decrypted = secretbox.open(message, nonce, this.key);
+    const decrypted = secretbox.open(message, nonce, key);
     if (!decrypted) {
       throw new Error("decryption failed - SecretBox.decrypt");
     }

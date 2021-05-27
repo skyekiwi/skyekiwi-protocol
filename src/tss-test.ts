@@ -1,18 +1,18 @@
 import secrets from 'secrets.js-grempe'
 import {
   hexToU8a, u8aToHex
-} from '../index'
+} from './index'
 
 // 32 bytes
 const SKYEKIWI_SECRETS_ENDING = "244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619"
 
-class TSS {
+class TSSTest {
 
   public static generateShares(
-    message: Uint8Array,
-    numShares: number,
+    message: Uint8Array, 
+    numShares: number, 
     threshold: number
-  ): Uint8Array[] {
+  ) : Uint8Array[] {
     const messageHexString = u8aToHex(message)
     const wrappedMessageHexString = messageHexString + SKYEKIWI_SECRETS_ENDING
 
@@ -34,24 +34,24 @@ class TSS {
     return shares_u8a
   }
 
-  public static recover(shares: Uint8Array[]): Uint8Array {
+  public static recover(shares:Uint8Array[]): Uint8Array {
     const sharesInHexString: string[] = shares.map(u8aToHex)
 
     // Recover by TSS
     // similar to shares generation, reverse the process by putting back the BITS
     const wrappedResult = secrets.combine(sharesInHexString.map(share => '8' + share))
 
-    if (wrappedResult.slice(wrappedResult.length - SKYEKIWI_SECRETS_ENDING.length)
+    if (wrappedResult.slice(wrappedResult.length - SKYEKIWI_SECRETS_ENDING.length) 
       !== SKYEKIWI_SECRETS_ENDING) {
       throw new Error("decryption failed, most likely because threshold is not met - TSS.recover")
     }
 
     return hexToU8a(
-      wrappedResult.slice(0,
+      wrappedResult.slice(0, 
         wrappedResult.length - SKYEKIWI_SECRETS_ENDING.length
       )
     );
   }
 }
 
-export { TSS, SKYEKIWI_SECRETS_ENDING }
+export { TSSTest, SKYEKIWI_SECRETS_ENDING }
