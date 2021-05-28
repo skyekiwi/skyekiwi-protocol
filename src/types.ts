@@ -31,19 +31,5 @@ class FileChunk {
   ) {}
 }
 
-class IPFSConfig {
-  constructor(
-    public host: string,
-    public port: number,
-    public protocol: 'https' | 'http' | 'ws'
-  ) {}
 
-  public toString() {
-    return JSON.stringify({
-      host: this.host,
-      port: this.port,
-      protocol: this.protocol
-    })
-  }
-}
-export { EncryptionSchema, Metadata, IPFSConfig, FileChunk}
+export { EncryptionSchema, Metadata, FileChunk}

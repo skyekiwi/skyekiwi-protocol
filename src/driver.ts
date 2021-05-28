@@ -1,25 +1,24 @@
 import {
   // EncryptionSchema, 
-  Metadata, RawFile, Seal, EncryptionSchema,
+  Metadata, Seal, EncryptionSchema, Chunks,
   File,
 
-  IPFS,
+  IPFS, IPFSConfig,
   SecretBox
 } from './index'
 
 class Driver {
 
-  private file: File
   private metadata: Metadata
 
   constructor(
     public encryptionSchema: EncryptionSchema,
-    public rawFile: RawFile,
+    public file: File,
     public seal: Seal
   ) {
-    this.file = new File(rawFile);
+    this.file = file;
     this.metadata = new Metadata(
-      rawFile, encryptionSchema, seal.mnemonic, seal.blockchainPrivateKey
+      new Chunks(file), seal
     )
   }
 
@@ -64,8 +63,10 @@ class Driver {
         chunk = (new SecretBox(this.metadata.seal.sealingKey)).encrypt(chunk)
 
         // 4. upload to IPFS
-        const IPFS_CID = await(new IPFS({ host: 'localhost', port: 5001, protocol: 'http' }))
-          .add(Buffer.from(chunk).toString());
+        const IPFS_CID = await (
+          new IPFS (new IPFSConfig('localhost', 5001, 'http'))
+          .add(Buffer.from(chunk).toString())
+        )
 
         // 5. write to chunkMetadata
         this.metadata.chunks.writeChunkResult(

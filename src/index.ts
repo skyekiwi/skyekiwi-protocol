@@ -1,11 +1,10 @@
-import { IPFS } from './IPFS'
+import { IPFS, IPFSConfig } from './IPFS'
 import { Driver } from './driver'
 import { File } from './File'
 import {
-  Chunks, RawFile, Seal, Metadata
+  Chunks, Seal, Metadata, EncryptionSchema
 } from './Metadata'
 import { 
-  EncryptionSchema, 
   Box, 
   SecretBox, 
   TSS,
@@ -16,21 +15,21 @@ import {
   Crust,
   Contract
 } from './Blockchain'
-import { hexToU8a, u8aToHex } from './Util'
+import * as Util from './Util'
 
 export {
   Driver,
 
-  IPFS,
+  IPFS, 
+  IPFSConfig,
   
   File, 
   
   Chunks, 
-  RawFile, 
   Seal, 
   Metadata,
-  
   EncryptionSchema,
+  
   Box,
   SecretBox,
   TSS,
@@ -40,6 +39,5 @@ export {
   Crust,
   Contract,
   
-  hexToU8a,
-  u8aToHex
+  Util
 }

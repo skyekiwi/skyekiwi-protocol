@@ -1,10 +1,14 @@
 import secrets from 'secrets.js-grempe'
-import {
-  hexToU8a, u8aToHex
-} from '../index'
+import {Util} from '../index'
 
 // 32 bytes
 const SKYEKIWI_SECRETS_ENDING = "244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619"
+
+// TODO: secret.js needs to be replaced by a better impl
+// the padding issue is stupid
+// secret.js gives a hex string that has 
+// half byte BITS + 1 bytes ID + N bytes of value 
+// the half byte cannot be parse to U8A correctly 
 
 class TSS {
 
@@ -13,7 +17,7 @@ class TSS {
     numShares: number,
     threshold: number
   ): Uint8Array[] {
-    const messageHexString = u8aToHex(message)
+    const messageHexString = Util.u8aToHex(message)
     const wrappedMessageHexString = messageHexString + SKYEKIWI_SECRETS_ENDING
 
     // Proceed with TSS
@@ -30,12 +34,12 @@ class TSS {
       return share.slice(1)
     })
 
-    const shares_u8a = derivedSharing.map(hexToU8a);
+    const shares_u8a = derivedSharing.map(Util.hexToU8a);
     return shares_u8a
   }
 
   public static recover(shares: Uint8Array[]): Uint8Array {
-    const sharesInHexString: string[] = shares.map(u8aToHex)
+    const sharesInHexString: string[] = shares.map(Util.u8aToHex)
 
     // Recover by TSS
     // similar to shares generation, reverse the process by putting back the BITS
@@ -46,7 +50,7 @@ class TSS {
       throw new Error("decryption failed, most likely because threshold is not met - TSS.recover")
     }
 
-    return hexToU8a(
+    return Util.hexToU8a(
       wrappedResult.slice(0,
         wrappedResult.length - SKYEKIWI_SECRETS_ENDING.length
       )

@@ -1,5 +1,7 @@
 output
 
+tmp/
+test.png
 # Logs
 logs
 *.log

@@ -1,73 +1,81 @@
-import { EncryptionSchema } from '../index'
-import {Chunks} from './Chunks'
-import {RawFile} from './RawFile'
+import { EncryptionSchema } from './EncryptionSchema'
+import { Chunks } from './Chunks'
 import { Seal } from './Seal'
+import {
+  stringToU8a
+} from '@polkadot/util'
+import {Util} from '../index'
 
 export {
-  Chunks, RawFile, Seal
+  Chunks, Seal, EncryptionSchema
 }
 
 export const SKYEKIWI_VERSION = "0.1.0";
 
 export class Metadata {
 
-  public chunks: Chunks  
-  public seal: Seal
+  constructor (
+    public chunks: Chunks, 
+    public seal: Seal
+  ) {}
 
-  private encryptionSchema: EncryptionSchema
+  // constructor(
+  //   file: File,
+  //   encryptionSchema: EncryptionSchema,
+  //   mnemonic?: string, sealingKey?: Uint8Array
+  // ) {
+  //   this.seal = new Seal(encryptionSchema, mnemonic, sealingKey)
+  //   this.chunks = new Chunks(file)
+  // }
 
-  constructor(
-    rawFile: RawFile,
-    encryptionSchema: EncryptionSchema,
-    mnemonic?: string, sealingKey?: Uint8Array,
-  ) {
-    this.seal = new Seal(encryptionSchema, mnemonic, sealingKey)
-    this.chunks = new Chunks(rawFile)
-    this.encryptionSchema = encryptionSchema
-  }
   public getCIDList() {
-    
+    return this.chunks.getCIDList()
+  }
+
+  public updateEncryptionSchema(newEncryptionSchema: EncryptionSchema) {
+    this.seal.updateEncryptionSchema(newEncryptionSchema)
   }
   
   public generatePreSealingMetadata() {
     return {
-      sealing_key: this.u8aToHex(this.seal.sealingKey),
-      chunk_metadata: this.chunks.toString(),
-      root_hash: this.u8aToHex(this.chunks.hash),
-      author: this.u8aToHex(this.encryptionSchema.author),
-
+      sealing_key: this.seal.sealingKey,
+      chunk_metadata: this.chunks,
+      root_hash: this.chunks.hash,
+      author: this.seal.getPublicAuthorKey(),
       protocol_version: SKYEKIWI_VERSION,
     }
   }
 
   public generateSealedMetadata() {
-    const sealing = this.seal.seal(
-      this.stringToU8a(
-        JSON.stringify(this.generatePreSealingMetadata())
+    const sealed = this.seal.seal(
+      stringToU8a(
+        JSON.stringify(
+          this.generatePreSealingMetadata())
       )
     )
 
     return {
-      public_sealing_key: this.u8aToHex(Seal.getPublicSealingKey(this.seal.sealingKey)),
-      numOfShares: this.encryptionSchema.numOfShares,
-      threshold: this.encryptionSchema.threshold,
-
-      public: sealing.public,
-      private: sealing.private,
-
-
-      numOfParticipants: this.encryptionSchema.getNumOfParticipants(),
+      public_sealing_key: this.seal.getPublicSealingKey(),
+      ... this.seal.digestEncryptionSchema(),
+      public: sealed.public,
+      private: sealed.private,
       protocol_version: SKYEKIWI_VERSION,
     }
   }
 
-  private u8aToHex(x: Uint8Array) {
-    return Buffer.from(x).toString('hex')
+  public serialize() {
+    return Util.serialize({
+      chunks: this.chunks.serialize(),
+      seal: this.seal.serialize
+    })
   }
-  private stringToU8a(x: string) {
-    const encoder = new TextEncoder();
-    return encoder.encode(x);
+
+  public static parse(str: string) {
+    const object = Util.parse(str)
+    object.chunks = Util.parse(object.chunks)
+    object.seal = Util.parse(object.seal)
+    return new Metadata(
+      object.chunks, object.seal
+    )
   }
 }
-
-

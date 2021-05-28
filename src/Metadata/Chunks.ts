@@ -1,8 +1,8 @@
-import {RawFile} from './index'
+import { File, Util} from '../index'
 
 export class Chunks {
 
-  public rawFile: RawFile
+  public file: File
   public chunkList: {
     [chunkId: number]: {
       "rawChunkSize": number,
@@ -12,8 +12,8 @@ export class Chunks {
   }
   public hash: Uint8Array
 
-  constructor(rawFile: RawFile) {
-    this.rawFile = rawFile
+  constructor(file: File) {
+    this.file = file
     this.chunkList = {}
   }
 
@@ -48,12 +48,23 @@ export class Chunks {
     return cids;
   }
 
-  public toString() : string {
-    return JSON.stringify({
-      rawFile: this.rawFile.toString(),
-      chunkStats: JSON.stringify(this.chunkList),
-      hash: Buffer.from(this.hash).toString('hex')
+  public serialize() : string {
+    return Util.serialize({
+      file: this.file.serialize(),
+      chunkStats: this.chunkList,
+      hash: this.hash
     });
   }
+
+  public static parse(str: string) {
+    const object = Util.parse(str)
+
+    let chunks = new Chunks(File.parse(object.file))
+    chunks.chunkList = object.chunkList
+    chunks.hash = object.hash
+
+    return chunks
+  }
+
 
 }

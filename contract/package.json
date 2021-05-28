@@ -1,5 +1,5 @@
 {
-  "name": "skyekiwivault",
+  "name": "skyekiwi-contract-demo",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,18 +12,11 @@
     "@redspot/patract": "0.11.4-6",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
-    "body-parser": "^1.19.0",
     "chai": "^4.2.0",
-    "cids": "^1.1.6",
     "dotenv": "^10.0.0",
-    "eth-crypto": "^1.8.0",
-    "express": "^4.17.1",
     "ipfs-http-client": "^49.0.2",
-    "lowdb": "^1.0.0",
     "redspot": "0.11.4-6",
-    "secrets.js-grempe": "^2.0.0",
-    "typescript": "^4.0.2",
-    "uuid": "^8.3.2"
+    "typescript": "^4.0.2"
   },
   "scripts": {
     "build": "npx redspot compile",

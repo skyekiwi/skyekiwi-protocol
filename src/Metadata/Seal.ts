@@ -1,7 +1,6 @@
-import { EncryptionSchema, TSS, Box } from '../index'
+import { EncryptionSchema, TSS, Box, Util } from '../index'
 import { randomBytes } from 'tweetnacl'
 import { mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto'
-
 
 export class Seal {
 
@@ -27,12 +26,12 @@ export class Seal {
 
     // mnemonic has 12 words
     if (mnemonic.split(' ').length !== 12) {
-      throw new Error('mnemonic length error - KeyMetadata.constructor');
+      throw new Error('mnemonic length error - Seal.constructor');
     }
 
     // SecretBoxKey is 32 bytes long
     if (sealingKey && sealingKey.length !== 32) {
-      throw new Error('SecretBox key length error, should be 32 bytes long - KeyMetadata.contructor');
+      throw new Error('SecretBox key length error, should be 32 bytes long - Seal.contructor');
     }
 
     this.blockchainPrivateKey = mnemonicToMiniSecret(mnemonic);
@@ -41,26 +40,29 @@ export class Seal {
     this.sealingKey = sealingKey ? sealingKey : randomBytes(32);
 
     this.encryptionSchema = encryptionSchema
-
     this.box = new Box(this.blockchainPrivateKey)
+  }
+
+  public updateEncryptionSchema(newEncryptionSchema: EncryptionSchema) {
+    this.encryptionSchema = newEncryptionSchema
   }
 
   public seal(message: Uint8Array) {
     
-    let public_shares: any[] = []
-    let private_shares: any[] = []
+    let public_shares: Uint8Array[] = []
+    let private_shares: Uint8Array[] = []
     
     // pieces = public piece(s) + members' piece(s)
     if (this.encryptionSchema.numOfShares !==
       this.encryptionSchema.unencryptedPieceCount +
-      Object.keys(this.encryptionSchema.members).length) {
+      this.encryptionSchema.members.length) {
 
-      throw new Error("wrong encryptionSchema supplied - EncryptionKeyMetadata.encrypt")
+      throw new Error("wrong encryptionSchema supplied - Seal.seal")
     }
 
     // quorum > pieces : a vault that can never be decrypt
     if (this.encryptionSchema.threshold > this.encryptionSchema.numOfShares) {
-      throw new Error("wrong encryptionSchema supplied - EncryptionKeyMetadata.encrypt")
+      throw new Error("wrong encryptionSchema supplied - Seal.seal")
     }
     
     this.encryptionSchema.author = this.box.getPublicKey()
@@ -75,10 +77,9 @@ export class Seal {
       public_shares.push(shares.pop())
     }
 
-    for (let member_hexstring in this.encryptionSchema.members) {
-
-      let member = Uint8Array.from(Buffer.from(member_hexstring, 'hex'));
-      private_shares.push(this.box.encrypt(shares.pop(), member))
+    for (let index in this.encryptionSchema.members) {
+      private_shares.push(this.box.encrypt(shares.pop(), 
+        this.encryptionSchema.members[index]))
     }
 
     return {
@@ -87,31 +88,57 @@ export class Seal {
     }
   }
 
-  public recover(public_pieces: [], private_pieces: [], keyPairs: {}) : Uint8Array {
+  public recover(public_pieces: Uint8Array[], private_pieces: Uint8Array[], keyPairs: {}) : Uint8Array {
 
-    let shares: Uint8Array[] = []
-    public_pieces.map(item => {
-      shares.push(item)
-    })
-
-    private_pieces.map(item => {
-      for (let publicKey in keyPairs) {
+    let shares: Uint8Array[] = [...public_pieces]
+    for (let piece of private_pieces) {
+      for (let key in keyPairs) {
         try {
           const decrypted = Box.decrypt(
-            item, Uint8Array.from(keyPairs[publicKey]), this.encryptionSchema.author
+            piece, keyPairs[key], this.encryptionSchema.author
           )
           if (decrypted) shares.push(decrypted)
-        } catch(err) {}
+        } catch(err) {
+          // pass
+        }
       }
-    })
+    }
     return TSS.recover(shares);
   }
 
-  public static getPublicSealingKey(sealingKey: Uint8Array) : Uint8Array {
-    return Box.getPublicKeyFromPrivateKey(sealingKey)
+  public getPublicSealingKey() : Uint8Array {
+    return Box.getPublicKeyFromPrivateKey(this.sealingKey)
   }
 
-  public static getPublicAuthorKey(mnemonic: string) : Uint8Array {
-    return Box.getPublicKeyFromPrivateKey(mnemonicToMiniSecret(mnemonic))
+  public getPublicAuthorKey() : Uint8Array {
+    return Box.getPublicKeyFromPrivateKey(this.blockchainPrivateKey)
+  }
+
+  public digestEncryptionSchema() {
+    return {
+      'numOfShares': this.encryptionSchema.numOfShares,
+      'threshold': this.encryptionSchema.threshold,
+      'numOfParticipants': this.encryptionSchema.getNumOfParticipants()
+    }
+  }
+
+  public serialize() {
+    console.warn("this is very risky for leaking private info - Seal.serialize")
+    return Util.serialize({
+      sealingKey: this.sealingKey,
+      publicSealingKey: this.getPublicSealingKey(),
+      author: this.getPublicAuthorKey(),
+
+      blockchainPrivateKey: this.blockchainPrivateKey,
+      mnemonic: this.mnemonic,
+      encryptionSchema: this.encryptionSchema.serialize()
+    })
+  }
+
+  public static parse(str: string) {
+    const object = Util.parse(str)
+    object.encryptionSchema = EncryptionSchema.parse(object.encryptionSchema)
+    object.sealingKey = Util.parse(object.sealingKey)
+    return new Seal(object.encryptionSchema, object.mnemonic, object.sealingKey)
   }
 }
