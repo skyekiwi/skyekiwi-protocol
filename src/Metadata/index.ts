@@ -40,17 +40,18 @@ export class Metadata {
     return {
       sealing_key: this.seal.sealingKey,
       chunk_metadata: this.chunks,
-      root_hash: this.chunks.hash,
       author: this.seal.getPublicAuthorKey(),
       protocol_version: SKYEKIWI_VERSION,
     }
   }
 
   public generateSealedMetadata() {
+    
     const sealed = this.seal.seal(
       stringToU8a(
-        JSON.stringify(
-          this.generatePreSealingMetadata())
+        Util.serialize(
+          this.generatePreSealingMetadata()
+        )
       )
     )
 

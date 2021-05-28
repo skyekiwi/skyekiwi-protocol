@@ -14,12 +14,17 @@ import { KeyringPair } from '@polkadot/keyring/types';
  */
 export async function sendTx(
   extrinsic: any,
-  signer: KeyringPair
+  signer: KeyringPair,
+  logging?: boolean
 ): Promise<boolean> {
+  logging = logging === undefined ? false : logging
+
+  if (logging)
   console.log('⛓  Send tx to chain...');
 
   return new Promise((resolve, reject) => {
     extrinsic.signAndSend(signer, ({ events = [], status }) => {
+      if (logging)
       console.log(
         `  ↪ 💸  Transaction status: ${status.type}, nonce: ${extrinsic.nonce}`
       );
@@ -42,6 +47,7 @@ export async function sendTx(
             console.error(`  ↪ ❌  Send transaction(${extrinsic.type}) failed.`);
             resolve(false);
           } else if (method === 'ExtrinsicSuccess') {
+            if (logging)
             console.log(`  ↪ ✅  Send transaction(${extrinsic.type}) success.`);
             resolve(true);
           }

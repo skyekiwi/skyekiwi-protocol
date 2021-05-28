@@ -2,6 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import {sendTx} from './index'
 import IPFS from 'ipfs-core'
+import {Util} from '../index'
 
 export class Crust {
 
@@ -22,6 +23,21 @@ export class Crust {
         ),
         this.signer
       )
+  }
+  public async placeBatchOrderWithCIDList(cidList: [{cid: string, size: number}], tip?: number) {
+    
+    let extrinsicQueue = []
+    for (let cid of cidList) {
+      extrinsicQueue.push(this.api.tx.market.placeStorageOrder(
+        cid.cid, cid.size, tip ? tip : 0
+      ))
+    }
+    const crustResult = await sendTx(
+      this.api.tx.utility.batchAll(
+        extrinsicQueue
+      ), this.signer
+    )
+    return crustResult
   }
 
   public async placeBatchOrder(content: Uint8Array[], tip?: number) {
@@ -58,7 +74,7 @@ export class Crust {
 
   private async addFile(ipfs: IPFS.IPFS, content: Uint8Array) {
     const cid = await ipfs.add(
-      Buffer.from(content).toString('hex'),
+      Util.u8aToHex(content),
       {
         progress: (prog: any) => console.log(`add received: ${prog}`)
       }

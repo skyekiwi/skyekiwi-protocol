@@ -8,6 +8,7 @@ import {
 } from '@polkadot/util'
 import { mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto'
 
+
 import fs from 'fs'
 
 require('dotenv').config();
@@ -17,28 +18,28 @@ const file2Path = path.join(__dirname, '/tmp/tmp.file2')
 
 const setup = async () => {
   // we are creating two files here:
-  // tmp.file1 - a 120MB file with random bytes
-  // tmp.file2 - a 119MB file with repeating byte of '187'
+  // tmp.file1 - a 1.2MB file with random bytes
+  // tmp.file2 - a 1.19MB file with repeating byte of '187'
 
-  const content1 = Buffer.from(randomBytes(120000000))
-  const content2 = Buffer.alloc(119000000, 187)
+  const content1 = Buffer.from(randomBytes(1200000))
+  const content2 = Buffer.alloc(1190000, 187)
 
   await SkyeKiwi.Util.writeFile(content1, file1Path)
   await SkyeKiwi.Util.writeFile(content2, file2Path)
 
-  // RawFile has a default chunk size of 120MB.
-  // we are making it 10MB here to demostrate it works
+  // SkyeKiwi.File has a default chunk size of 100MB.
+  // we are making it 0.1MB here to demostrate it works
   const file1 = new SkyeKiwi.File(
     file1Path,
     'tmp.file1',
     'a testing file with 120MB random bytes',
-    1 * (10 ** 7)
+    1 * (10 ** 5)
   )
   const file2 = new SkyeKiwi.File(
     file2Path,
     'tmp.file2',
     'a testing file with 119MB repeating 187 byte',
-    1 * (10 ** 7)
+    1 * (10 ** 5)
   )
 
   return { file1, file2 }
@@ -156,8 +157,8 @@ describe('File', function() {
     const size1 = file1.fileSize()
     const size2 = file2.fileSize()
 
-    expect(size1).to.equal(120000000)
-    expect(size2).to.equal(119000000)
+    expect(size1).to.equal(1200000)
+    expect(size2).to.equal(1190000)
 
     await cleanup()
   })
@@ -184,9 +185,9 @@ describe('File', function() {
       1: []
     }
 
-    // file2 hash under chunk size of 10MB
+    // file2 hash under chunk size of 0.1MB
     // the hash will be different when chunk size is different 
-    const file2Hash = 'ec8fb30fa63c26b1dd0c3bbac108388527344dfa3debe7b9bb1380c837073495'
+    const file2Hash = '643ff196e1568bdd5b1ba0e6bd1d131cd273caa818973527fdd6179efdad2c37'
 
     for (let loop = 0; loop < 2; loop ++) {
 
@@ -272,7 +273,9 @@ describe('IPFS Client', function() {
   })
 })
 
-describe('Metadata', () => {
+describe('Metadata', function() {
+
+  this.timeout(35000)
 
   const mnemonic = mnemonicGenerate()
   const mnemonic2 = mnemonicGenerate()
@@ -325,10 +328,73 @@ describe('Metadata', () => {
     expect(u8aToString(recovered)).to.equal(message)
   })
 
-  
+  it('Chunks: chunks are recorded well & CID list matches', async() => {
+    const {file1} = await setup()
+
+    const chunks1 = new SkyeKiwi.Chunks(file1)
+
+    const ipfsConfig = new SkyeKiwi.IPFSConfig(
+      'ipfs.infura.io', 5001, 'https'
+    )
+
+    const ipfs = new SkyeKiwi.IPFS(ipfsConfig)
+    let chunkId = 0
+
+    let cids = []
+    for await (const chunk of file1.readStream) {
+      const cid = await ipfs.add(SkyeKiwi.Util.u8aToHex(chunk))
+      chunks1.writeChunkResult(
+        chunkId, chunk.length, cid.size, cid.cid.toString()
+      )
+      chunkId ++
+      cids.push(cid)
+    }
+
+    const cidList = chunks1.getCIDList()
+    expect(cidList.length).to.equal(cids.length)
+    for (let i = 0; i < cidList.length; i ++) {
+      expect(cidList[i].cid).to.equal(cids[i].cid.toString())
+      expect(cidList[i].size).to.equal(cids[i].size)
+    }
+  })
 })
 
-describe('Blockchain', () => {
+describe('Blockchain', function() {
 
+  this.timeout(30000)
 
+  const abi = require('../contract/artifacts/skyekiwi.json')
+
+  // to run a local canvas blockchain ...
+  // const { execSync } = require("child_process")
+  // execSync('canvas --dev --tmp')
+  
+  it('Blockchain: send contract tx & storage order works', async() => {
+    const mnemonic = process.env.SEED_PHRASE
+    const blockchain = new SkyeKiwi.Blockchain(
+      mnemonic,
+      '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+      'wss://jupiter-poa.elara.patract.io',
+      'wss://rocky-api.crust.network/',
+      abi)
+
+    await blockchain.init()
+    
+    // const storage = blockchain.storage
+    const instance = blockchain.contract
+    
+    let content = []
+    for (let i = 0; i < 3; i++) {
+      content.push(randomBytes(1000))
+    }
+
+    // const crustResult = await storage.placeBatchOrder(content)
+    // expect(crustResult).to.equal(true)
+  
+    const contractResult = await instance.execContract(
+    'createVault', ['QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm'])
+
+    // console.log(contractResult['ok'])
+    expect(contractResult['ok']).to.be.a('number')
+  })
 })

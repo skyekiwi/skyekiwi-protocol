@@ -10,8 +10,9 @@ import { Keyring } from '@polkadot/keyring';
 
 export class Blockchain {
 
-  public instance: Contract
+  public contract: Contract
   public storage: Crust
+  public isReady: boolean
 
   constructor(
     private seed: string,
@@ -21,6 +22,7 @@ export class Blockchain {
     private contract_abi: {},
     private types?: any
   ) {
+    this.isReady = false
     this.types = types ? types : {
       "LookupSource": "MultiAddress",
       "Address": "MultiAddress",
@@ -46,6 +48,8 @@ export class Blockchain {
   }
 
   public async init() {
+    if (this.isReady) return
+
     await waitReady()
 
     const keyring = (new Keyring({
@@ -71,13 +75,15 @@ export class Blockchain {
       this.contract_address
     );
 
-    this.instance = new Contract(
+    this.contract = new Contract(
       keyring, contract_instance
     )
 
     this.storage = new Crust(
       keyring, crust_api
     )
+    
+    this.isReady = true
   }
 }
 

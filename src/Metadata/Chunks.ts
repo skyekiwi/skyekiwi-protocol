@@ -51,7 +51,7 @@ export class Chunks {
   public serialize() : string {
     return Util.serialize({
       file: this.file.serialize(),
-      chunkStats: this.chunkList,
+      chunkList: this.chunkList,
       hash: this.hash
     });
   }

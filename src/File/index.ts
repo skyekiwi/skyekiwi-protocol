@@ -75,7 +75,8 @@ export class File {
 
   public serialize() {
     return Util.serialize({
-      filePath: this.filePath,
+      // we are not gonna publish the filePath
+      // filePath: this.filePath,
       fileName: this.fileName,
       fileNote: this.fileNote,
       fileChunkSize: this.fileChunkSize

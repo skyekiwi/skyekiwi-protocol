@@ -88,21 +88,29 @@ export class Seal {
     }
   }
 
-  public recover(public_pieces: Uint8Array[], private_pieces: Uint8Array[], keyPairs: {}) : Uint8Array {
+  public static recover(public_pieces: Uint8Array[], private_pieces: Uint8Array[], 
+    keys: Uint8Array[], orignalAuthor: Uint8Array) : Uint8Array {
 
-    let shares: Uint8Array[] = [...public_pieces]
+    let shares: Uint8Array[] = []
+    shares = [...public_pieces]
+
+    console.log(shares)
+    console.log(private_pieces)
     for (let piece of private_pieces) {
-      for (let key in keyPairs) {
+      for (let key in keys) {
         try {
           const decrypted = Box.decrypt(
-            piece, keyPairs[key], this.encryptionSchema.author
+            piece, keys[key], orignalAuthor
           )
+          console.log('keys',keys[key])
+          console.log('decrypted',decrypted)
           if (decrypted) shares.push(decrypted)
         } catch(err) {
           // pass
         }
       }
     }
+    console.log('shares',shares)
     return TSS.recover(shares);
   }
 
@@ -118,7 +126,8 @@ export class Seal {
     return {
       'numOfShares': this.encryptionSchema.numOfShares,
       'threshold': this.encryptionSchema.threshold,
-      'numOfParticipants': this.encryptionSchema.getNumOfParticipants()
+      'numOfParticipants': this.encryptionSchema.getNumOfParticipants(),
+      'author': Util.u8aToHex(this.encryptionSchema.author)
     }
   }
 

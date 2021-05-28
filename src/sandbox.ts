@@ -166,40 +166,92 @@
 // // // }
 // // // main()
 
+import path from 'path'
+import * as SkyeKiwi from './index'
+require('dotenv').config()
+// import {mnemonicToMiniSecret} from '@polkadot/util-crypto'
+// const upstream = async() => {
+//   const mnemonic = process.env.SEED_PHRASE
+//   console.log('mnemonic', mnemonic)
 
-import {
-  Driver, RawFile, Seal, EncryptionSchema, IPFS, Box
-} from './index'
-import { mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto'
+//   const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
+//     mnemonicToMiniSecret(mnemonic)
+//   )
 
-const upstream = async() => {
-  const mnemonic = mnemonicGenerate()
-  console.log('mnemonic', mnemonic)
+//   const ipfs_config = new SkyeKiwi.IPFSConfig(
+//     'ipfs.infura.io', 5001, 'https'
+//   )
+//   const ipfs = new SkyeKiwi.IPFS(ipfs_config)
 
 
-  const author = Box.getPublicKeyFromPrivateKey(
-    mnemonicToMiniSecret(mnemonic)
-  )
+//   const encryptionSchema = new SkyeKiwi.EncryptionSchema(
+//     2, 2, author, 1
+//   )
 
-  // const ipfs = new IPFS({
-  //   host: 'localhost',
-  //   port: 5001,
-  //   protocol: 'http'
-  // })
+//   encryptionSchema.addMember(author, 1)
 
-  const encryptionSchema = new EncryptionSchema(
-    2, 2, author, 1
-  )
-
-  encryptionSchema.addMember(author)
-
-  const key = new Seal(encryptionSchema, mnemonic)
-  const fileHandle = new RawFile(
-    __dirname + '/test.png',
-    'test.png', 'a testing file'
-  )
+//   const key = new SkyeKiwi.Seal(encryptionSchema, mnemonic)
+//   const fileHandle = new SkyeKiwi.File(
+//     __dirname + '/test.png',
+//     'test.png', 'a testing file'
+//   )
   
-  const skyekiwi = new Driver(encryptionSchema, fileHandle, key)
-  await skyekiwi.upstream()
+//   const skyekiwi = new SkyeKiwi.Driver(
+//     encryptionSchema, 
+//     fileHandle,
+//     key, 
+//     ipfs
+//   )
+
+//   const result = await skyekiwi.upstream()
+//   console.log(result)
+// }
+// upstream()
+
+
+const downstream = async () => {
+  // const encryptionSchema = new SkyeKiwi.EncryptionSchema(
+  //   2, 2, author, 1
+  // )
+  // encryptionSchema.addMember(author, 1)
+
+  // const key = new SkyeKiwi.Seal(encryptionSchema, mnemonic)
+  // const fileHandle = new SkyeKiwi.File(
+  //   __dirname + '/test.png',
+  //   'test.png', 'a testing file'
+  // )
+
+  // const skyekiwi = new SkyeKiwi.Driver(
+  //   encryptionSchema,
+  //   fileHandle,
+  //   key,
+  //   ipfs
+  // )
+
+  const abi = require('../contract/artifacts/skyekiwi.json')
+  const mnemonic = process.env.SEED_PHRASE
+  const blockchain = new SkyeKiwi.Blockchain(
+    // seed phrase
+    mnemonic,
+    // contract address
+    '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+    // contract instance endpoint
+    'wss://jupiter-poa.elara.patract.io',
+    // storage network endpoint
+    'wss://rocky-api.crust.network/',
+    // contract abi
+    abi
+  )
+
+  const ipfs_config = new SkyeKiwi.IPFSConfig(
+    'ipfs.infura.io', 5001, 'https'
+  )
+  const ipfs = new SkyeKiwi.IPFS(ipfs_config)
+
+  await SkyeKiwi.Driver.downstream(
+    6, blockchain, ipfs, mnemonic,
+    path.join(__dirname, '/download.png')
+  )
 }
-upstream()
+
+downstream()
