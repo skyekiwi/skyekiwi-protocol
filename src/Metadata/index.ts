@@ -32,16 +32,12 @@ export class Metadata {
     return this.chunks.getCIDList()
   }
 
-  public updateEncryptionSchema(newEncryptionSchema: EncryptionSchema) {
-    this.seal.updateEncryptionSchema(newEncryptionSchema)
-  }
-  
   public generatePreSealingMetadata() {
     return {
-      sealing_key: this.seal.sealingKey,
-      chunk_metadata: this.chunks,
+      sealingKey: this.seal.sealingKey,
+      chunkMetadata: this.chunks,
       author: this.seal.getPublicAuthorKey(),
-      protocol_version: SKYEKIWI_VERSION,
+      protocolVersion: SKYEKIWI_VERSION,
     }
   }
 
@@ -56,11 +52,11 @@ export class Metadata {
     )
 
     return {
-      public_sealing_key: this.seal.getPublicSealingKey(),
+      publicSealingKey: this.seal.getPublicSealingKey(),
       ... this.seal.digestEncryptionSchema(),
       public: sealed.public,
       private: sealed.private,
-      protocol_version: SKYEKIWI_VERSION,
+      protocolVersion: SKYEKIWI_VERSION,
     }
   }
 

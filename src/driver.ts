@@ -1,5 +1,4 @@
 import { stringToU8a, u8aToString } from '@polkadot/util';
-import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
 import {
   // EncryptionSchema, 
   Metadata, Seal, EncryptionSchema, Chunks,
@@ -25,6 +24,7 @@ class Driver {
       new Chunks(file), seal
     )
 
+    // hardcoded to pointed at the smart contract abi
     const abi = require('../contract/artifacts/skyekiwi.json')
 
     this.blockchain = new Blockchain(
@@ -58,6 +58,7 @@ class Driver {
 
     // now let's compress and process the sealedData
     let sealedData : any = this.metadata.generateSealedMetadata()
+
     sealedData = Util.serialize(sealedData)
     sealedData = stringToU8a(sealedData)
     sealedData = await File.deflatChunk(sealedData)
@@ -78,11 +79,9 @@ class Driver {
     
     // TODO: wait when the order is picked up .... TBI
     if (storageResult) {
-     const contractResult = await contract.execContract('createVault', [
-       result.cid.toString()
-     ])
-
-      console.log(contractResult)
+      const contractResult = await contract.execContract('createVault', [
+        result.cid.toString()
+      ])
       return contractResult['ok']
     }
   }
@@ -118,20 +117,18 @@ class Driver {
     );
   }
 
-  // TODO: seed should not be necessary? 
-  public static async downstream(
-    vaultId: number,
+  public static async getMetadataByVaultId(
+    vaultId: number, 
     blockchain: Blockchain, 
-    ipfs: IPFS, 
-    seed: string,
-    outputPath: string
+    ipfs: IPFS,
+    keys: Uint8Array[]
   ) {
     await blockchain.init()
     const contract = blockchain.contract
 
     const contractResult = (await contract.queryContract('getMetadata', [vaultId])).output.toString()
 
-    let metadata : any = await ipfs.cat(contractResult)
+    let metadata: any = await ipfs.cat(contractResult)
 
     // revert the metadata compressing process 
     metadata = Util.hexToU8a(metadata)
@@ -139,20 +136,30 @@ class Driver {
     metadata = u8aToString(metadata)
     metadata = Util.parse(metadata)
 
-    const privateKey = mnemonicToMiniSecret(seed)
-    let keys = [privateKey]
-
-    let unsealed : any = Seal.recover(
+    let unsealed: any = Seal.recover(
       metadata.public, metadata.private, keys, metadata.author
     )
     unsealed = u8aToString(unsealed)
     unsealed = Util.parse(unsealed)
 
-    const sealingKey = unsealed.sealing_key
-    const chunks = unsealed.chunk_metadata.chunkStats
-    const hash = unsealed.chunk_metadata.hash
+    return unsealed
+  }
 
-    await this.downstreamChunkProcessingPipeLine(
+  public static async downstream(
+    vaultId: number,
+    blockchain: Blockchain, 
+    ipfs: IPFS, 
+    outputPath: string,
+    keys: Uint8Array[]
+  ) {
+    
+    const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
+
+    const sealingKey = unsealed.sealingKey
+    const chunks = unsealed.chunkMetadata.chunkList
+    const hash = unsealed.chunkMetadata.hash
+
+    return await this.downstreamChunkProcessingPipeLine(
       chunks, hash, sealingKey, ipfs, outputPath
     )
   }
@@ -168,6 +175,7 @@ class Driver {
     let currentHash : Uint8Array
 
     for (let chunkId in chunks) {
+
       let cid = chunks[chunkId].ipfsCID
       let rawChunkSize = chunks[chunkId].rawChunkSize
 
@@ -190,10 +198,61 @@ class Driver {
 
       // writeFile APPENDS to existing file
       await Util.writeFile(Buffer.from(chunk), outputPath)
+
     }
     if (Buffer.compare(currentHash, hash) !== 0) {
       throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine')
     }
+  }
+
+  public static async updateEncryptionSchema(
+    vaultId: number, 
+    newEncryptionSchema: EncryptionSchema,
+    seed: string,
+    keys: Uint8Array[],
+    ipfs: IPFS,
+    blockchain: Blockchain
+  ) {
+    const unsealed = await Driver.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
+    const chunks = Chunks.parse(Util.serialize(unsealed.chunkMetadata))
+
+    // TODO: check if sealingKey existis
+
+    console.log("SEALING KEY!", unsealed)
+    const metadata = new Metadata(
+      chunks, new Seal(newEncryptionSchema, seed, unsealed.sealingKey)
+    )
+    console.log('generatePreSealingMetadata',metadata.generatePreSealingMetadata())
+
+    console.log('updateEncryptionSchema',unsealed)
+    let sealedData: any = metadata.generateSealedMetadata()
+
+    sealedData = Util.serialize(sealedData)
+    sealedData = stringToU8a(sealedData)
+    sealedData = await File.deflatChunk(sealedData)
+    sealedData = Util.u8aToHex(sealedData)
+
+    await blockchain.init()
+    const storage = blockchain.storage
+    const contract = blockchain.contract
+
+    const result = await ipfs.add(sealedData)
+    const cidList = [{
+      'cid': result.cid.toString(),
+      'size': result.size
+    }]
+
+    // @ts-ignore
+    const storageResult = await storage.placeBatchOrderWithCIDList(cidList)
+
+    if (storageResult) {
+      const contractResult = contract.execContract(
+        'updateMetadata', [vaultId, result.cid.toString()]
+      )
+      return contractResult
+    }
+
+    return null
   }
 }
 

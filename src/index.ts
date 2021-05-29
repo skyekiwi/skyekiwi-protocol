@@ -1,6 +1,6 @@
 import { IPFS, IPFSConfig } from './IPFS'
 import { Driver } from './driver'
-import { File } from './File'
+import { File, FileDigest } from './File'
 import {
   Chunks, Seal, Metadata, EncryptionSchema
 } from './Metadata'
@@ -23,7 +23,7 @@ export {
   IPFS, 
   IPFSConfig,
   
-  File, 
+  File, FileDigest,
   
   Chunks, 
   Seal, 

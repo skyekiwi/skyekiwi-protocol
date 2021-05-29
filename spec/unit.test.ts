@@ -275,7 +275,7 @@ describe('IPFS Client', function() {
 
 describe('Metadata', function() {
 
-  this.timeout(35000)
+  this.timeout(55000)
 
   const mnemonic = mnemonicGenerate()
   const mnemonic2 = mnemonicGenerate()
@@ -308,21 +308,22 @@ describe('Metadata', function() {
 
     const sealed = seal.seal(message_u8a)
 
-    let keypairs = {}
+    let keypairs = []
     
     // 2 piece
-    keypairs[SkyeKiwi.Util.u8aToHex(author)] = author_privateKey
+    keypairs.push(author_privateKey)
     
     // 1 piece - can be uncommonted 
-    // keypairs[SkyeKiwi.Util.u8aToHex(publicKey2)] = privateKey2
+    // keypairs.push(privateKey2)
     
     // 1 piece - can be uncommonted 
-    // keypairs[SkyeKiwi.Util.u8aToHex(publicKey3)] = privateKey3
+    // keypairs.push(privateKey3)
 
-    const recovered = seal.recover(
+    const recovered = SkyeKiwi.Seal.recover(
       sealed["public"], 
       sealed["private"],
-      keypairs
+      keypairs,
+      author
     )
 
     expect(u8aToString(recovered)).to.equal(message)
@@ -356,6 +357,7 @@ describe('Metadata', function() {
       expect(cidList[i].cid).to.equal(cids[i].cid.toString())
       expect(cidList[i].size).to.equal(cids[i].size)
     }
+    await cleanup()
   })
 })
 
@@ -393,8 +395,6 @@ describe('Blockchain', function() {
   
     const contractResult = await instance.execContract(
     'createVault', ['QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm'])
-
-    // console.log(contractResult['ok'])
     expect(contractResult['ok']).to.be.a('number')
   })
 })

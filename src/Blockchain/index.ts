@@ -15,7 +15,7 @@ export class Blockchain {
   public isReady: boolean
 
   constructor(
-    private seed: string,
+    public seed: string,
     private contract_address: string,
     private contract_endpoint: string,
     private crust_endpoint: string,

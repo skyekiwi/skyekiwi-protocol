@@ -16,6 +16,7 @@ const isValidHex = str => {
   return (str.length & 1) === 0 && 
     (/^[0-9A-Fa-f]*$/g).test(str)
 }
+
 const writeFile = (content: Buffer, filePath: string) => {
   return new Promise((res, rej) => {
     const stream = fs.createWriteStream(filePath, {flags: 'a'})
@@ -25,6 +26,7 @@ const writeFile = (content: Buffer, filePath: string) => {
     stream.on('error', rej)
   })
 }
+
 const serialize = (object: any) : string => {
   for (let key in object) {
     if (object[key].constructor === Uint8Array) {
@@ -47,21 +49,26 @@ const serialize = (object: any) : string => {
   }
   return JSON.stringify(object)
 }
+
 const parse = (str: string) : any => {
-  const object = JSON.parse(str)
-  for (let key in object) {
-    let obj = object[key]
-    if (typeof obj === 'string' && isValidHex(obj)) {
-      object[key] = hexToU8a(obj)
-    } else {
-      try {
-        object[key] = parse(obj)
-      } catch(err) {
-        // pass
+  try {
+    const object = JSON.parse(str)
+    for (let key in object) {
+      let obj = object[key]
+      if (typeof obj === 'string' && isValidHex(obj)) {
+        object[key] = hexToU8a(obj)
+      } else {
+        try {
+          object[key] = parse(obj)
+        } catch (err) {
+          // pass
+        }
       }
     }
+    return object
+  } catch (err) {
+    return str
   }
-  return object
 }
 
 export {
