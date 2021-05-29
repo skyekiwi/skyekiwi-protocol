@@ -44,14 +44,14 @@ class Driver {
   public async upstream() {
     
     let chunkCount = 0;
-    console.log('file size:', this.file.fileSize());
-    console.log('total chunks', this.file.fileChunkCount());
+    // console.log('file size:', this.file.fileSize());
+    // console.log('total chunks', this.file.fileChunkCount());
 
     const readStream = this.file.getReadStream()
 
     for await (const chunk of readStream) {
       await this.upstreamChunkProcessingPipeLine(chunk, chunkCount++, this.ipfs);
-      console.log("finished", chunkCount)
+      // console.log("finished", chunkCount)
     }
 
     let cidList = this.metadata.chunks.getCIDList()
@@ -218,13 +218,10 @@ class Driver {
 
     // TODO: check if sealingKey existis
 
-    console.log("SEALING KEY!", unsealed)
     const metadata = new Metadata(
       chunks, new Seal(newEncryptionSchema, seed, unsealed.sealingKey)
     )
-    console.log('generatePreSealingMetadata',metadata.generatePreSealingMetadata())
 
-    console.log('updateEncryptionSchema',unsealed)
     let sealedData: any = metadata.generateSealedMetadata()
 
     sealedData = Util.serialize(sealedData)

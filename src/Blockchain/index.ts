@@ -87,8 +87,6 @@ export class Blockchain {
   }
 }
 
-
-
 export {
   sendTx, Crust, Contract
 }

@@ -234,7 +234,6 @@ describe('Integration', function() {
     )
 
     const downstreamContent = fs.readFileSync(downstreamPath)
-    console.log(downstreamContent.length)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
     await unlink(downstreamPath)
   })
