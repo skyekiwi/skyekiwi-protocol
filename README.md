@@ -113,6 +113,13 @@ git clone git@github.com:skyekiwi/skyekiwi-protocol.git
 yarn
 ```
 
+2. Install global dependencies
+
+```bash
+yarn global add mocha
+yarn global add ts-node
+```
+
 2. Create `.env`  files at the project home directory and write your seed phrase to it
 
 ```
