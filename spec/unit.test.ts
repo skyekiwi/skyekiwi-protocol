@@ -26,7 +26,7 @@ const setup = async () => {
   } catch (err) {
     // pass
   }
-  
+
   const content1 = Buffer.from(randomBytes(1200000))
   const content2 = Buffer.alloc(1190000, 187)
 
@@ -388,17 +388,17 @@ describe('Blockchain', function() {
 
     await blockchain.init()
     
-    // const storage = blockchain.storage
+    const storage = blockchain.storage
     const contract = blockchain.contract
     
-    // let content = []
-    // for (let i = 0; i < 3; i++) {
-    //   content.push(randomBytes(1000))
-    // }
+    let content = []
+    for (let i = 0; i < 3; i++) {
+      content.push(randomBytes(1000))
+    }
 
-    // const crustResult = await storage.placeBatchOrder(content)
-    // console.log(crustResult)
-    // expect(crustResult).to.equal(true)
+    const crustResult = await storage.placeBatchOrder(content)
+    console.log(crustResult)
+    expect(crustResult).to.equal(true)
   
     const contractResult = await contract.execContract(
     'createVault', ['QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm'])

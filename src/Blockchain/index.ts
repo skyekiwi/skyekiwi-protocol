@@ -53,7 +53,9 @@ export class Blockchain {
       "UnappliedSlash": {
         "validator": "AccountId",
         "reporters": "Vec<AccountId>"
-      }
+      }, "Error": {
+        _enum: ['VaultIdError', 'AccessDenied', 'MetadataNotValid', 'MathError']
+      },
     }
   }
 
