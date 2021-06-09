@@ -48,7 +48,6 @@ export class Crust {
       taskQueue.push(this.addFile(ipfs, chunk))
     }
     const results = await Promise.all(taskQueue)
-    console.log(results)
     let extrinsicQueue = []
     for (let result of results) {
       extrinsicQueue.push(this.api.tx.market.placeStorageOrder(

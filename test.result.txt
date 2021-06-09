@@ -1,0 +1,40 @@
+skyekiwi-protocol on master [⇣!?] via ⬢ v14.16.0 on ☁️  us-east-1 took 27s 
+❯ yarn run test                                                                                                             songzhou@meow-2
+yarn run v1.22.10
+$ mocha -r ts-node/register ./spec/*.test.ts
+
+
+  Integration
+    ✓ upstream: testnet, author only (75115ms)
+    ✓ downstream: testnet, author only (26198ms)
+    ✓ upstream: testnet, two members + author (87495ms)
+    ✓ downstream: testnet, two members + author (27627ms)
+    ✓ update encryptionSchema & downstream again (54583ms)
+
+  Encryption
+    ✓ Symmetric: Encryption & Decryption Works
+    ✓ Asymmetric: Encryption & Decryption Works
+    ✓ Symmetric: Decryption Fails w/Wrong Key
+    ✓ Asymmetric: Decryption Fails w/Wrong Key
+    ✓ TSS: Sharing Works
+
+  File
+    ✓ File: file size reads well
+    ✓ File: file chunk count calculated correctly
+    ✓ File: chunk hash calculation works (38ms)
+    ✓ File: inflate & deflat work (131ms)
+
+  IPFS Client
+    ✓ uploads some content to IPFS (4017ms)
+    ✓ fetch content by CID on IPFS (1762ms)
+    ✓ pins a CID on Infura IPFS (5051ms)
+
+  Metadata
+    ✓ Seal: sealing & recover works
+    ✓ Chunks: chunks are recorded well & CID list matches (34065ms)
+
+  Blockchain
+    ✓ Blockchain: send contract tx & storage order works (16799ms)
+
+
+  20 passing (6m)

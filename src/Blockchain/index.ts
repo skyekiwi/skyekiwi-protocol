@@ -26,6 +26,18 @@ export class Blockchain {
     this.types = types ? types : {
       "LookupSource": "MultiAddress",
       "Address": "MultiAddress",
+      "AccountInfo": "AccountInfoWithTripleRefCount",
+      "AliveContractInfo": {
+        "trieId": "TrieId",
+        "storageSize": "u32",
+        "pairCount": "u32",
+        "codeHash": "CodeHash",
+        "rentAllowance": "Balance",
+        "rentPayed": "Balance",
+        "deductBlock": "BlockNumber",
+        "lastWrite": "Option<BlockNumber>",
+        "_reserved": "Option<Null>"
+      },
       "FullIdentification": "AccountId",
       "AuthorityState": {
         "_enum": [
@@ -41,9 +53,7 @@ export class Blockchain {
       "UnappliedSlash": {
         "validator": "AccountId",
         "reporters": "Vec<AccountId>"
-      }, Error: {
-        _enum: ['VaultIdError', 'AccessDenied', 'MetadataNotValid', 'MathError']
-      },
+      }
     }
   }
 
@@ -55,7 +65,6 @@ export class Blockchain {
     const keyring = (new Keyring({
       type: 'sr25519',
     })).addFromUri(this.seed);
-
 
     let crust_api = new ApiPromise({
       provider: new WsProvider(this.crust_endpoint),
@@ -70,10 +79,11 @@ export class Blockchain {
     contract_api = await contract_api.isReadyOrError;
 
     let contract_instance = new ContractPromise(
+      // @ts-ignore
       contract_api, 
       this.contract_abi, 
       this.contract_address
-    );
+    )
 
     this.contract = new Contract(
       keyring, contract_instance

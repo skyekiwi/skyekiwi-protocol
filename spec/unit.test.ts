@@ -21,6 +21,12 @@ const setup = async () => {
   // tmp.file1 - a 1.2MB file with random bytes
   // tmp.file2 - a 1.19MB file with repeating byte of '187'
 
+  try {
+    cleanup()
+  } catch (err) {
+    // pass
+  }
+  
   const content1 = Buffer.from(randomBytes(1200000))
   const content2 = Buffer.alloc(1190000, 187)
 
@@ -275,7 +281,7 @@ describe('IPFS Client', function() {
 
 describe('Metadata', function() {
 
-  this.timeout(55000)
+  this.timeout(100000)
 
   const mnemonic = mnemonicGenerate()
   const mnemonic2 = mnemonicGenerate()
@@ -363,7 +369,7 @@ describe('Metadata', function() {
 
 describe('Blockchain', function() {
 
-  this.timeout(30000)
+  this.timeout(100000)
 
   const abi = require('../contract/artifacts/skyekiwi.json')
 
@@ -375,25 +381,26 @@ describe('Blockchain', function() {
     const mnemonic = process.env.SEED_PHRASE
     const blockchain = new SkyeKiwi.Blockchain(
       mnemonic,
-      '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
       'wss://jupiter-poa.elara.patract.io',
-      'wss://rocky-api.crust.network/',
+      'wss://api.crust.network/',
       abi)
 
     await blockchain.init()
     
     // const storage = blockchain.storage
-    const instance = blockchain.contract
+    const contract = blockchain.contract
     
-    let content = []
-    for (let i = 0; i < 3; i++) {
-      content.push(randomBytes(1000))
-    }
+    // let content = []
+    // for (let i = 0; i < 3; i++) {
+    //   content.push(randomBytes(1000))
+    // }
 
     // const crustResult = await storage.placeBatchOrder(content)
+    // console.log(crustResult)
     // expect(crustResult).to.equal(true)
   
-    const contractResult = await instance.execContract(
+    const contractResult = await contract.execContract(
     'createVault', ['QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm'])
     expect(contractResult['ok']).to.be.a('number')
   })

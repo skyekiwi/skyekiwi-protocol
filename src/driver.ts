@@ -31,11 +31,11 @@ class Driver {
       // seed phrase
       this.seal.mnemonic,
       // contract address
-      '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://rocky-api.crust.network/',
+      'wss://api.crust.network/',
       // contract abi
       abi
     )

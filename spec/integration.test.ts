@@ -12,6 +12,12 @@ const downstreamPath = path.join(__dirname, '/tmp/tmp.down')
 const content = randomBytes(12000000)
 
 const setup = async () => {
+  try {
+    await unlink(filePath)
+  } catch(err) {
+    // pass
+  }
+
   // we are creating two files here:
   // tmp.file - a 12MB file of random bytes
   await SkyeKiwi.Util.writeFile(Buffer.from(content), filePath)
@@ -21,7 +27,7 @@ const setup = async () => {
   const file = new SkyeKiwi.File(
     filePath,
     'tmp.file',
-    'a testing file with 119MB repeating 187 byte',
+    'a testing file with 12MB random bytes',
     4 * (10 ** 6)
   )
 
@@ -80,11 +86,11 @@ describe('Integration', function() {
       // seed phrase
       mnemonic,
       // contract address
-      '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://rocky-api.crust.network/',
+      'wss://api.crust.network/',
       // contract abi
       abi
     )
@@ -133,13 +139,13 @@ describe('Integration', function() {
     encryptionSchema.addMember(publicKey2, 1)
 
     const key = new SkyeKiwi.Seal(encryptionSchema, mnemonic)
+
     const skyekiwi = new SkyeKiwi.Driver(
       encryptionSchema,
       fileHandle,
       key,
       ipfs
     )
-
     vaultId2 = await skyekiwi.upstream()
     await unlink(filePath)
   })
@@ -152,11 +158,11 @@ describe('Integration', function() {
       // seed phrase
       mnemonic,
       // contract address
-      '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://rocky-api.crust.network/',
+      'wss://api.crust.network/',
       // contract abi
       abi
     )
@@ -196,11 +202,11 @@ describe('Integration', function() {
       // seed phrase
       mnemonic,
       // contract address
-      '3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF',
+      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://rocky-api.crust.network/',
+      'wss://api.crust.network/',
       // contract abi
       abi
     )

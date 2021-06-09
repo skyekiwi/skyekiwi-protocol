@@ -99,6 +99,9 @@ Codes are tested with the following environment:
 `canvas`: `canvas 0.1.0-385c4cc-x86_64-macos` <br/>
 `OS Version`: `macOS Big Sur 11.0.1` <br/>
 
+`ts-node`: `v10.0.0` <br/>
+`mocha`: `8.4.0` <br/>
+
 **Node Packages**
 Please refer to the `package.json`
 
