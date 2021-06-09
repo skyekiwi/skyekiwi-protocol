@@ -1,5 +1,6 @@
 import createClient from 'ipfs-http-client'
 import { Util } from '../index'
+const localIPFS = require('ipfs-core')
 
 export class IPFSConfig {
   constructor(
@@ -30,12 +31,28 @@ export class IPFS {
     this.client = createClient(config)
   }
 
+  public async initLocalIPFS() {
+    return await localIPFS.create()
+  }
   public async add(str: string) {
     try {
       return await this.client.add(str)
     } catch (err) {
-      console.error(err)
-      throw (new Error('IPFS Failure: ipfs.add'))
+      console.log("remote gateway failing, fallback to local IPFS")
+      try {
+        const local = await this.initLocalIPFS()
+        const cid = await local.add( str, {
+            progress: (prog: any) => console.log(`add received: ${prog}`)
+          }
+        );
+        const fileStat = await local.files.stat("/ipfs/" + cid.path)
+        return {
+          cid: cid.path, size: fileStat.cumulativeSize
+        }
+      } catch(err) {
+        console.error(err)
+        throw (new Error('IPFS Failure: ipfs.add'))
+      }
     }
   }
   public async cat(cid: string) {
