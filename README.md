@@ -204,6 +204,100 @@ SEED_PHRASE = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
 
 Please refer to the `spec/integration.test.ts` folder which contains test cases for common useage.
 
+```javascript
+const skyekiwi = new SkyeKiwi.Driver(
+  encryptionSchema, // a SkyeKiwi.encryptionSchema instance - specify 
+  fileHandle, // a SkyeKiwi.File instance - specify which file to upload
+  key, // a SkyeKiwi.Seal instance - specify keys used
+  ipfs // a SkyeKiwi.ipfs instance - specify which IPFS to be used 
+)
+
+skyekiwi.upstream() // upstream the file, it take two major actions: 
+// upload files to the Crust Network & Write to a smart contract to generate a vaultId 
+```
+
+```javascript
+await SkyeKiwi.Driver.downstream(
+  vaultId, // the file id from the smart contract
+  blockchain, // SkyeKiwi.Blockchain instance
+  ipfs,
+  downstreamPath, // where to keep the recorvered file 
+  [privateKey1, privateKey2] // keys used to decrypt 
+)
+// upon finishing, the file will be download and recovered to the destination path
+```
+
+
+```javascript
+await SkyeKiwi.Driver.updateEncryptionSchema(
+  vaultId, // vaultId from the smart contract
+  encryptionSchema, // the new encryptionSchema
+  mnemonic, // blockchain seed phrase
+  [mnemonicToMiniSecret(mnemonic)],  // an array of keys used to decrypt the seal
+  ipfs,  
+  blockchain
+)
+// upon finishing, the encryptionSchema will be updated
+```
+
+### Project Structure 
+```
+.
+├── LICENSE
+├── README.md
+├── contract // a sample smart contract
+│   ├── LICENSE.txt 
+│   ├── artifacts // compiled smart contract
+│   │   ├── skyekiwi.contract 
+│   │   └── skyekiwi.json
+│   ├── contracts // smart contract source files
+│   │   ├── Cargo.lock
+│   │   ├── Cargo.toml
+│   │   └── lib.rs
+│   ├── package.json
+│   ├── redspot.config.ts // redspot configuration see https://github.com/patractlabs/redspot
+│   ├── scripts
+│   │   └── deploy.ts // script used to deploy to the Jupiter testnet
+│   ├── tests // smart contract testing
+│   │   └── skyekiwi.test.ts
+│   ├── tsconfig.json
+│   └── yarn.lock
+├── package.json
+├── spec // testing for the main protocol
+│   ├── integration.test.ts 
+│   ├── tmp // temp folder for generated test file, if testing throws an error, try remove all files within this folder and restart
+│   └── unit.test.ts
+├── src 
+│   ├── Blockchain // Blockchain Adapter 
+│   │   ├── Contract.ts 
+│   │   ├── Crust.ts
+│   │   ├── index.ts
+│   │   └── sendTx.ts // helper function to send transactions, Credit: Crust Network
+│   ├── Encryption
+│   │   ├── Box.ts // public-key encryption
+│   │   ├── SecretBox.ts // symmetric encryption
+│   │   ├── TSS.ts // threshold secret sharing 
+│   │   └── index.ts
+│   ├── File // file handler
+│   │   └── index.ts
+│   ├── IPFS // ipfs client wrapper
+│   │   └── index.ts
+│   ├── Metadata // the heavy lifting Metadata handler
+│   │   ├── Chunks.ts // process all generated chunks, not encypted
+│   │   ├── EncryptionSchema.ts // normalized EncryptionSchema 
+│   │   ├── Seal.ts // encryption handler
+│   │   └── index.ts // main Metadata instance 
+│   ├── Util
+│   │   └── index.ts
+│   ├── driver.ts // entry point that wraps all functions with three main APIs: upstream, downstream & updateEncryptionSchema
+│   ├── index.ts
+│   └── types.ts
+├── tsconfig.json
+├── tslint.json
+└── yarn.lock
+```
+
+
 ### LICENSE
 
 Apache 2.0. See the `LICNESE` File. 
