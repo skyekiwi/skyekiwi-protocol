@@ -184,7 +184,7 @@ $ mocha -r ts-node/register ./spec/*.test.ts
 ```
 
 ### Run & test the sample smart contract
-The repository comes with a pre-compiled version of the smart contract included and a deployed version of it on the Jupiter testnet @ `3hBx1oKmeK3YzCxkiFh6Le2tJXBYgg6pRhT7VGVL4yaNiERF`
+The repository comes with a pre-compiled version of the smart contract included and a deployed version of it on the Jupiter testnet @ `3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM`
 
 1. Navigate to the `contract` directory, and use `yarn` to install dependencies.
 2. Fire up a local smart contract enabled blockchain. Please refer to the `Full Environment Setup` section. 
