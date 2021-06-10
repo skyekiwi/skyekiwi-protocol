@@ -254,7 +254,7 @@ describe('File', function() {
 })
 
 describe('IPFS Client', function() {
-  this.timeout(15000)
+  this.timeout(0)
 
   const ipfs_config = new SkyeKiwi.IPFSConfig(
     'ipfs.infura.io', 5001, 'https'
@@ -276,6 +276,21 @@ describe('IPFS Client', function() {
   it('pins a CID on Infura IPFS', async () => {
     const result = await ipfs.add(testString)
     await ipfs.pin(result.cid)
+  })
+
+  it('ipfs fallback test', async() => {
+
+    // when the config is intentionally wrong
+    const wrong_ipfs_config = new SkyeKiwi.IPFSConfig(
+      'sfpi.infura.io', 5001, 'https'
+    )
+    const wrong_ipfs = new SkyeKiwi.IPFS(wrong_ipfs_config)
+
+    for (let i = 0; i < 10; i ++) {
+      const data = randomBytes(1000)
+      const data_hex = SkyeKiwi.Util.u8aToHex(data)
+      await wrong_ipfs.add(data_hex)
+    }
   })
 })
 

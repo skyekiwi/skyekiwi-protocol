@@ -25,14 +25,22 @@ export class IPFSConfig {
 export class IPFS {
   private client: any
   private config: IPFSConfig
+  private localIpfsReady: boolean
+  private localIpfs: any
 
   constructor(config: IPFSConfig) {
     this.config = config
     this.client = createClient(config)
+    this.localIpfsReady = false
   }
 
   public async initLocalIPFS() {
-    return await localIPFS.create()
+    if (!this.localIpfsReady) {
+      const localIpfs = await localIPFS.create()
+      this.localIpfsReady = true
+      this.localIpfs = localIpfs
+      return localIpfs
+    } return this.localIpfs
   }
   public async add(str: string) {
     try {
