@@ -29,19 +29,10 @@ export class IPFS {
   private config: IPFSConfig
   private localIpfsReady: boolean
   private localIpfs: any
-  private decooClient: any
 
   constructor(config: IPFSConfig) {
     this.config = config
     this.client = createClient(config)
-    this.decooClient = createClient({
-      host: 'api.decoo.io/psa',
-      port: 5001,
-      protocol: 'https',
-      headers: {
-        authorization: 'Bearer ' + process.env.DECOO
-      }
-    })
     this.localIpfsReady = false
   }
 
@@ -50,35 +41,33 @@ export class IPFS {
       const localIpfs = await localIPFS.create()
       this.localIpfsReady = true
       this.localIpfs = localIpfs
-      return localIpfs
-    } return this.localIpfs
+    }
   }
 
-  public async initDecoo() {
-
+  public async cleanup() {
+    if (this.localIpfsReady) {
+      await this.localIpfs.stop()
+    }
   }
+
   public async add(str: string) {
     try {
       return await this.client.add(str)
     } catch (err) {
-      console.log("remote gateway failing, fallback to decoo IPFS")
+      console.log("remote gateway failing, fallback to local IPFS")
       try {
-        return await this.decooClient.add(str)
-      } catch(err) {
-        try {
-          const local = await this.initLocalIPFS()
-          const cid = await local.add(str, {
+        await this.initLocalIPFS()
+        const cid = await this.localIpfs.add(str, {
             progress: (prog: any) => console.log(`add received: ${prog}`)
           }
-          );
-          const fileStat = await local.files.stat("/ipfs/" + cid.path)
-          return {
-            cid: cid.path, size: fileStat.cumulativeSize
-          }
-        } catch (err) {
-          console.error(err)
-          throw (new Error('IPFS Failure: ipfs.add'))
+        );
+        const fileStat = await this.localIpfs.files.stat("/ipfs/" + cid.path)
+        return {
+          cid: cid.path, size: fileStat.cumulativeSize
         }
+      } catch (err) {
+        console.error(err)
+        throw (new Error('IPFS Failure: ipfs.add'))
       }
     }
   }
@@ -95,10 +84,11 @@ export class IPFS {
       }
       return result
     } catch (err) {
+
       try {
-        const stream = this.decooClient.cat(cid)
-        for await (const chunk of stream) {
-          result += chunk.toString()
+        await this.initLocalIPFS()
+        for await (const chunk of this.localIpfs.cat(cid)) {
+          result += chunk
         }
         return result
       } catch(err) {

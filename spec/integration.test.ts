@@ -75,6 +75,8 @@ describe('Integration', function() {
     )
 
     vaultId1 = await skyekiwi.upstream()
+
+    await ipfs.cleanup()
     await unlink(filePath)
   })
 
@@ -107,6 +109,8 @@ describe('Integration', function() {
 
     const downstreamContent = fs.readFileSync(downstreamPath)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
+    
+    await ipfs.cleanup()
     await unlink(downstreamPath)
   })
 
@@ -147,6 +151,8 @@ describe('Integration', function() {
       ipfs
     )
     vaultId2 = await skyekiwi.upstream()
+
+    await ipfs.cleanup()
     await unlink(filePath)
   })
 
@@ -187,6 +193,8 @@ describe('Integration', function() {
 
     const downstreamContent = fs.readFileSync(downstreamPath)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
+
+    await ipfs.cleanup()
     await unlink(downstreamPath)
   })
 
@@ -241,6 +249,8 @@ describe('Integration', function() {
 
     const downstreamContent = fs.readFileSync(downstreamPath)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
+
+    await ipfs.cleanup()
     await unlink(downstreamPath)
   })
 })

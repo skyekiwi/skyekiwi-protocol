@@ -278,7 +278,7 @@ describe('IPFS Client', function() {
     await ipfs.pin(result.cid)
   })
 
-  it('ipfs fallback test', async() => {
+  it('ipfs fallback test - add', async() => {
 
     // when the config is intentionally wrong
     const wrong_ipfs_config = new SkyeKiwi.IPFSConfig(
@@ -291,6 +291,30 @@ describe('IPFS Client', function() {
       const data_hex = SkyeKiwi.Util.u8aToHex(data)
       await wrong_ipfs.add(data_hex)
     }
+
+    await wrong_ipfs.cleanup()
+  })
+
+  it('ipfs fallback test - cat', async () => {
+
+    // when the config is intentionally wrong
+    const wrong_ipfs_config = new SkyeKiwi.IPFSConfig(
+      'sfpi.infura.io', 5001, 'https'
+    )
+    const wrong_ipfs = new SkyeKiwi.IPFS(wrong_ipfs_config)
+
+    const cids = []
+    for (let i = 0; i < 10; i++) {
+      const data = randomBytes(1000)
+      const data_hex = SkyeKiwi.Util.u8aToHex(data)
+      const cid = await wrong_ipfs.add(data_hex)
+      cids.push(cid.cid)
+    }
+
+    for (let cid of cids) {
+      await wrong_ipfs.cat(cid)
+    }
+    await wrong_ipfs.cleanup()
   })
 })
 
@@ -378,6 +402,8 @@ describe('Metadata', function() {
       expect(cidList[i].cid).to.equal(cids[i].cid.toString())
       expect(cidList[i].size).to.equal(cids[i].size)
     }
+
+    await ipfs.cleanup()
     await cleanup()
   })
 })
@@ -403,7 +429,7 @@ describe('Blockchain', function() {
 
     await blockchain.init()
     
-    const storage = blockchain.storage
+    // const storage = blockchain.storage
     const contract = blockchain.contract
     
     let content = []
@@ -411,9 +437,9 @@ describe('Blockchain', function() {
       content.push(randomBytes(1000))
     }
 
-    const crustResult = await storage.placeBatchOrder(content)
-    console.log(crustResult)
-    expect(crustResult).to.equal(true)
+    // const crustResult = await storage.placeBatchOrder(content)
+    // console.log(crustResult)
+    // expect(crustResult).to.equal(true)
   
     const contractResult = await contract.execContract(
     'createVault', ['QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm'])
