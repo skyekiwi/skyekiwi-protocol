@@ -54,7 +54,8 @@ class Driver {
       // console.log("finished", chunkCount)
     }
 
-    let cidList = this.metadata.chunks.getCIDList()
+    // @ts-ignore
+    let cidList:[{cid: string, size: number}] = this.metadata.chunks.getCIDList()
 
     // now let's compress and process the sealedData
     let sealedData : any = this.metadata.generateSealedMetadata()
@@ -66,7 +67,7 @@ class Driver {
 
     const result = await this.ipfs.add(sealedData)
     cidList.push({
-      'cid': result.cid.toString(),
+      'cid': result.cid,
       'size': result.size
     })
     
@@ -74,13 +75,13 @@ class Driver {
     const storage = this.blockchain.storage
     const contract = this.blockchain.contract
 
-    // @ts-ignore
     const storageResult = await storage.placeBatchOrderWithCIDList(cidList)
-    
-    // TODO: wait when the order is picked up .... TBI
+
     if (storageResult) {
+      //@ts-ignore
+      // await storage.awaitNetworkFetching(cidList)
       const contractResult = await contract.execContract('createVault', [
-        result.cid.toString()
+        result.cid
       ])
       return contractResult['ok']
     }
@@ -152,7 +153,6 @@ class Driver {
     outputPath: string,
     keys: Uint8Array[]
   ) {
-    
     const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
 
     const sealingKey = unsealed.sealingKey
@@ -196,8 +196,7 @@ class Driver {
         throw new Error('chunk size error: Driver.downstreamChunkProcessingPipeLine')
       }
 
-      // writeFile APPENDS to existing file
-      await Util.writeFile(Buffer.from(chunk), outputPath)
+      await Util.writeFile(Buffer.from(chunk), outputPath, 'a')
 
     }
     if (Buffer.compare(currentHash, hash) !== 0) {
@@ -243,12 +242,13 @@ class Driver {
     const storageResult = await storage.placeBatchOrderWithCIDList(cidList)
 
     if (storageResult) {
+      // @ts-ignore
+      // await storage.awaitNetworkFetching(cidList)
       const contractResult = contract.execContract(
         'updateMetadata', [vaultId, result.cid.toString()]
       )
       return contractResult
     }
-
     return null
   }
 }

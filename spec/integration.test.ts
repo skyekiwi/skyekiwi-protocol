@@ -6,21 +6,22 @@ require('dotenv').config();
 import fs from 'fs'
 import {expect} from 'chai'
 import { randomBytes } from 'tweetnacl';
-const filePath = path.join(__dirname, '/tmp/tmp.file')
-const downstreamPath = path.join(__dirname, '/tmp/tmp.down')
+const filePath = path.join(__dirname, '/tmp/integration.file')
+const downstreamPath = path.join(__dirname, '/tmp/integration.down')
 
 const content = randomBytes(12000000)
 
 const setup = async () => {
   try {
     await unlink(filePath)
+    await unlink(downstreamPath)
   } catch(err) {
     // pass
   }
 
   // we are creating two files here:
   // tmp.file - a 12MB file of random bytes
-  await SkyeKiwi.Util.writeFile(Buffer.from(content), filePath)
+  await SkyeKiwi.Util.writeFile(Buffer.from(content), filePath, 'a')
 
   // SkyeKiwi.File has a default chunk size of 100MB.
   // we are making it 0.1MB here to demostrate it works
@@ -43,12 +44,12 @@ const unlink = (filePath) => {
 }
 
 describe('Integration', function() {
-  this.timeout(1000000)
+  this.timeout(0)
 
   let vaultId1: number
   let vaultId2: number
 
-  it('upstream: testnet, author only', async () => {
+  it('upstream, author only', async () => {
     const fileHandle = await setup()
 
     const mnemonic = process.env.SEED_PHRASE
@@ -56,11 +57,7 @@ describe('Integration', function() {
       mnemonicToMiniSecret(mnemonic)
     )
 
-    const ipfs_config = new SkyeKiwi.IPFSConfig(
-      'ipfs.infura.io', 5001, 'https'
-    )
-    const ipfs = new SkyeKiwi.IPFS(ipfs_config)
-
+    const ipfs = new SkyeKiwi.IPFS()
     const encryptionSchema = new SkyeKiwi.EncryptionSchema(
       2, 2, author, 1
     )
@@ -76,11 +73,15 @@ describe('Integration', function() {
 
     vaultId1 = await skyekiwi.upstream()
 
-    await ipfs.cleanup()
+    await ipfs.stopIfRunning()
     await unlink(filePath)
   })
 
-  it('downstream: testnet, author only', async () => {
+  it('downstream, author only', async () => {
+
+    try {
+      await unlink(downstreamPath)
+    } catch (err) { }
 
     const abi = require('../contract/artifacts/skyekiwi.json')
     const mnemonic = process.env.SEED_PHRASE
@@ -97,10 +98,7 @@ describe('Integration', function() {
       abi
     )
 
-    const ipfs_config = new SkyeKiwi.IPFSConfig(
-      'ipfs.infura.io', 5001, 'https'
-    )
-    const ipfs = new SkyeKiwi.IPFS(ipfs_config)
+    const ipfs = new SkyeKiwi.IPFS()
 
     await SkyeKiwi.Driver.downstream(
       vaultId1, blockchain, ipfs,
@@ -110,7 +108,7 @@ describe('Integration', function() {
     const downstreamContent = fs.readFileSync(downstreamPath)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
     
-    await ipfs.cleanup()
+    await ipfs.stopIfRunning()
     await unlink(downstreamPath)
   })
 
@@ -120,7 +118,7 @@ describe('Integration', function() {
   const publicKey1 = SkyeKiwi.Box.getPublicKeyFromPrivateKey(privateKey1)
   const publicKey2 = SkyeKiwi.Box.getPublicKeyFromPrivateKey(privateKey2)
 
-  it('upstream: testnet, two members + author', async () => {
+  it('upstream, two members + author', async () => {
     const fileHandle = await setup()
 
     const mnemonic = process.env.SEED_PHRASE
@@ -128,10 +126,7 @@ describe('Integration', function() {
       mnemonicToMiniSecret(mnemonic)
     )
 
-    const ipfs_config = new SkyeKiwi.IPFSConfig(
-      'ipfs.infura.io', 5001, 'https'
-    )
-    const ipfs = new SkyeKiwi.IPFS(ipfs_config)
+    const ipfs = new SkyeKiwi.IPFS()
 
     // Author can decrypt
     // two members can decrypt together but not by themselves
@@ -152,11 +147,15 @@ describe('Integration', function() {
     )
     vaultId2 = await skyekiwi.upstream()
 
-    await ipfs.cleanup()
+    await ipfs.stopIfRunning()
     await unlink(filePath)
   })
 
-  it('downstream: testnet, two members + author', async () => {
+  it('downstream, two members + author', async () => {
+
+    try {
+      await unlink(downstreamPath)
+    } catch (err) { }
 
     const abi = require('../contract/artifacts/skyekiwi.json')
     const mnemonic = process.env.SEED_PHRASE
@@ -173,10 +172,7 @@ describe('Integration', function() {
       abi
     )
 
-    const ipfs_config = new SkyeKiwi.IPFSConfig(
-      'ipfs.infura.io', 5001, 'https'
-    )
-    const ipfs = new SkyeKiwi.IPFS(ipfs_config)
+    const ipfs = new SkyeKiwi.IPFS()
 
     // Author can decrypt
     // await SkyeKiwi.Driver.downstream(
@@ -194,13 +190,17 @@ describe('Integration', function() {
     const downstreamContent = fs.readFileSync(downstreamPath)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
 
-    await ipfs.cleanup()
+    await ipfs.stopIfRunning()
     await unlink(downstreamPath)
   })
 
   // `vaultId1` is a vault with only the author can read
   it('update encryptionSchema & downstream again', async () => {
     const mnemonic = process.env.SEED_PHRASE
+    try {
+      await unlink(downstreamPath)
+    } catch(err){}
+
     const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
       mnemonicToMiniSecret(mnemonic)
     )
@@ -219,11 +219,7 @@ describe('Integration', function() {
       abi
     )
 
-    const ipfs_config = new SkyeKiwi.IPFSConfig(
-      'ipfs.infura.io', 5001, 'https'
-    )
-    const ipfs = new SkyeKiwi.IPFS(ipfs_config)
-
+    const ipfs = new SkyeKiwi.IPFS()
 
     // updated encryptionSchema
 
@@ -250,7 +246,7 @@ describe('Integration', function() {
     const downstreamContent = fs.readFileSync(downstreamPath)
     expect(Buffer.compare(downstreamContent, content)).to.equal(0)
 
-    await ipfs.cleanup()
+    await ipfs.stopIfRunning()
     await unlink(downstreamPath)
   })
 })

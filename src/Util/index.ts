@@ -17,9 +17,9 @@ const isValidHex = str => {
     (/^[0-9A-Fa-f]*$/g).test(str)
 }
 
-const writeFile = (content: Buffer, filePath: string) => {
+const writeFile = (content: Buffer, filePath: string, flags: string) => {
   return new Promise((res, rej) => {
-    const stream = fs.createWriteStream(filePath, {flags: 'a'})
+    const stream = fs.createWriteStream(filePath, { flags: flags})
     stream.write(content)
     stream.end()
     stream.on('finish', () => res(true))

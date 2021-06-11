@@ -1,4 +1,4 @@
-import { IPFS, IPFSConfig } from './IPFS'
+import { IPFS } from './IPFS'
 import { Driver } from './driver'
 import { File, FileDigest } from './File'
 import {
@@ -21,7 +21,6 @@ export {
   Driver,
 
   IPFS, 
-  IPFSConfig,
   
   File, FileDigest,
   

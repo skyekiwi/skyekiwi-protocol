@@ -1,8 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import {sendTx} from './index'
-import IPFS from 'ipfs-core'
-import {Util} from '../index'
 
 export class Crust {
 
@@ -25,7 +23,7 @@ export class Crust {
       )
   }
   public async placeBatchOrderWithCIDList(cidList: [{cid: string, size: number}], tip?: number) {
-    
+
     let extrinsicQueue = []
     for (let cid of cidList) {
       extrinsicQueue.push(this.api.tx.market.placeStorageOrder(
@@ -40,28 +38,35 @@ export class Crust {
     return crustResult
   }
 
-  public async placeBatchOrder(content: Uint8Array[], tip?: number) {
-    const ipfs = await IPFS.create()
-
-    let taskQueue: Promise<{cid: string, size: number}>[] = []
-    for await (let chunk of content) {
-      taskQueue.push(this.addFile(ipfs, chunk))
-    }
-    const results = await Promise.all(taskQueue)
-    let extrinsicQueue = []
-    for (let result of results) {
-      extrinsicQueue.push(this.api.tx.market.placeStorageOrder(
-        result.cid, result.size, tip?tip:0
-      ))
+  public async awaitNetworkFetching(cidList: [{ cid: string, size: number }]) {
+    let cidQueue = []
+    for (let cid of cidList) {
+      cidQueue.push(cid.cid) 
     }
 
-    const crustResult = await sendTx(
-      this.api.tx.utility.batchAll(
-        extrinsicQueue
-      ), this.signer
-    )
+    while (cidQueue.length != 0) {
+      // console.log(cidQueue)
+      const result = []
+      for (let i = 0; i < cidQueue.length; i ++) {
+        const status = await this.api.query.market.files(cidQueue[i]);
+        
+        //@ts-ignore
+        result.push(status && status.reported_replica_count != 0)
+        console.log(status)
+      }
 
-    return crustResult
+      for (let i = 0; i < cidQueue.length; i ++) {
+        if (result[i]) cidQueue[i] = ""
+      }
+
+      cidQueue = cidQueue.filter(cid => cid !== "")
+      // cidQueue = cidQueue.filter(async cid => {
+      //   const status = await this.api.query.market.files(cid);
+      //   console.log(status)
+        
+      //   return status && status.reported_replica_count != 0
+      // })
+    }
   }
 
   // size in term of bytes
@@ -70,21 +75,4 @@ export class Crust {
     const price = parseInt(unitPricePerMB.toHex())
     return  price * size / 1024
   }
-
-  private async addFile(ipfs: IPFS.IPFS, content: Uint8Array) {
-    const cid = await ipfs.add(
-      Util.u8aToHex(content),
-      {
-        progress: (prog: any) => console.log(`add received: ${prog}`)
-      }
-    );
-
-    const fileStat = await ipfs.files.stat("/ipfs/" + cid.path)
-
-    return {
-      cid: cid.path, size: fileStat.cumulativeSize
-    }
-  }
-
-
 }

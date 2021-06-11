@@ -143,16 +143,11 @@ yarn test
 5. Relax. After a few minutes. It should produce something similar as:
 
 ```
-❯ yarn test                                                                                                                                                  
-yarn run v1.22.10
+$ yarn test:all
 $ mocha -r ts-node/register ./spec/*.test.ts
 
-  Integration
-    ✓ upstream: testnet, author only (54723ms)
-    ✓ downstream: testnet, author only (22690ms)
-    ✓ upstream: testnet, two members + author (55323ms)
-    ✓ downstream: testnet, two members + author (23409ms)
-    ✓ update encryptionSchema & downstream again (29771ms)
+  Blockchain
+    ✓ Blockchain: send contract tx & storage order works (33919ms)
 
   Encryption
     ✓ Symmetric: Encryption & Decryption Works
@@ -164,23 +159,26 @@ $ mocha -r ts-node/register ./spec/*.test.ts
   File
     ✓ File: file size reads well
     ✓ File: file chunk count calculated correctly
-    ✓ File: chunk hash calculation works
-    ✓ File: inflate & deflat work (122ms)
+    ✓ File: chunk hash calculation works (44ms)
+    ✓ File: inflate & deflat work (147ms)
+
+  Integration
+    ✓ upstream, author only (59532ms)
+    ✓ downstream, author only (31919ms)
+    ✓ upstream, two members + author (69974ms)
+    ✓ downstream, two members + author (33960ms)
+    ✓ update encryptionSchema & downstream again (40926ms)
 
   IPFS Client
-    ✓ uploads some content to IPFS (1207ms)
-    ✓ fetch content by CID on IPFS (1202ms)
-    ✓ pins a CID on Infura IPFS (2809ms)
+    ✓ ipfs works (65381ms)
 
   Metadata
     ✓ Seal: sealing & recover works
-    ✓ Chunks: chunks are recorded well & CID list matches (48500ms)
-
-  Blockchain
-    ✓ Blockchain: send contract tx & storage order works (12634ms)
+    ✓ Chunks: chunks are recorded well & CID list matches (16470ms)
 
 
-  20 passing (4m)
+  18 passing (6m)
+
 ```
 
 ### Run & test the sample smart contract
@@ -239,6 +237,22 @@ await SkyeKiwi.Driver.updateEncryptionSchema(
 )
 // upon finishing, the encryptionSchema will be updated
 ```
+
+### IPFS Pin Service
+
+By default, we use two IPFS remote pin service before the Crust Network is able to fetch the files. 
+
+- Decoo: https://decoo.io/
+Signup and get an API key, save it to the `.env` as `DECOO = 'xxxx'`
+
+- Infura: https://infura.io/docs/ipfs
+You don't need to do anything with this, they are offering IPFS pinning without authorization for now. However, pinning to Infura might fail sometimes. 
+
+When pushing content to IPFS, the IPFS module of the SkyeKiwi Protocol will try to push content to Decoo, if the HTTP request fails, or if you do not record an Decoo API key in the `.env` file, it will fall back to Infura IPFS. If Infura IPFS fails again, it will fallback to start a local IPFS node, in that case, you will be required to keep the local IPFS node running, so that the Crust Network can fetch the file. It might take up to 2 hours for the Crust Network to pick up the file. Please refer to [Crust Wiki](https://wiki.crust.network/docs/en/storageUserGuide) for file fetching. 
+
+Similarly, for `ipfs.cat`, it will try to use an Infura ipfs gateway first, if failed, it will fall back to a local node. 
+
+If an `ERR_LOCK_EXISTS` appears on `jsipfs`, it is because that you are trying to start another local IPFS node when there is already one running. Run `await ipfs.stopIfRunning()` to stop the local IPFS node. `stopIfRunning` will always do checks and if there is actually a local node running, if not, it will not do anything. Therefore, if a local IPFS node is not needed, always run `await ipfs.stopIfRunning()`. 
 
 ### Project Structure 
 ```
