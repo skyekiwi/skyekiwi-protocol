@@ -13,7 +13,7 @@ import {
 import {
   Blockchain,
   Crust,
-  Contract
+  Contract, getAbi
 } from './Blockchain'
 import * as Util from './Util'
 
@@ -36,7 +36,7 @@ export {
 
   Blockchain,
   Crust,
-  Contract,
+  Contract, getAbi,
   
   Util
 }

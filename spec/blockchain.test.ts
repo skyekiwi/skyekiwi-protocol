@@ -8,7 +8,7 @@ describe('Blockchain', function () {
 
   this.timeout(100000)
 
-  const abi = require('../contract/artifacts/skyekiwi.json')
+  const abi = SkyeKiwi.getAbi()
 
   // to run a local canvas blockchain ...
   // const { execSync } = require("child_process")
@@ -20,7 +20,7 @@ describe('Blockchain', function () {
       mnemonic,
       '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
       'wss://jupiter-poa.elara.patract.io',
-      'wss://api.crust.network/',
+      'wss://rocky-api.crust.network/',
       abi)
 
     await blockchain.init()

@@ -2,7 +2,7 @@ const ipfs = require('ipfs-core')
 const axios = require('axios')
 const FormData = require('form-data')
 require('dotenv').config()
-import createClient from 'ipfs-http-client'
+const createClient = require('ipfs-http-client')
 // import { Util } from '../index'
 
 export class IPFS {
@@ -34,8 +34,7 @@ export class IPFS {
     const remoteResult = await this.remoteGatewayAddAndPin(str)
     if (remoteResult !== null) return remoteResult
 
-    console.log(`all remote push failed, fallback to local IPFS, 
-            \\ you need to keep the local IPFS running`)
+    console.log(`all remote push failed, fallback to local IPFS, you need to keep the local IPFS running`)
     try {
       await this.init()
       const cid = await this.localIpfs.add(str);
@@ -55,16 +54,16 @@ export class IPFS {
     }
 
     try {
-      const remoteResult = await this.fetchFileFromRemote(cid)
-      return remoteResult
-    } catch(err) {
       let result = ''
+      await this.init()
+      for await (const chunk of this.localIpfs.cat(cid)) {
+        result += chunk
+      }
+      return result
+    } catch (err) {
       try {
-        await this.init()
-        for await (const chunk of this.localIpfs.cat(cid)) {
-          result += chunk
-        }
-        return result
+        const remoteResult = await this.fetchFileFromRemote(cid)
+        return remoteResult
       } catch (err) {
         console.error(err)
         throw (new Error('IPFS Failure: ipfs.cat'))
@@ -90,7 +89,7 @@ export class IPFS {
         form_data.append("file", Buffer.from(content, 'utf-8'), 'upload');
         const request_config = {
           method: "post",
-          url: 'https://api.decoo.io/pinning/pinFile',
+          url: 'http://api.decoo.io/pinning/pinFile',
           headers: {
             "Authorization": "Bearer " + process.env.DECOO,
             "Content-Type": "multipart/form-data",

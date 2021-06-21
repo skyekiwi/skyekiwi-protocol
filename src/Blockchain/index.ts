@@ -1,6 +1,7 @@
 import {sendTx} from './sendTx'
 import { Crust } from './Crust'
 import { Contract } from './Contract'
+import { getAbi } from './getAbi'
 
 import { ContractPromise } from '@polkadot/api-contract';
 import { waitReady } from '@polkadot/wasm-crypto'
@@ -100,5 +101,5 @@ export class Blockchain {
 }
 
 export {
-  sendTx, Crust, Contract
+  sendTx, Crust, Contract, getAbi
 }

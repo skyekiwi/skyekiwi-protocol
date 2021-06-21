@@ -83,7 +83,7 @@ describe('Integration', function() {
       await unlink(downstreamPath)
     } catch (err) { }
 
-    const abi = require('../contract/artifacts/skyekiwi.json')
+    const abi = SkyeKiwi.getAbi()
     const mnemonic = process.env.SEED_PHRASE
     const blockchain = new SkyeKiwi.Blockchain(
       // seed phrase
@@ -93,7 +93,7 @@ describe('Integration', function() {
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://api.crust.network/',
+      'wss://rocky-api.crust.network/',
       // contract abi
       abi
     )
@@ -157,7 +157,7 @@ describe('Integration', function() {
       await unlink(downstreamPath)
     } catch (err) { }
 
-    const abi = require('../contract/artifacts/skyekiwi.json')
+    const abi = SkyeKiwi.getAbi()
     const mnemonic = process.env.SEED_PHRASE
     const blockchain = new SkyeKiwi.Blockchain(
       // seed phrase
@@ -167,7 +167,7 @@ describe('Integration', function() {
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://api.crust.network/',
+      'wss://rocky-api.crust.network/',
       // contract abi
       abi
     )
@@ -205,7 +205,7 @@ describe('Integration', function() {
       mnemonicToMiniSecret(mnemonic)
     )
 
-    const abi = require('../contract/artifacts/skyekiwi.json')
+    const abi = SkyeKiwi.getAbi()
     const blockchain = new SkyeKiwi.Blockchain(
       // seed phrase
       mnemonic,
@@ -214,7 +214,7 @@ describe('Integration', function() {
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://api.crust.network/',
+      'wss://rocky-api.crust.network/',
       // contract abi
       abi
     )

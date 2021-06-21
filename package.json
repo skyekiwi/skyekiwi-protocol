@@ -31,10 +31,11 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "test:integration": "mocha -r ts-node/register ./spec/integration.test.ts",
-    "test:all": "mocha -r ts-node/register ./spec/*.test.ts",
+    "test:integration": "cp contract/artifacts/* src/abi && mocha -r ts-node/register ./spec/integration.test.ts",
+    "test:all": "cp contract/artifacts/* src/abi && mocha -r ts-node/register ./spec/*.test.ts",
     "test": "yarn test:all",
-    "build": "tsc",
-    "lint": "tslint --config tslint.json --project ."
+    "build": "cp contract/artifacts/* src/abi && tsc",
+    "build:all": "webpack --mode production",
+    "start": "webpack-dev-server --mode development --progress --color"
   }
 }

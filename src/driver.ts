@@ -2,7 +2,7 @@ import { stringToU8a, u8aToString } from '@polkadot/util';
 import {
   // EncryptionSchema, 
   Metadata, Seal, EncryptionSchema, Chunks,
-  File, Util, Blockchain,
+  File, Util, Blockchain, getAbi,
 
   IPFS,
   SecretBox
@@ -25,7 +25,7 @@ class Driver {
     )
 
     // hardcoded to pointed at the smart contract abi
-    const abi = require('../contract/artifacts/skyekiwi.json')
+    const abi = getAbi()
 
     this.blockchain = new Blockchain(
       // seed phrase
@@ -35,7 +35,7 @@ class Driver {
       // contract instance endpoint
       'wss://jupiter-poa.elara.patract.io',
       // storage network endpoint
-      'wss://api.crust.network/',
+      'wss://rocky-api.crust.network/',
       // contract abi
       abi
     )
