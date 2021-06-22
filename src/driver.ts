@@ -2,7 +2,7 @@ import { stringToU8a, u8aToString } from '@polkadot/util';
 import {
   // EncryptionSchema, 
   Metadata, Seal, EncryptionSchema, Chunks,
-  File, Util, Blockchain, getAbi,
+  File, Util, Blockchain,
 
   IPFS,
   SecretBox
@@ -11,13 +11,13 @@ import {
 class Driver {
 
   private metadata: Metadata
-  private blockchain: Blockchain
 
   constructor(
     public encryptionSchema: EncryptionSchema,
     public file: File,
     public seal: Seal,
-    public ipfs: IPFS
+    public ipfs: IPFS,
+    public blockchain: Blockchain
   ) {
     this.file = file;
     this.metadata = new Metadata(
@@ -25,20 +25,6 @@ class Driver {
     )
 
     // hardcoded to pointed at the smart contract abi
-    const abi = getAbi()
-
-    this.blockchain = new Blockchain(
-      // seed phrase
-      this.seal.mnemonic,
-      // contract address
-      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-      // contract instance endpoint
-      'wss://jupiter-poa.elara.patract.io',
-      // storage network endpoint
-      'wss://rocky-api.crust.network/',
-      // contract abi
-      abi
-    )
   }
 
   public async upstream() {

@@ -48,6 +48,21 @@ describe('Integration', function() {
 
   let vaultId1: number
   let vaultId2: number
+  const abi = SkyeKiwi.getAbi()
+  const mnemonic = process.env.SEED_PHRASE
+
+  const blockchain = new SkyeKiwi.Blockchain(
+    // seed phrase
+    mnemonic,
+    // contract address
+    '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
+    // contract instance endpoint
+    'wss://jupiter-poa.elara.patract.io',
+    // storage network endpoint
+    'wss://rocky-api.crust.network/',
+    // contract abi
+    abi
+  )
 
   it('upstream, author only', async () => {
     const fileHandle = await setup()
@@ -68,7 +83,8 @@ describe('Integration', function() {
       encryptionSchema,
       fileHandle,
       key,
-      ipfs
+      ipfs,
+      blockchain
     )
 
     vaultId1 = await skyekiwi.upstream()
@@ -82,21 +98,7 @@ describe('Integration', function() {
     try {
       await unlink(downstreamPath)
     } catch (err) { }
-
-    const abi = SkyeKiwi.getAbi()
-    const mnemonic = process.env.SEED_PHRASE
-    const blockchain = new SkyeKiwi.Blockchain(
-      // seed phrase
-      mnemonic,
-      // contract address
-      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-      // contract instance endpoint
-      'wss://jupiter-poa.elara.patract.io',
-      // storage network endpoint
-      'wss://rocky-api.crust.network/',
-      // contract abi
-      abi
-    )
+    
 
     const ipfs = new SkyeKiwi.IPFS()
 
@@ -143,7 +145,8 @@ describe('Integration', function() {
       encryptionSchema,
       fileHandle,
       key,
-      ipfs
+      ipfs,
+      blockchain
     )
     vaultId2 = await skyekiwi.upstream()
 
@@ -156,21 +159,6 @@ describe('Integration', function() {
     try {
       await unlink(downstreamPath)
     } catch (err) { }
-
-    const abi = SkyeKiwi.getAbi()
-    const mnemonic = process.env.SEED_PHRASE
-    const blockchain = new SkyeKiwi.Blockchain(
-      // seed phrase
-      mnemonic,
-      // contract address
-      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-      // contract instance endpoint
-      'wss://jupiter-poa.elara.patract.io',
-      // storage network endpoint
-      'wss://rocky-api.crust.network/',
-      // contract abi
-      abi
-    )
 
     const ipfs = new SkyeKiwi.IPFS()
 
@@ -203,20 +191,6 @@ describe('Integration', function() {
 
     const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
       mnemonicToMiniSecret(mnemonic)
-    )
-
-    const abi = SkyeKiwi.getAbi()
-    const blockchain = new SkyeKiwi.Blockchain(
-      // seed phrase
-      mnemonic,
-      // contract address
-      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-      // contract instance endpoint
-      'wss://jupiter-poa.elara.patract.io',
-      // storage network endpoint
-      'wss://rocky-api.crust.network/',
-      // contract abi
-      abi
     )
 
     const ipfs = new SkyeKiwi.IPFS()
