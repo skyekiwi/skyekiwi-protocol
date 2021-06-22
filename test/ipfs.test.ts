@@ -22,6 +22,7 @@ describe('IPFS Client', function () {
 
     console.log(cids)
     for (let i = 0; i < 10; i++) {
+      console.log(i, cids[i].cid)
       const content = await ipfs.cat(cids[i].cid)
       expect(content).to.equal(SkyeKiwi.Util.u8aToHex(data[i]))
     }
