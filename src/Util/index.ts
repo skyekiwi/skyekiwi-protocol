@@ -1,4 +1,3 @@
-import fs from 'fs'
 import * as SkyeKiwi from '../index'
 
 const hexToU8a = (hex: string) => {
@@ -15,16 +14,6 @@ const u8aToHex = bytes =>
 const isValidHex = str => {
   return (str.length & 1) === 0 && 
     (/^[0-9A-Fa-f]*$/g).test(str)
-}
-
-const writeFile = (content: Buffer, filePath: string, flags: string) => {
-  return new Promise((res, rej) => {
-    const stream = fs.createWriteStream(filePath, { flags: flags})
-    stream.write(content)
-    stream.end()
-    stream.on('finish', () => res(true))
-    stream.on('error', rej)
-  })
 }
 
 const serialize = (object: any) : string => {
@@ -72,5 +61,5 @@ const parse = (str: string) : any => {
 }
 
 export {
-  hexToU8a, u8aToHex, writeFile, isValidHex, serialize, parse
+  hexToU8a, u8aToHex, isValidHex, serialize, parse
 }

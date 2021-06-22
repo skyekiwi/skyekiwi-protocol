@@ -32,10 +32,10 @@ describe('Blockchain', function () {
     let content = []
     for (let i = 0; i < 3; i++) {
       content.push(await ipfs.add(
-        SkyeKiwi.Util.u8aToHex(
-          randomBytes(1000)
+          SkyeKiwi.Util.u8aToHex(
+            randomBytes(1000)
+          )
         )
-      )
       )
     }
 

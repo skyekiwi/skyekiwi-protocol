@@ -91,6 +91,16 @@ export class File {
     }
     return new File(object.filePath, object.fileName, object.fileNote, object.fileChunkSize)
   }
+
+  public static writeFile(content: Buffer, filePath: string, flags: string) {
+    return new Promise((res, rej) => {
+      const stream = fs.createWriteStream(filePath, { flags: flags })
+      stream.write(content)
+      stream.end()
+      stream.on('finish', () => res(true))
+      stream.on('error', rej)
+    })
+  }
 }
 
 export class FileDigest{ 

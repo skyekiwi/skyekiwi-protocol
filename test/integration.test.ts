@@ -21,7 +21,7 @@ const setup = async () => {
 
   // we are creating two files here:
   // tmp.file - a 12MB file of random bytes
-  await SkyeKiwi.Util.writeFile(Buffer.from(content), filePath, 'a')
+  await SkyeKiwi.File.writeFile(Buffer.from(content), filePath, 'a')
 
   // SkyeKiwi.File has a default chunk size of 100MB.
   // we are making it 0.1MB here to demostrate it works

@@ -182,7 +182,7 @@ class Driver {
         throw new Error('chunk size error: Driver.downstreamChunkProcessingPipeLine')
       }
 
-      await Util.writeFile(Buffer.from(chunk), outputPath, 'a')
+      await File.writeFile(Buffer.from(chunk), outputPath, 'a')
 
     }
     if (Buffer.compare(currentHash, hash) !== 0) {
