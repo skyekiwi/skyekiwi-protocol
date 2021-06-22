@@ -52,18 +52,17 @@ export class IPFS {
     if (cid.length !== 46) {
       throw new Error('cid length error: ipfs.cat')
     }
-
     try {
-      let result = ''
-      await this.init()
-      for await (const chunk of this.localIpfs.cat(cid)) {
-        result += chunk
-      }
-      return result
+      const remoteResult = await this.fetchFileFromRemote(cid)
+      return remoteResult
     } catch (err) {
       try {
-        const remoteResult = await this.fetchFileFromRemote(cid)
-        return remoteResult
+        let result = ''
+        await this.init()
+        for await (const chunk of this.localIpfs.cat(cid)) {
+          result += chunk
+        }
+        return result
       } catch (err) {
         console.error(err)
         throw (new Error('IPFS Failure: ipfs.cat'))
@@ -144,22 +143,48 @@ export class IPFS {
   }
 
   public async fetchFileFromRemote(cid: string) {
+    
     try {
-      const infura = createClient({
-        host: 'ipfs.infura.io',
-        port: 5001,
-        protocol: 'https'
-      })
-      let result = ""
-      const stream = infura.cat(cid)
-      for await (const chunk of stream) {
-        result += chunk.toString()
-      }
-      return result
+      const request_configs = [{
+        method: "GET",
+        url: `https://ipfs.io/ipfs/${cid}`,
+      }, {
+        method: "GET",
+        url: `https://gateway.ipfs.io/ipfs/${cid}`,
+      }, {
+        method: "GET",
+        url: `https://gateway.originprotocol.com/ipfs/${cid}`,
+      }, {
+        method: "GET",
+        url: `https://bin.d0x.to/ipfs/${cid}`,
+      }, {
+        method: "GET",
+        url: `https://ipfs.fleek.co/ipfs/${cid}`,
+      }, {
+        method: "GET",
+        url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
+      }]
+      const requests = request_configs.map(config => axios(config))
+      const result = await Promise.race(requests)
+      return result.data
     } catch(err) {
-      throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote')
-      // remote fetching failed, falling back to local
-      return null
+      try {
+        const infura = createClient({
+          host: 'ipfs.infura.io',
+          port: 5001,
+          protocol: 'https'
+        })
+        let result = ""
+        const stream = infura.cat(cid)
+        for await (const chunk of stream) {
+          result += chunk.toString()
+        }
+        return result
+      } catch (err) {
+        throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote')
+        // remote fetching failed, falling back to local
+        return null
+      }
     }
   }
   public serialize() {

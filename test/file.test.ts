@@ -24,8 +24,8 @@ const setup = async () => {
   const content1 = Buffer.from(randomBytes(1200000))
   const content2 = Buffer.alloc(1190000, 187)
 
-  await SkyeKiwi.Util.writeFile(content1, file1Path, 'a')
-  await SkyeKiwi.Util.writeFile(content2, file2Path, 'a')
+  await SkyeKiwi.File.writeFile(content1, file1Path, 'a')
+  await SkyeKiwi.File.writeFile(content2, file2Path, 'a')
 
   // SkyeKiwi.File has a default chunk size of 100MB.
   // we are making it 0.1MB here to demostrate it works
