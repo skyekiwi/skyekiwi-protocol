@@ -90,16 +90,13 @@ export class IPFS {
         form_data.append("file", Buffer.from(content, 'utf-8'), 'upload');
         const request_config = {
           method: "post",
-          url: 'https://api.decoo.io/pinning/pinFile',
+          url: 'http://api.decoo.io/pinning/pinFile',
           headers: {
             "Authorization": "Bearer " + process.env.DECOO,
             "Content-Type": "multipart/form-data",
             ...form_data.getHeaders()
           },
           timeout: 5000,
-          httpsAgent: new https.Agent({
-            rejectUnauthorized: false
-          }),
           data: form_data
         }
 
@@ -153,37 +150,37 @@ export class IPFS {
     try {
       const request_configs = [{
         method: "GET",
-        url: `http://ipfs.io/ipfs/${cid}`,
+        url: `https://ipfs.io/ipfs/${cid}`,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false
         })
       }, {
         method: "GET",
-        url: `http://gateway.ipfs.io/ipfs/${cid}`,
+        url: `https://gateway.ipfs.io/ipfs/${cid}`,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false
         })
       }, {
         method: "GET",
-        url: `http://gateway.originprotocol.com/ipfs/${cid}`,
+        url: `https://gateway.originprotocol.com/ipfs/${cid}`,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false
         })
       }, {
         method: "GET",
-        url: `http://bin.d0x.to/ipfs/${cid}`,
+        url: `https://bin.d0x.to/ipfs/${cid}`,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false
         })
       }, {
         method: "GET",
-        url: `http://ipfs.fleek.co/ipfs/${cid}`,
+        url: `https://ipfs.fleek.co/ipfs/${cid}`,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false
         })
       }, {
         method: "GET",
-        url: `http://cloudflare-ipfs.com/ipfs/${cid}`,
+        url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
         httpsAgent: new https.Agent({
           rejectUnauthorized: false
         })
