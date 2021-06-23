@@ -6,7 +6,7 @@ require('dotenv').config();
 
 describe('Blockchain', function () {
 
-  this.timeout(100000)
+  this.timeout(0)
 
   const abi = SkyeKiwi.getAbi()
 

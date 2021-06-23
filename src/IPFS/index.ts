@@ -3,6 +3,7 @@ const axios = require('axios')
 const FormData = require('form-data')
 require('dotenv').config()
 const createClient = require('ipfs-http-client')
+const https = require('https')
 // import { Util } from '../index'
 
 export class IPFS {
@@ -39,6 +40,7 @@ export class IPFS {
       await this.init()
       const cid = await this.localIpfs.add(str);
       const fileStat = await this.localIpfs.files.stat("/ipfs/" + cid.path)
+      console.log(cid)
       return {
         cid: cid.path, size: fileStat.cumulativeSize
       }
@@ -78,7 +80,7 @@ export class IPFS {
     }
   }
 
-  public async remoteGatewayAddAndPin(content: string) {
+  public async remoteGatewayAddAndPin(content: string) {    
     let infuraResult
     let decooResult
 
@@ -88,12 +90,16 @@ export class IPFS {
         form_data.append("file", Buffer.from(content, 'utf-8'), 'upload');
         const request_config = {
           method: "post",
-          url: 'http://api.decoo.io/pinning/pinFile',
+          url: 'https://api.decoo.io/pinning/pinFile',
           headers: {
             "Authorization": "Bearer " + process.env.DECOO,
             "Content-Type": "multipart/form-data",
             ...form_data.getHeaders()
           },
+          timeout: 5000,
+          httpsAgent: new https.Agent({
+            rejectUnauthorized: false
+          }),
           data: form_data
         }
 
@@ -147,22 +153,40 @@ export class IPFS {
     try {
       const request_configs = [{
         method: "GET",
-        url: `https://ipfs.io/ipfs/${cid}`,
+        url: `http://ipfs.io/ipfs/${cid}`,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       }, {
         method: "GET",
-        url: `https://gateway.ipfs.io/ipfs/${cid}`,
+        url: `http://gateway.ipfs.io/ipfs/${cid}`,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       }, {
         method: "GET",
-        url: `https://gateway.originprotocol.com/ipfs/${cid}`,
+        url: `http://gateway.originprotocol.com/ipfs/${cid}`,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       }, {
         method: "GET",
-        url: `https://bin.d0x.to/ipfs/${cid}`,
+        url: `http://bin.d0x.to/ipfs/${cid}`,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       }, {
         method: "GET",
-        url: `https://ipfs.fleek.co/ipfs/${cid}`,
+        url: `http://ipfs.fleek.co/ipfs/${cid}`,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       }, {
         method: "GET",
-        url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
+        url: `http://cloudflare-ipfs.com/ipfs/${cid}`,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
       }]
       const requests = request_configs.map(config => axios(config))
       const result = await Promise.race(requests)
@@ -182,8 +206,6 @@ export class IPFS {
         return result
       } catch (err) {
         throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote')
-        // remote fetching failed, falling back to local
-        return null
       }
     }
   }

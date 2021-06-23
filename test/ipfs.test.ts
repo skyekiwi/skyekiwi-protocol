@@ -13,7 +13,7 @@ describe('IPFS Client', function () {
     const cids = []
     let data = []
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       data.push(randomBytes(10000))
       const data_hex = SkyeKiwi.Util.u8aToHex(data[i])
       cids.push(await ipfs.add(data_hex))
@@ -21,7 +21,7 @@ describe('IPFS Client', function () {
     }
 
     console.log(cids)
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       console.log(i, cids[i].cid)
       const content = await ipfs.cat(cids[i].cid)
       expect(content).to.equal(SkyeKiwi.Util.u8aToHex(data[i]))

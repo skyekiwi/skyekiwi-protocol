@@ -65,7 +65,7 @@ const cleanup = async () => {
 
 describe('Metadata', function () {
 
-  this.timeout(100000)
+  this.timeout(0)
 
   const mnemonic = mnemonicGenerate()
   const mnemonic2 = mnemonicGenerate()

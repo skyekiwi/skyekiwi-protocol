@@ -1,8 +1,42 @@
-export * from './ipfs'
-export * from './file'
-export * from './driver'
-export * from './metadata'
-export * from './encryption'
-export * from './blockchain'
+import { IPFS } from './IPFS'
+import { Driver } from './driver'
+import { File, FileDigest } from './File'
+import {
+  Chunks, Seal, Metadata, EncryptionSchema
+} from './Metadata'
+import {
+  Box,
+  SecretBox,
+  TSS,
+  SKYEKIWI_SECRETS_ENDING
+} from './Encryption'
+import {
+  Blockchain,
+  Crust,
+  Contract, getAbi
+} from './Blockchain'
+import * as Util from './Util'
 
-export * as Util from './util'
+export {
+  Driver,
+
+  IPFS,
+
+  File, FileDigest,
+
+  Chunks,
+  Seal,
+  Metadata,
+  EncryptionSchema,
+
+  Box,
+  SecretBox,
+  TSS,
+  SKYEKIWI_SECRETS_ENDING,
+
+  Blockchain,
+  Crust,
+  Contract, getAbi,
+
+  Util
+}
