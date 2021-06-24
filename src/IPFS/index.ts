@@ -80,67 +80,77 @@ export class IPFS {
     }
   }
 
-  public async remoteGatewayAddAndPin(content: string) {    
-    let infuraResult
-    let decooResult
+  public async addAndPinInfura(content: string) {
+    console.log("trying to pin to Infura")
+    const infura = createClient({
+      host: 'ipfs.infura.io',
+      port: 5001,
+      protocol: 'https'
+    })
 
-    if (process.env.DECOO) {
-      try {
-        const form_data = new FormData();
-        form_data.append("file", Buffer.from(content, 'utf-8'), 'upload');
-        const request_config = {
-          method: "post",
-          url: 'http://api.decoo.io/pinning/pinFile',
-          headers: {
-            "Authorization": "Bearer " + process.env.DECOO,
-            "Content-Type": "multipart/form-data",
-            ...form_data.getHeaders()
-          },
-          timeout: 5000,
-          data: form_data
-        }
+    const infuraResult = await infura.add(content)
+    await infura.pin.add(infuraResult.cid.toString())
 
-        decooResult = await axios(request_config)
-        return { cid: decooResult.data.PinHash, size: decooResult.data.PinSize }
-      } catch(err) {
-        console.log('posting to Decoo failed')
-        // console.log(err)
+    return {
+      cid: infuraResult.path,
+      size: infuraResult.size
+    }
+  }
 
+  public async addAndPinSkyeKiwi(content: string) {
+    console.log("trying to pin to SkyeKiwi")
+    const skyekiwiNode = createClient({
+      host: 'sgnode.skye.kiwi',
+      port: 5001,
+      protocol: 'http'
+    })
+
+    const skyekiwiResult = await skyekiwiNode.add(content)
+    await skyekiwiNode.pin.add(skyekiwiResult.cid.toString())
+
+    return {
+      cid: skyekiwiResult.path,
+      size: skyekiwiResult.size
+    }
+  }
+
+  public async addAndPinDecoo(content: string) {
+    console.log("trying to pin to Decoo")
+    const form_data = new FormData();
+    form_data.append("file", Buffer.from(content, 'utf-8'), 'upload');
+    const request_config = {
+      method: "post",
+      url: 'http://api.decoo.io/pinning/pinFile',
+      headers: {
+        "Authorization": "Bearer " + process.env.DECOO,
+        "Content-Type": "multipart/form-data",
+        ...form_data.getHeaders()
+      },
+      timeout: 5000,
+      data: form_data
+    }
+
+    const decooResult = await axios(request_config)
+    return { cid: decooResult.data.PinHash, size: decooResult.data.PinSize }
+  }
+
+  public async remoteGatewayAddAndPin(content: string) {
+    try {
+      return await this.addAndPinSkyeKiwi(content)
+    } catch(err) {
+      if (process.env.DECOO) {
         try {
-          const infura = createClient({
-            host: 'ipfs.infura.io',
-            port: 5001,
-            protocol: 'https'
-          })
-
-          infuraResult = await infura.add(content)
-          await infura.pin.add(infuraResult.cid.toString())
-
-          return {
-            cid: infuraResult.path,
-            size: infuraResult.size
-          }
+          return await this.addAndPinDecoo(content)
+        } catch(err) {
+          console.log('decoo pinning failed')
+          return await this.addAndPinInfura(content)
+        }
+      } else {
+        try {
+          return await this.addAndPinInfura(content)
         } catch (err) {
-          return null
+          throw new Error("all remote pin failed - ipfs.remoteGatewayAddAndPin")
         }
-      }
-    } else {
-      try {
-        const infura = createClient({
-          host: 'ipfs.infura.io',
-          port: 5001,
-          protocol: 'https'
-        })
-
-        infuraResult = await infura.add(content)
-        await infura.pin.add(infuraResult.cid.toString())
-
-        return {
-          cid: infuraResult.path,
-          size: infuraResult.size
-        }
-      } catch (err) {
-        return null
       }
     }
   }
@@ -190,6 +200,8 @@ export class IPFS {
       return result.data
     } catch(err) {
       try {
+
+        console.log("public gateway failed. Trying Infura")
         const infura = createClient({
           host: 'ipfs.infura.io',
           port: 5001,
@@ -202,7 +214,22 @@ export class IPFS {
         }
         return result
       } catch (err) {
-        throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote')
+        try {
+          console.log("public gateway & Infura failed. Trying SkyeKiwi")
+          const skyekiwiNode = createClient({
+            host: 'sgnode.skye.kiwi',
+            port: 5001,
+            protocol: 'http'
+          })
+          let result = ""
+          const stream = skyekiwiNode.cat(cid)
+          for await (const chunk of stream) {
+            result += chunk.toString()
+          }
+          return result
+        } catch (err) {
+          throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote')
+        }
       }
     }
   }
