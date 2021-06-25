@@ -42,7 +42,6 @@ export class Metadata {
   }
 
   public generateSealedMetadata() {
-    
     const sealed = this.seal.seal(
       stringToU8a(
         Util.serialize(
@@ -53,7 +52,7 @@ export class Metadata {
 
     return {
       publicSealingKey: this.seal.getPublicSealingKey(),
-      ... this.seal.digestEncryptionSchema(),
+      author: Util.u8aToHex(this.seal.encryptionSchema.author),
       public: sealed.public,
       private: sealed.private,
       protocolVersion: SKYEKIWI_VERSION,

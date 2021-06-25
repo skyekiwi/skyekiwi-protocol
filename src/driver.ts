@@ -19,20 +19,14 @@ class Driver {
     public ipfs: IPFS,
     public blockchain: Blockchain
   ) {
-    this.file = file;
     this.metadata = new Metadata(
-      new Chunks(file), seal
+      new Chunks(), seal
     )
-
-    // hardcoded to pointed at the smart contract abi
   }
 
   public async upstream() {
     
     let chunkCount = 0;
-    // console.log('file size:', this.file.fileSize());
-    // console.log('total chunks', this.file.fileChunkCount());
-
     const readStream = this.file.getReadStream()
 
     for await (const chunk of readStream) {
@@ -82,9 +76,9 @@ class Driver {
     // 1. get hash, if this is the first chunk, get the hash
     //          else, get hash combined with last hash
     if (this.metadata.chunks.hash === undefined) {
-      this.metadata.chunks.hash = File.getChunkHash(chunk);
+      this.metadata.chunks.hash = await File.getChunkHash(chunk);
     } else {
-      this.metadata.chunks.hash = File.getCombinedChunkHash(
+      this.metadata.chunks.hash = await File.getCombinedChunkHash(
         this.metadata.chunks.hash, chunk
       );
     }
@@ -173,9 +167,9 @@ class Driver {
       
 
       if (currentHash === undefined) {
-        currentHash = File.getChunkHash(chunk)
+        currentHash = await File.getChunkHash(chunk)
       } else {
-        currentHash = File.getCombinedChunkHash(currentHash, chunk)
+        currentHash = await File.getCombinedChunkHash(currentHash, chunk)
       }
       
       if (chunk.length != rawChunkSize) {

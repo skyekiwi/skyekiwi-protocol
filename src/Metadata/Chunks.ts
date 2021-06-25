@@ -1,8 +1,6 @@
-import { File, FileDigest, Util} from '../index'
+import { Util } from '../index'
 
 export class Chunks {
-
-  public file: File | FileDigest
   public chunkList: {
     [chunkId: number]: {
       "rawChunkSize": number,
@@ -12,8 +10,7 @@ export class Chunks {
   }
   public hash: Uint8Array
 
-  constructor(file: File | FileDigest) {
-    this.file = file
+  constructor() {
     this.chunkList = {}
   }
 
@@ -50,7 +47,6 @@ export class Chunks {
 
   public serialize() : string {
     return Util.serialize({
-      file: this.file.serialize(),
       chunkList: this.chunkList,
       hash: this.hash
     });
@@ -58,13 +54,10 @@ export class Chunks {
 
   public static parse(str: string) {
     const object = Util.parse(str)
-
-    let chunks = new Chunks(FileDigest.parse(object.file))
+    let chunks = new Chunks()
     chunks.chunkList = object.chunkList
     chunks.hash = object.hash
 
     return chunks
   }
-
-
 }

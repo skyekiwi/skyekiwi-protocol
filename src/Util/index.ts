@@ -1,5 +1,3 @@
-import * as SkyeKiwi from '../index'
-
 const hexToU8a = (hex: string) => {
   if (isValidHex(hex)) {
     return new Uint8Array(hex.match(/[0-9A-Fa-f]{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -24,16 +22,11 @@ const serialize = (object: any) : string => {
     else if (object[key].constructor === Buffer) {
       object[key] = u8aToHex(Uint8Array.from(object[key]))
     }
-    else if (object[key].constructor === SkyeKiwi.Chunks ||
-      object[key].constructor === SkyeKiwi.Seal ||
-      object[key].constructor === SkyeKiwi.File ||
-      object[key].constructor === SkyeKiwi.IPFS ||
-      object[key].constructor === SkyeKiwi.EncryptionSchema ||
-      object[key].constructor === SkyeKiwi.Metadata) {
-      object[key] = object[key].serialize()
-    }
     else if (Array.isArray(object[key])) {
       object[key] = serialize(object[key])
+    }
+    else if (object[key].serialize !== undefined) {
+      object[key] = object[key].serialize()
     }
   }
   return JSON.stringify(object)

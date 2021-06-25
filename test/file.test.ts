@@ -30,16 +30,16 @@ const setup = async () => {
   // SkyeKiwi.File has a default chunk size of 100MB.
   // we are making it 0.1MB here to demostrate it works
   const file1 = new SkyeKiwi.File(
-    file1Path,
     'tmp.file1',
-    'a testing file with 120MB random bytes',
-    1 * (10 ** 5)
+    fs.createReadStream(file1Path, {
+      highWaterMark: 1 * (10 ** 5)
+    })
   )
   const file2 = new SkyeKiwi.File(
-    file2Path,
     'tmp.file2',
-    'a testing file with 119MB repeating 187 byte',
-    1 * (10 ** 5)
+    fs.createReadStream(file2Path, {
+      highWaterMark: 1 * (10 ** 5)
+    })
   )
 
   return { file1, file2 }
@@ -60,29 +60,6 @@ const cleanup = async () => {
 describe('File', function () {
   this.timeout(15000)
 
-  it('File: file size reads well', async () => {
-    const { file1, file2 } = await setup()
-
-    const size1 = file1.fileSize()
-    const size2 = file2.fileSize()
-
-    expect(size1).to.equal(1200000)
-    expect(size2).to.equal(1190000)
-
-    await cleanup()
-  })
-
-  it('File: file chunk count calculated correctly', async () => {
-    const { file1, file2 } = await setup()
-    const chunk1 = file1.fileChunkCount()
-    const chunk2 = file2.fileChunkCount()
-
-    expect(chunk1).to.equal(12)
-    expect(chunk2).to.equal(12)
-
-    await cleanup()
-  })
-
   it('File: chunk hash calculation works', async () => {
     let { file1, file2 } = await setup()
     const stream1 = file1.getReadStream()
@@ -102,9 +79,9 @@ describe('File', function () {
 
       for await (const chunk of stream1) {
         if (hash1 === undefined) {
-          hash1 = SkyeKiwi.File.getChunkHash(chunk)
+          hash1 = await SkyeKiwi.File.getChunkHash(chunk)
         } else {
-          hash1 = SkyeKiwi.File.getCombinedChunkHash(
+          hash1 = await SkyeKiwi.File.getCombinedChunkHash(
             hash1, chunk
           )
         }
@@ -112,9 +89,9 @@ describe('File', function () {
 
       for await (const chunk of stream2) {
         if (hash2 === undefined) {
-          hash2 = SkyeKiwi.File.getChunkHash(chunk)
+          hash2 = await SkyeKiwi.File.getChunkHash(chunk)
         } else {
-          hash2 = SkyeKiwi.File.getCombinedChunkHash(
+          hash2 = await SkyeKiwi.File.getCombinedChunkHash(
             hash2, chunk
           )
         }

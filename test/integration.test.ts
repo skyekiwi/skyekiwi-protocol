@@ -24,12 +24,12 @@ const setup = async () => {
   await SkyeKiwi.File.writeFile(Buffer.from(content), filePath, 'a')
 
   // SkyeKiwi.File has a default chunk size of 100MB.
-  // we are making it 0.1MB here to demostrate it works
+  // we are making it 1MB here to demostrate it works
   const file = new SkyeKiwi.File(
-    filePath,
-    'tmp.file',
-    'a testing file with 12MB random bytes',
-    4 * (10 ** 6)
+    'tmp.file1',
+    fs.createReadStream(filePath, {
+      highWaterMark: 1 * (10 ** 8)
+    })
   )
 
   return file

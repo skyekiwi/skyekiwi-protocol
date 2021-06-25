@@ -1,9 +1,11 @@
 const ipfs = require('ipfs-core')
-const axios = require('axios')
-const FormData = require('form-data')
-require('dotenv').config()
+
+let fetch
+if (typeof window === 'undefined') {
+  fetch = require('node-fetch')
+} else fetch = window.fetch
+
 const createClient = require('ipfs-http-client')
-const https = require('https')
 // import { Util } from '../index'
 
 export class IPFS {
@@ -81,7 +83,7 @@ export class IPFS {
   }
 
   public async addAndPinInfura(content: string) {
-    console.log("trying to pin to Infura")
+    // console.log("trying to pin to Infura")
     const infura = createClient({
       host: 'ipfs.infura.io',
       port: 5001,
@@ -98,7 +100,7 @@ export class IPFS {
   }
 
   public async addAndPinSkyeKiwi(content: string) {
-    console.log("trying to pin to SkyeKiwi")
+    // console.log("trying to pin to SkyeKiwi")
     const skyekiwiNode = createClient({
       host: 'sgnode.skye.kiwi',
       port: 5001,
@@ -114,90 +116,30 @@ export class IPFS {
     }
   }
 
-  public async addAndPinDecoo(content: string) {
-    console.log("trying to pin to Decoo")
-    const form_data = new FormData();
-    form_data.append("file", Buffer.from(content, 'utf-8'), 'upload');
-    const request_config = {
-      method: "post",
-      url: 'http://api.decoo.io/pinning/pinFile',
-      headers: {
-        "Authorization": "Bearer " + process.env.DECOO,
-        "Content-Type": "multipart/form-data",
-        ...form_data.getHeaders()
-      },
-      timeout: 5000,
-      data: form_data
-    }
-
-    const decooResult = await axios(request_config)
-    return { cid: decooResult.data.PinHash, size: decooResult.data.PinSize }
-  }
-
   public async remoteGatewayAddAndPin(content: string) {
     try {
-      return await this.addAndPinSkyeKiwi(content)
-    } catch(err) {
-      if (process.env.DECOO) {
-        try {
-          return await this.addAndPinDecoo(content)
-        } catch(err) {
-          console.log('decoo pinning failed')
-          return await this.addAndPinInfura(content)
-        }
-      } else {
-        try {
-          return await this.addAndPinInfura(content)
-        } catch (err) {
-          throw new Error("all remote pin failed - ipfs.remoteGatewayAddAndPin")
-        }
+      return await this.addAndPinInfura(content)
+    } catch (err) {
+      try {
+        return await this.addAndPinSkyeKiwi(content)
+      } catch (err) {
+        throw new Error("all remote pin failed - ipfs.remoteGatewayAddAndPin")
       }
     }
   }
-
   public async fetchFileFromRemote(cid: string) {
     
     try {
-      const request_configs = [{
-        method: "GET",
-        url: `https://ipfs.io/ipfs/${cid}`,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      }, {
-        method: "GET",
-        url: `https://gateway.ipfs.io/ipfs/${cid}`,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      }, {
-        method: "GET",
-        url: `https://gateway.originprotocol.com/ipfs/${cid}`,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      }, {
-        method: "GET",
-        url: `https://bin.d0x.to/ipfs/${cid}`,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      }, {
-        method: "GET",
-        url: `https://ipfs.fleek.co/ipfs/${cid}`,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      }, {
-        method: "GET",
-        url: `https://cloudflare-ipfs.com/ipfs/${cid}`,
-        httpsAgent: new https.Agent({
-          rejectUnauthorized: false
-        })
-      }]
-      const requests = request_configs.map(config => axios(config))
+      const requests = [
+        fetch(`https://ipfs.io/ipfs/${cid}`),
+        fetch(`https://gateway.ipfs.io/ipfs/${cid}`),
+        fetch(`https://gateway.originprotocol.com/ipfs/${cid}`),
+        fetch(`https://bin.d0x.to/ipfs/${cid}`),
+        fetch(`https://ipfs.fleek.co/ipfs/${cid}`),
+        fetch(`https://cloudflare-ipfs.com/ipfs/${cid}`)
+      ]
       const result = await Promise.race(requests)
-      return result.data
+      return await result.text()
     } catch(err) {
       try {
 

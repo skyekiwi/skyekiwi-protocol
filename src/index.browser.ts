@@ -1,5 +1,5 @@
 import { IPFS } from './IPFS'
-import { Driver } from './driver'
+import { Driver } from './driver.browser'
 import { File } from './File'
 import {
   Chunks, Seal, Metadata, EncryptionSchema

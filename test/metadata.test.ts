@@ -13,8 +13,8 @@ import fs from 'fs'
 
 require('dotenv').config();
 
-const file1Path = path.join(__dirname, '/tmp/metadata.file1')
-const file2Path = path.join(__dirname, '/tmp/metadata.file2')
+const file1Path = path.join(__dirname, '/tmp/file.file1')
+const file2Path = path.join(__dirname, '/tmp/file.file2')
 
 const setup = async () => {
   // we are creating two files here:
@@ -35,17 +35,19 @@ const setup = async () => {
 
   // SkyeKiwi.File has a default chunk size of 100MB.
   // we are making it 0.1MB here to demostrate it works
+
+
   const file1 = new SkyeKiwi.File(
-    file1Path,
     'tmp.file1',
-    'a testing file with 120MB random bytes',
-    1 * (10 ** 5)
+    fs.createReadStream(file1Path, {
+      highWaterMark: 1 * (10 ** 5)
+    })
   )
   const file2 = new SkyeKiwi.File(
-    file2Path,
     'tmp.file2',
-    'a testing file with 119MB repeating 187 byte',
-    1 * (10 ** 5)
+    fs.createReadStream(file2Path, {
+      highWaterMark: 1 * (10 ** 5)
+    })
   )
 
   return { file1, file2 }
@@ -122,7 +124,7 @@ describe('Metadata', function () {
   it('Chunks: chunks are recorded well & CID list matches', async () => {
     const { file1 } = await setup()
 
-    const chunks1 = new SkyeKiwi.Chunks(file1)
+    const chunks1 = new SkyeKiwi.Chunks()
 
     const ipfs = new SkyeKiwi.IPFS()
     let chunkId = 0
