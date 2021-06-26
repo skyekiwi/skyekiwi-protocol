@@ -1,4 +1,4 @@
-<img alt='logo' src="https://i.ibb.co/DkJW76L/dark-logo.png" style="height: 200px; width: auto;"/>
+<img alt='logo_not_loading' src="https://i.ibb.co/DkJW76L/dark-logo.png" style="height: 200px;" />
 
 # Skye.Kiwi Protocol <small>0.1.0</small>
 
