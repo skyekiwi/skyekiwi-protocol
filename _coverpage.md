@@ -2,7 +2,7 @@
 
 # Skye.Kiwi Protocol  <small>0.1.0</small>
 
-> A Decentralized Secret Sharing Protocol.
+> A Decentralized Secret Sharing Protocol
 
 - Share with Privacy
 <br /><br /><br /><br />
