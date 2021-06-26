@@ -4,8 +4,8 @@
 
 > A Decentralized Secret Sharing Protocol.
 
-- Arbitrary File Size
 - Share with Privacy
+- 
 
 [GitHub](https://github.com/skyekiwi)
 [Getting Started](#docsify)
