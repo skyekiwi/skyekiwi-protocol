@@ -4,9 +4,8 @@
 
 > A Decentralized Secret Sharing Protocol.
 
-- Simple and lightweight
-- No statically built html files
-- Multiple themes
+- Arbitrary File Size
+- Share with Privacy
 
 [GitHub](https://github.com/skyekiwi)
 [Getting Started](#docsify)
