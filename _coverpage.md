@@ -5,8 +5,8 @@
 > A Decentralized Secret Sharing Protocol.
 
 - Share with Privacy
-- #
-- #
+- <br/>
+
 
 [GitHub](https://github.com/skyekiwi)
 [Getting Started](#docsify)
