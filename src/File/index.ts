@@ -3,8 +3,10 @@ import pako from 'pako'
 let FileSaver, fs, crypto
 
 if (typeof window === 'undefined') {
-  fs = require('fs')
-  crypto = require('crypto')
+  try {
+    fs = require('fs')
+    crypto = require('crypto')
+  } catch (e) {}
 } else {
   FileSaver = require('file-saver')
 }
