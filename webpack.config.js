@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
-
+const buffer = require("buffer")
+const webpack = require('webpack')
 module.exports = {
   // devtool: 'inline-source-map',
   mode: 'development',
@@ -17,6 +18,11 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }) 
+  ],
   resolve: {
     extensions: [ '.ts', '.tsx', '.js', '.json' ],
     fallback: {

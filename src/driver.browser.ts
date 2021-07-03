@@ -130,7 +130,6 @@ class Driver {
     vaultId: number,
     blockchain: Blockchain,
     ipfs: IPFS,
-    outputPath: string,
     keys: Uint8Array[]
   ) {
     const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
@@ -140,7 +139,7 @@ class Driver {
     const hash = unsealed.chunkMetadata.hash
 
     return await this.downstreamChunkProcessingPipeLine(
-      chunks, hash, sealingKey, ipfs, outputPath
+      chunks, hash, sealingKey, ipfs
     )
   }
 
@@ -148,8 +147,8 @@ class Driver {
     chunks: {},
     hash: Uint8Array,
     sealingKey: Uint8Array,
-    ipfs: IPFS,
-    outputPath: string
+    ipfs: IPFS //,
+    // outputPath: string
   ) {
 
     let currentHash: Uint8Array
@@ -176,11 +175,17 @@ class Driver {
         throw new Error('chunk size error: Driver.downstreamChunkProcessingPipeLine')
       }
 
-      await File.writeFile(Buffer.from(chunk), outputPath, 'a')
+      await File.saveAs(chunk)
 
     }
-    if (Buffer.compare(currentHash, hash) !== 0) {
+
+    if (currentHash.length != hash.length) {
       throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine')
+    }
+    for (let i = 0; i < currentHash.length; i++) {
+      if (currentHash[i] != hash[i]) {
+        throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine')
+      }
     }
   }
 

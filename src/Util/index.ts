@@ -19,9 +19,9 @@ const serialize = (object: any) : string => {
     if (object[key].constructor === Uint8Array) {
       object[key] = u8aToHex(object[key])
     }
-    else if (object[key].constructor === Buffer) {
-      object[key] = u8aToHex(Uint8Array.from(object[key]))
-    }
+    // else if (object[key].constructor === Buffer) {
+    //   object[key] = u8aToHex(Uint8Array.from(object[key]))
+    // }
     else if (Array.isArray(object[key])) {
       object[key] = serialize(object[key])
     }

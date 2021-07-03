@@ -23,6 +23,7 @@
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
     "@types/node": "^10.11.4",
+    "buffer": "^6.0.3",
     "chai": "^4.2.0",
     "crypto-browserify": "^3.12.0",
     "mocha": "^9.0.1",
@@ -41,9 +42,10 @@
     "test:ipfs": "mocha -r ts-node/register ./test/ipfs.test.ts",
     "test:all": "mocha -r ts-node/register ./test/*.test.ts",
     "test": "yarn test:all",
+    "test:browser": "",
     "build": "yarn build:node && yarn build:browser",
     "build:node": "tsc",
-    "build:browser": "webpack --mode production",
-    "start": "webpack serve --mode production --progress --color"
+    "build:browser": "webpack --mode development",
+    "start": "webpack serve --mode development --progress --color"
   }
 }

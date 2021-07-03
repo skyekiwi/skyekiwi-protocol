@@ -73,7 +73,7 @@ export class File {
   }
 
   public static writeFile(
-    content: Buffer, 
+    content: ArrayBuffer, 
     filePath: string, 
     flags: string
   ) {
