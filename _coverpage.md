@@ -9,4 +9,4 @@
 
 
 [GitHub](https://github.com/skyekiwi)
-[Getting Started](#docsify)
+[Getting Started](intro.md)
