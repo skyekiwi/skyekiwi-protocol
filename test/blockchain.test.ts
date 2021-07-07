@@ -18,8 +18,8 @@ describe('Blockchain', function () {
     const mnemonic = process.env.SEED_PHRASE
     const blockchain = new SkyeKiwi.Blockchain(
       mnemonic,
-      '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-      'wss://jupiter-poa.elara.patract.io',
+      '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg',
+      'wss://ws.jupiter-poa.patract.cn',
       'wss://rocky-api.crust.network/',
       abi)
 

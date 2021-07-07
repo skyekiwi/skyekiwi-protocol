@@ -118,10 +118,10 @@ export class IPFS {
 
   public async remoteGatewayAddAndPin(content: string) {
     try {
-      return await this.addAndPinInfura(content)
+      return await this.addAndPinSkyeKiwi(content)
     } catch (err) {
       try {
-        return await this.addAndPinSkyeKiwi(content)
+        return await this.addAndPinInfura(content)
       } catch (err) {
         throw new Error("all remote pin failed - ipfs.remoteGatewayAddAndPin")
       }
@@ -139,6 +139,9 @@ export class IPFS {
         fetch(`https://cloudflare-ipfs.com/ipfs/${cid}`)
       ]
       const result = await Promise.race(requests)
+      if (result.status != 200) {
+        throw new Error("public gateway non-200 response - ipfs.fetchFileFromRemote")
+      }
       return await result.text()
     } catch(err) {
       try {

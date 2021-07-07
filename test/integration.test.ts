@@ -55,9 +55,9 @@ describe('Integration', function() {
     // seed phrase
     mnemonic,
     // contract address
-    '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
+    '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg',
     // contract instance endpoint
-    'wss://jupiter-poa.elara.patract.io',
+    'wss://ws.jupiter-poa.patract.cn',
     // storage network endpoint
     'wss://rocky-api.crust.network/',
     // contract abi
@@ -108,7 +108,7 @@ describe('Integration', function() {
     )
 
     const downstreamContent = fs.readFileSync(downstreamPath)
-    expect(Buffer.compare(downstreamContent, content)).to.equal(0)
+    expect(Buffer.compare(downstreamContent, Buffer.from(content))).to.equal(0)
     
     await ipfs.stopIfRunning()
     await unlink(downstreamPath)
@@ -176,7 +176,7 @@ describe('Integration', function() {
     )
 
     const downstreamContent = fs.readFileSync(downstreamPath)
-    expect(Buffer.compare(downstreamContent, content)).to.equal(0)
+    expect(Buffer.compare(downstreamContent, Buffer.from(content))).to.equal(0)
 
     await ipfs.stopIfRunning()
     await unlink(downstreamPath)
@@ -218,7 +218,7 @@ describe('Integration', function() {
     )
 
     const downstreamContent = fs.readFileSync(downstreamPath)
-    expect(Buffer.compare(downstreamContent, content)).to.equal(0)
+    expect(Buffer.compare(downstreamContent, Buffer.from(content))).to.equal(0)
 
     await ipfs.stopIfRunning()
     await unlink(downstreamPath)

@@ -137,8 +137,15 @@ class Driver {
 
     const sealingKey = unsealed.sealingKey
     const chunks = unsealed.chunkMetadata.chunkList
-    const hash = unsealed.chunkMetadata.hash
+    let hash = unsealed.chunkMetadata.hash
 
+    if (typeof hash === 'object') {
+      try {
+        hash = Buffer.from(hash.data)
+      } catch(err) {
+        throw new Error('hash parse err - driver.downstream')
+      }
+    }
     return await this.downstreamChunkProcessingPipeLine(
       chunks, hash, sealingKey, ipfs, outputPath
     )
