@@ -16,15 +16,13 @@ export class IPFS {
     this.localIpfsReady = false
   }
 
-  public async init() {
-    if (!this.localIpfsReady) {
+  public async init() { 
+    try {
+      this.localIpfs = await ipfs.create()
       this.localIpfsReady = true
-      try {
-        this.localIpfs = await ipfs.create()
-      } catch(err) {
-        // pass
-        // this is where there is already an ipfs node running 
-      }
+    } catch(err) {
+      // pass
+      // this is where there is already an ipfs node running 
     }
   }
   public async stopIfRunning() {
@@ -42,7 +40,6 @@ export class IPFS {
       await this.init()
       const cid = await this.localIpfs.add(str);
       const fileStat = await this.localIpfs.files.stat("/ipfs/" + cid.path)
-      console.log(cid)
       return {
         cid: cid.path, size: fileStat.cumulativeSize
       }
@@ -52,7 +49,6 @@ export class IPFS {
     }
   }
   public async cat(cid: string) {
-
     if (cid.length !== 46) {
       throw new Error('cid length error: ipfs.cat')
     }
@@ -60,6 +56,8 @@ export class IPFS {
       const remoteResult = await this.fetchFileFromRemote(cid)
       return remoteResult
     } catch (err) {
+      console.error(err)
+      return ""
       try {
         let result = ''
         await this.init()
@@ -71,14 +69,6 @@ export class IPFS {
         console.error(err)
         throw (new Error('IPFS Failure: ipfs.cat'))
       }
-    }
-  }
-  public async pin(cid: String) {
-    try {
-      return await this.localIpfs.pin.add(cid)
-    } catch (err) {
-      console.error(err)
-      throw (new Error('IPFS Failure: ipfs.pin'))
     }
   }
 
@@ -128,15 +118,13 @@ export class IPFS {
     }
   }
   public async fetchFileFromRemote(cid: string) {
-    
     try {
       const requests = [
-        fetch(`https://ipfs.io/ipfs/${cid}`),
-        fetch(`https://gateway.ipfs.io/ipfs/${cid}`),
-        fetch(`https://gateway.originprotocol.com/ipfs/${cid}`),
-        fetch(`https://bin.d0x.to/ipfs/${cid}`),
-        fetch(`https://ipfs.fleek.co/ipfs/${cid}`),
-        fetch(`https://cloudflare-ipfs.com/ipfs/${cid}`)
+        fetch(`http://ipfs.io/ipfs/${cid}`),
+        fetch(`http://gateway.ipfs.io/ipfs/${cid}`),
+        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`),
+        fetch(`http://ipfs.fleek.co/ipfs/${cid}`),
+        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`)
       ]
       const result = await Promise.race(requests)
       if (result.status != 200) {
@@ -145,7 +133,6 @@ export class IPFS {
       return await result.text()
     } catch(err) {
       try {
-
         console.log("public gateway failed. Trying Infura")
         const infura = createClient({
           host: 'ipfs.infura.io',
@@ -177,11 +164,5 @@ export class IPFS {
         }
       }
     }
-  }
-  public serialize() {
-    return {}
-  }
-  public static parse() {
-    return new IPFS()
   }
 }

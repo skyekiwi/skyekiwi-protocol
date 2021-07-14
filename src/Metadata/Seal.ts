@@ -78,9 +78,23 @@ export class Seal {
         this.encryptionSchema.members[index]))
     }
 
+    let publicSharesHex = ""
+    let privateSharesHex = ""
+
+    for (let share of public_shares) {
+      publicSharesHex += Util.u8aToHex(share) + "|"
+    }
+
+    publicSharesHex = Util.trimEnding(publicSharesHex)
+
+    for (let share of private_shares) {
+      privateSharesHex += Util.u8aToHex(share) + "|"
+    }
+
+    privateSharesHex = Util.trimEnding(privateSharesHex)
     return {
-      "public": public_shares,
-      "private": private_shares
+      "public": publicSharesHex,
+      "private": privateSharesHex
     }
   }
 
@@ -119,25 +133,5 @@ export class Seal {
       'numOfParticipants': this.encryptionSchema.getNumOfParticipants(),
       'author': Util.u8aToHex(this.encryptionSchema.author)
     }
-  }
-
-  public serialize() {
-    console.warn("this is very risky for leaking private info - Seal.serialize")
-    return Util.serialize({
-      sealingKey: this.sealingKey,
-      publicSealingKey: this.getPublicSealingKey(),
-      author: this.getPublicAuthorKey(),
-
-      blockchainPrivateKey: this.blockchainPrivateKey,
-      mnemonic: this.mnemonic,
-      encryptionSchema: this.encryptionSchema.serialize()
-    })
-  }
-
-  public static parse(str: string) {
-    const object = Util.parse(str)
-    object.encryptionSchema = EncryptionSchema.parse(object.encryptionSchema)
-    object.sealingKey = Util.parse(object.sealingKey)
-    return new Seal(object.encryptionSchema, object.mnemonic, object.sealingKey)
   }
 }

@@ -1,5 +1,3 @@
-import { Util } from '../index'
-
 export class EncryptionSchema {
   public members: Uint8Array[]
 
@@ -25,39 +23,5 @@ export class EncryptionSchema {
   public addMember(memberPublicKey: Uint8Array, shares: number) {
     for (let i = 0 ; i < shares; i ++)
     this.members.push(memberPublicKey)
-  }
-
-  public serialize() {
-    return Util.serialize({
-      numOfShares: this.numOfShares,
-      threshold: this.threshold,
-      author: this.author,
-      unencryptedPieceCount: this.unencryptedPieceCount,
-      members: this.members,
-      numOfParticipants: this.getNumOfParticipants()
-    })
-  }
-
-  public static parse(str: string) {
-    const object = Util.parse(str)
-
-    if (!object.numOfShares || !object.threshold 
-      || !object.author || !object.unencryptedPieceCount) {
-        throw new Error('parse error: EncryptionSchema.parse')
-      }
-    
-
-    let result = new EncryptionSchema(
-      object.numOfShares, object.threshold,
-      object.author, object.unencryptedPieceCount
-    )
-    for (let member of object.members) {
-      if (member.constructor !== Uint8Array) {
-        throw new Error('parse error: EncryptionSchema.parse')
-      }
-      result.addMember(member, 1)
-    }
-
-    return result
   }
 }

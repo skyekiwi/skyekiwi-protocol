@@ -1,3 +1,5 @@
+import { stringToU8a, u8aToString } from '@polkadot/util';
+
 const hexToU8a = (hex: string) => {
   if (isValidHex(hex)) {
     return new Uint8Array(hex.match(/[0-9A-Fa-f]{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -13,46 +15,20 @@ const isValidHex = str => {
   return (str.length & 1) === 0 && 
     (/^[0-9A-Fa-f]*$/g).test(str)
 }
-
-const serialize = (object: any) : string => {
-  for (let key in object) {
-    if (object[key].constructor === Uint8Array) {
-      object[key] = u8aToHex(object[key])
-    }
-    // else if (object[key].constructor === Buffer) {
-    //   object[key] = u8aToHex(Uint8Array.from(object[key]))
-    // }
-    else if (Array.isArray(object[key])) {
-      object[key] = serialize(object[key])
-    }
-    else if (object[key].serialize !== undefined) {
-      object[key] = object[key].serialize()
-    }
-  }
-  return JSON.stringify(object)
+const numberPadding = n => {
+  return String(n).padStart(16, '0')
 }
 
-const parse = (str: string) : any => {
-  try {
-    const object = JSON.parse(str)
-    for (let key in object) {
-      let obj = object[key]
-      if (typeof obj === 'string' && isValidHex(obj)) {
-        object[key] = hexToU8a(obj)
-      } else {
-        try {
-          object[key] = parse(obj)
-        } catch (err) {
-          // pass
-        }
-      }
-    }
-    return object
-  } catch (err) {
-    return str
-  }
+const trimEnding = (str: string) => {
+  const len = str.length
+  if (str[len - 1] === '|' || str[len - 1] === '-' || str[len - 1] === ' ') {
+    return str.substring(0, len - 1)
+  } else return str
 }
-
 export {
-  hexToU8a, u8aToHex, isValidHex, serialize, parse
+  hexToU8a, u8aToHex, isValidHex, 
+    
+  numberPadding,
+  
+  stringToU8a, u8aToString, trimEnding
 }

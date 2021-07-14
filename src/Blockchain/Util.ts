@@ -1,3 +1,13 @@
+export function getAbi() {
+  try {
+    return require('../../abi/skyekiwi.json');
+  } catch (e) {
+    throw new Error("abi not found or misnamed. Looking for skyekiwi.json")
+    return null;
+  }
+}
+
+
 // Ported from 
 // https://github.com/crustio/crust.js/blob/main/packages/crust-pin/src/util.ts
 // With minor modifications
@@ -20,14 +30,14 @@ export async function sendTx(
   logging = logging === undefined ? false : logging
 
   if (logging)
-  console.log('⛓  Send tx to chain...');
+    console.log('⛓  Send tx to chain...');
 
   return new Promise((resolve, reject) => {
     extrinsic.signAndSend(signer, ({ events = [], status }) => {
       if (logging)
-      console.log(
-        `  ↪ 💸  Transaction status: ${status.type}, nonce: ${extrinsic.nonce}`
-      );
+        console.log(
+          `  ↪ 💸  Transaction status: ${status.type}, nonce: ${extrinsic.nonce}`
+        );
 
       if (
         status.isInvalid ||
@@ -48,7 +58,7 @@ export async function sendTx(
             resolve(false);
           } else if (method === 'ExtrinsicSuccess') {
             if (logging)
-            console.log(`  ↪ ✅  Send transaction(${extrinsic.type}) success.`);
+              console.log(`  ↪ ✅  Send transaction(${extrinsic.type}) success.`);
             resolve(true);
           }
         });

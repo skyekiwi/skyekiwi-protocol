@@ -1,7 +1,6 @@
-import {sendTx} from './sendTx'
+import { sendTx, getAbi} from './Util'
 import { Crust } from './Crust'
 import { Contract } from './Contract'
-import { getAbi } from './getAbi'
 
 import { ContractPromise } from '@polkadot/api-contract';
 import { waitReady } from '@polkadot/wasm-crypto'

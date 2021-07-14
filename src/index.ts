@@ -2,7 +2,7 @@ import { IPFS } from './IPFS'
 import { Driver } from './driver'
 import { File } from './File'
 import {
-  Chunks, Seal, Metadata, EncryptionSchema
+  Seal, Metadata, EncryptionSchema
 } from './Metadata'
 import {
   Box,
@@ -24,7 +24,6 @@ export {
 
   File,
 
-  Chunks,
   Seal,
   Metadata,
   EncryptionSchema,

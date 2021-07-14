@@ -11,8 +11,6 @@ if (typeof window === 'undefined') {
   FileSaver = require('file-saver')
 }
 
-import { Util } from '../index'
-
 export class File {
 
   constructor(
@@ -58,20 +56,6 @@ export class File {
     }
   }
 
-  public serialize() {
-    return Util.serialize({
-      fileName: this.fileName
-    })
-  }
-
-  public static parse(str: string) {
-    const object = Util.parse(str)
-    if (!object.fileName || !object.fileNote) {
-      throw new Error('parse error: File.parse')
-    }
-    return new File( object.fileName, object.fileChunkSize)
-  }
-
   public static writeFile(
     content: ArrayBuffer, 
     filePath: string, 
@@ -87,6 +71,7 @@ export class File {
       })
     } else throw new Error("writeFile is for node.js, use File.saveAs instead - File.writeFile")
   }
+  
   public static saveAs(
     content: Uint8Array, 
     fileName?: string,
