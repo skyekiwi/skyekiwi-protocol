@@ -11,8 +11,6 @@ if (typeof window === 'undefined') {
   FileSaver = require('file-saver')
 }
 
-import { Util } from '../index'
-
 export class File {
 
   constructor(
@@ -56,20 +54,6 @@ export class File {
     } catch (err) {
       throw new Error("inflation failed - File.inflatDeflatedChunk")
     }
-  }
-
-  public serialize() {
-    return Util.serialize({
-      fileName: this.fileName
-    })
-  }
-
-  public static parse(str: string) {
-    const object = Util.parse(str)
-    if (!object.fileName || !object.fileNote) {
-      throw new Error('parse error: File.parse')
-    }
-    return new File( object.fileName, object.fileChunkSize)
   }
 
   public static writeFile(

@@ -19,44 +19,6 @@ const numberPadding = n => {
   return String(n).padStart(16, '0')
 }
 
-const serialize = (object: any) : string => {
-  for (let key in object) {
-    if (object[key].constructor === Uint8Array) {
-      object[key] = u8aToHex(object[key])
-    }
-    // else if (object[key].constructor === Buffer) {
-    //   object[key] = u8aToHex(Uint8Array.from(object[key]))
-    // }
-    else if (Array.isArray(object[key])) {
-      object[key] = serialize(object[key])
-    }
-    else if (object[key].serialize !== undefined) {
-      object[key] = object[key].serialize()
-    }
-  }
-  return JSON.stringify(object)
-}
-
-const parse = (str: string) : any => {
-  try {
-    const object = JSON.parse(str)
-    for (let key in object) {
-      let obj = object[key]
-      if (typeof obj === 'string' && isValidHex(obj)) {
-        object[key] = hexToU8a(obj)
-      } else {
-        try {
-          object[key] = parse(obj)
-        } catch (err) {
-          // pass
-        }
-      }
-    }
-    return object
-  } catch (err) {
-    return str
-  }
-}
 const trimEnding = (str: string) => {
   const len = str.length
   if (str[len - 1] === '|' || str[len - 1] === '-' || str[len - 1] === ' ') {
@@ -65,9 +27,7 @@ const trimEnding = (str: string) => {
 }
 export {
   hexToU8a, u8aToHex, isValidHex, 
-  
-  serialize, parse, 
-  
+    
   numberPadding,
   
   stringToU8a, u8aToString, trimEnding
