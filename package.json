@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/protocol",
-  "version": "0.1.2",
+  "version": "0.1.2-1",
   "main": "./dist/index.js",
   "repository": {
     "type": "git",
@@ -26,17 +26,16 @@
     "pako": "^2.0.3",
     "stream-browserify": "^3.0.0",
     "tweetnacl": "^1.0.3",
-    "tweetnacl-util": "^0.15.1"
+    "tweetnacl-util": "^0.15.1",
+    "secrets.js-grempe": "^2.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
     "@types/node": "^10.11.4",
-    "buffer": "^6.0.3",
     "chai": "^4.2.0",
     "crypto-browserify": "^3.12.0",
     "mocha": "^9.0.1",
-    "secrets.js-grempe": "^2.0.0",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tslint": "^5.11.0",
