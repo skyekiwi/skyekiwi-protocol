@@ -655,6 +655,11 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
+"@skyekiwi/secrets@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@skyekiwi/secrets/-/secrets-2.0.1.tgz#b14bdd53651332cf20c1ab2f9ffc4ae9b389cad5"
+  integrity sha512-qecFhKiRWzGOM/dh1+59prvFpT3VESvD9Gw2f5YBLcrrkG1cWQ8l1d3wepl/EDp5GIM0VEDsTvmx8Xnw6N0jAg==
+
 "@sovpro/delimited-stream@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@sovpro/delimited-stream/-/delimited-stream-1.1.0.tgz#4334bba7ee241036e580fdd99c019377630d26b4"
@@ -6575,11 +6580,6 @@ secp256k1@^4.0.0:
     elliptic "^6.5.2"
     node-addon-api "^2.0.0"
     node-gyp-build "^4.2.0"
-
-secrets.js-grempe@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/secrets.js-grempe/-/secrets.js-grempe-2.0.0.tgz#65b32bf6bfe4f40e8ed0e44dc74f469e293a4ab8"
-  integrity sha512-4xkOIaDAg998dTFXZUJTOoVbdLHfB818SMeLJ69ABccgGEKokxsoRFupAFfAImloUSKv4QUGNMgKVbKMf6z0Ug==
 
 select-hose@^2.0.0:
   version "2.0.0"

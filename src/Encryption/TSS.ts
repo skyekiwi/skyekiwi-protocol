@@ -1,4 +1,4 @@
-import secrets from 'secrets.js-grempe'
+import secrets from '@skyekiwi/secrets'
 import {Util} from '../index'
 
 // 32 bytes
