@@ -1,7 +1,7 @@
 {
   "name": "@skyekiwi/protocol",
-  "version": "0.1.0",
-  "main": "./src/index.ts",
+  "version": "0.1.1",
+  "main": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com//skyekiwi/skyekiwi-protocol.git "
