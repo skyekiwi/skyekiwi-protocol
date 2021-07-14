@@ -129,9 +129,9 @@ yarn global add ts-node
 SEED_PHRASE = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
 ```
 
-3. Get some test-net tokens to interact with the blockchain. By default, SkyeKiwi uses the [Jupiter Network](https://github.com/patractlabs/jupiter/) for smart contract runtime and [Crust Network - Rocky Testnet](https://wiki.crust.network/docs/en/buildRockyGuidance) for storage.
+3. Get some test-net tokens to interact with the blockchain. By default, SkyeKiwi uses the [Canvas Testnet](https://paritytech.github.io/ink-docs/canvas/) for smart contract runtime and [Crust Network - Rocky Testnet](https://wiki.crust.network/docs/en/buildRockyGuidance) for storage.
 
-- Faucet on the Jupiter network is available at [LINK](https://patrastore.io/#/jupiter-a1/system/accounts)
+- Faucet on the Canvas Testnet is available at [LINK](https://riot.im/app/#/room/#canvas_faucet:matrix.parity.io)
 - Faucet on the Crust Network - Rocky Testnet is available at [LINK](https://github.com/decloudf/faucet-bot/issues)
 
 4. Run Tests. The process can take somewhere between 3minutes to 10 minutes, depends on network connection. 

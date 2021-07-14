@@ -1,7 +1,16 @@
 {
-  "name": "syekiwi-protocol",
+  "name": "@skyekiwi/protocol",
   "version": "0.1.0",
-  "private": true,
+  "main": "./src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com//skyekiwi/skyekiwi-protocol.git "
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2.0",
   "dependencies": {
     "@crustio/type-definitions": "^0.0.10",
     "@polkadot/api": "4.13.2-5",

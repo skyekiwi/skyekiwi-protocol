@@ -1,11 +1,10 @@
 'use strict';
 const path = require('path');
-const buffer = require("buffer")
 const webpack = require('webpack')
 module.exports = {
   // devtool: 'inline-source-map',
-  mode: 'development',
-	entry: './dist/index.browser.js',
+  mode: 'production',
+	entry: './src/index.ts',
 	output: {
 		filename: 'skyekiwi.browser.js',
 		path: path.resolve(__dirname, 'dist')
