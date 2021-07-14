@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SKYEKIWI_SECRETS_ENDING = exports.TSS = void 0;
-const secrets_js_grempe_1 = __importDefault(require("secrets.js-grempe"));
+const secrets_1 = __importDefault(require("@skyekiwi/secrets"));
 const index_1 = require("../index");
 // 32 bytes
 const SKYEKIWI_SECRETS_ENDING = "244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619";
@@ -19,7 +19,7 @@ class TSS {
         const messageHexString = index_1.Util.u8aToHex(message);
         const wrappedMessageHexString = messageHexString + SKYEKIWI_SECRETS_ENDING;
         // Proceed with TSS
-        const shares = secrets_js_grempe_1.default.share(wrappedMessageHexString, numShares, threshold);
+        const shares = secrets_1.default.share(wrappedMessageHexString, numShares, threshold);
         // get rid of the BITS field, where they create wrong u8a
         // it should be set by default to 8. 
         // I cannot think of a chance if the below error can be thrown, 
@@ -37,7 +37,7 @@ class TSS {
         const sharesInHexString = shares.map(index_1.Util.u8aToHex);
         // Recover by TSS
         // similar to shares generation, reverse the process by putting back the BITS
-        const wrappedResult = secrets_js_grempe_1.default.combine(sharesInHexString.map(share => '8' + share));
+        const wrappedResult = secrets_1.default.combine(sharesInHexString.map(share => '8' + share));
         if (wrappedResult.slice(wrappedResult.length - SKYEKIWI_SECRETS_ENDING.length)
             !== SKYEKIWI_SECRETS_ENDING) {
             throw new Error("decryption failed, most likely because threshold is not met - TSS.recover");
