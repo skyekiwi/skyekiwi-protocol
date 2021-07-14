@@ -1,7 +1,6 @@
-import { stringToU8a, u8aToString } from '@polkadot/util';
 import {
   // EncryptionSchema, 
-  Metadata, Seal, EncryptionSchema, Chunks,
+  Metadata, Seal, EncryptionSchema,
   File, Util, Blockchain,
 
   IPFS,
@@ -20,7 +19,7 @@ class Driver {
     public blockchain: Blockchain
   ) {
     this.metadata = new Metadata(
-      new Chunks(), seal
+      seal, ipfs
     )
   }
 
@@ -35,15 +34,10 @@ class Driver {
     }
 
     // @ts-ignore
-    let cidList:[{cid: string, size: number}] = this.metadata.chunks.getCIDList()
+    let cidList:[{cid: string, size: number}] = this.metadata.getCIDList()
 
     // now let's compress and process the sealedData
-    let sealedData : any = this.metadata.generateSealedMetadata()
-
-    sealedData = Util.serialize(sealedData)
-    sealedData = stringToU8a(sealedData)
-    sealedData = await File.deflatChunk(sealedData)
-    sealedData = Util.u8aToHex(sealedData)
+    let sealedData : string = await this.metadata.generateSealedMetadata()
 
     const result = await this.ipfs.add(sealedData)
     cidList.push({
@@ -75,11 +69,11 @@ class Driver {
 
     // 1. get hash, if this is the first chunk, get the hash
     //          else, get hash combined with last hash
-    if (this.metadata.chunks.hash === undefined) {
-      this.metadata.chunks.hash = await File.getChunkHash(chunk);
+    if (this.metadata.hash === undefined) {
+      this.metadata.hash = await File.getChunkHash(chunk);
     } else {
-      this.metadata.chunks.hash = await File.getCombinedChunkHash(
-        this.metadata.chunks.hash, chunk
+      this.metadata.hash = await File.getCombinedChunkHash(
+        this.metadata.hash, chunk
       );
     }
 
@@ -93,7 +87,7 @@ class Driver {
     const IPFS_CID = await ipfs.add(Util.u8aToHex(chunk))
 
     // 5. write to chunkMetadata
-    this.metadata.chunks.writeChunkResult(
+    this.metadata.writeChunkResult(
       chunkId, rawChunkSize, chunk.length, IPFS_CID.cid.toString()
     );
   }
@@ -112,17 +106,13 @@ class Driver {
     let metadata: any = await ipfs.cat(contractResult)
 
     // revert the metadata compressing process 
-    metadata = Util.hexToU8a(metadata)
-    metadata = await File.inflatDeflatedChunk(metadata)
-    metadata = u8aToString(metadata)
-    metadata = Util.parse(metadata)
-
+    metadata = Metadata.recoverSealedData(metadata)
     let unsealed: any = Seal.recover(
       metadata.public, metadata.private, keys, metadata.author
     )
-    unsealed = u8aToString(unsealed)
-    unsealed = Util.parse(unsealed)
 
+    unsealed = await Metadata.recoverPreSealData(unsealed, ipfs)
+    // console.log(unsealed)
     return unsealed
   }
 
@@ -136,23 +126,18 @@ class Driver {
     const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
 
     const sealingKey = unsealed.sealingKey
-    const chunks = unsealed.chunkMetadata.chunkList
-    let hash = unsealed.chunkMetadata.hash
+    const chunks = unsealed.chunks
 
-    if (typeof hash === 'object') {
-      try {
-        hash = Buffer.from(hash.data)
-      } catch(err) {
-        throw new Error('hash parse err - driver.downstream')
-      }
-    }
+    let hash = unsealed.hash
+
+
     return await this.downstreamChunkProcessingPipeLine(
       chunks, hash, sealingKey, ipfs, outputPath
     )
   }
 
   private static async downstreamChunkProcessingPipeLine(
-    chunks: {}, 
+    chunks: [string], 
     hash: Uint8Array, 
     sealingKey: Uint8Array, 
     ipfs: IPFS, 
@@ -160,35 +145,29 @@ class Driver {
   ) {
 
     let currentHash : Uint8Array
-
-    for (let chunkId in chunks) {
-
-      let cid = chunks[chunkId].ipfsCID
-      let rawChunkSize = chunks[chunkId].rawChunkSize
-
-      let chunk : any = await ipfs.cat(cid)
+    for (let chunkCID of chunks) {
+      let chunk: any = await ipfs.cat(Util.u8aToString(Util.hexToU8a(chunkCID)))
       chunk = Util.hexToU8a(chunk)
 
       chunk = SecretBox.decrypt(sealingKey, chunk)
       chunk = await File.inflatDeflatedChunk(chunk)
       
-
       if (currentHash === undefined) {
         currentHash = await File.getChunkHash(chunk)
       } else {
         currentHash = await File.getCombinedChunkHash(currentHash, chunk)
       }
-      
-      if (chunk.length != rawChunkSize) {
-        throw new Error('chunk size error: Driver.downstreamChunkProcessingPipeLine')
-      }
 
-      await File.writeFile(Buffer.from(chunk), outputPath, 'a')
-
+      await Driver.fileReady(chunk, outputPath)
     }
-    if (Buffer.compare(currentHash, hash) !== 0) {
+    if (Util.u8aToHex(currentHash) !== Util.u8aToHex(hash)) {
       throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine')
     }
+  }
+
+  public static async fileReady(chunk: Uint8Array, outputPath: string) {
+    await File.writeFile(chunk, outputPath, 'a')
+    return true
   }
 
   public static async updateEncryptionSchema(
@@ -200,26 +179,20 @@ class Driver {
     blockchain: Blockchain
   ) {
     const unsealed = await Driver.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
-    const chunks = Chunks.parse(Util.serialize(unsealed.chunkMetadata))
 
-    // TODO: check if sealingKey existis
-
-    const metadata = new Metadata(
-      chunks, new Seal(newEncryptionSchema, seed, unsealed.sealingKey)
+    const newSeal = new Seal(newEncryptionSchema, seed, unsealed.sealingKey)
+    const reSealed = Metadata.packageSealed(
+      newSeal,
+      Metadata.packagePreSeal(
+        newSeal, unsealed.hash, Util.stringToU8a(unsealed.chunksCID)
+      )
     )
-
-    let sealedData: any = metadata.generateSealedMetadata()
-
-    sealedData = Util.serialize(sealedData)
-    sealedData = stringToU8a(sealedData)
-    sealedData = await File.deflatChunk(sealedData)
-    sealedData = Util.u8aToHex(sealedData)
 
     await blockchain.init()
     const storage = blockchain.storage
     const contract = blockchain.contract
 
-    const result = await ipfs.add(sealedData)
+    const result = await ipfs.add(reSealed)
     const cidList = [{
       'cid': result.cid.toString(),
       'size': result.size

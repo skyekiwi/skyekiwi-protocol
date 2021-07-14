@@ -78,9 +78,23 @@ export class Seal {
         this.encryptionSchema.members[index]))
     }
 
+    let publicSharesHex = ""
+    let privateSharesHex = ""
+
+    for (let share of public_shares) {
+      publicSharesHex += Util.u8aToHex(share) + "|"
+    }
+
+    publicSharesHex = Util.trimEnding(publicSharesHex)
+
+    for (let share of private_shares) {
+      privateSharesHex += Util.u8aToHex(share) + "|"
+    }
+
+    privateSharesHex = Util.trimEnding(privateSharesHex)
     return {
-      "public": public_shares,
-      "private": private_shares
+      "public": publicSharesHex,
+      "private": privateSharesHex
     }
   }
 

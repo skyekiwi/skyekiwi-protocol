@@ -1,3 +1,5 @@
+import { stringToU8a, u8aToString } from '@polkadot/util';
+
 const hexToU8a = (hex: string) => {
   if (isValidHex(hex)) {
     return new Uint8Array(hex.match(/[0-9A-Fa-f]{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -12,6 +14,9 @@ const u8aToHex = bytes =>
 const isValidHex = str => {
   return (str.length & 1) === 0 && 
     (/^[0-9A-Fa-f]*$/g).test(str)
+}
+const numberPadding = n => {
+  return String(n).padStart(16, '0')
 }
 
 const serialize = (object: any) : string => {
@@ -52,7 +57,18 @@ const parse = (str: string) : any => {
     return str
   }
 }
-
+const trimEnding = (str: string) => {
+  const len = str.length
+  if (str[len - 1] === '|' || str[len - 1] === '-' || str[len - 1] === ' ') {
+    return str.substring(0, len - 1)
+  } else return str
+}
 export {
-  hexToU8a, u8aToHex, isValidHex, serialize, parse
+  hexToU8a, u8aToHex, isValidHex, 
+  
+  serialize, parse, 
+  
+  numberPadding,
+  
+  stringToU8a, u8aToString, trimEnding
 }

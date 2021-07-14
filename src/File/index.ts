@@ -87,6 +87,7 @@ export class File {
       })
     } else throw new Error("writeFile is for node.js, use File.saveAs instead - File.writeFile")
   }
+  
   public static saveAs(
     content: Uint8Array, 
     fileName?: string,
