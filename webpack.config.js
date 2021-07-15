@@ -4,10 +4,10 @@ const webpack = require('webpack')
 module.exports = {
   // devtool: 'inline-source-map',
   mode: 'production',
-	entry: './src/index.ts',
+	entry: './browser.test/index.test.ts',
 	output: {
-		filename: 'skyekiwi.browser.js',
-		path: path.resolve(__dirname, 'dist')
+		filename: 'test.browser.js',
+		path: path.resolve(__dirname, 'browser.test')
 	},
   module: {
     rules: [

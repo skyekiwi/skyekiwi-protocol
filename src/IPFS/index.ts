@@ -5,7 +5,7 @@ if (typeof window === 'undefined') {
   fetch = require('node-fetch')
 } else fetch = window.fetch
 
-const createClient = require('ipfs-http-client')
+const {create} = require('ipfs-http-client')
 // import { Util } from '../index'
 
 export class IPFS {
@@ -56,8 +56,6 @@ export class IPFS {
       const remoteResult = await this.fetchFileFromRemote(cid)
       return remoteResult
     } catch (err) {
-      console.error(err)
-      return ""
       try {
         let result = ''
         await this.init()
@@ -74,10 +72,14 @@ export class IPFS {
 
   public async addAndPinInfura(content: string) {
     // console.log("trying to pin to Infura")
-    const infura = createClient({
+    const infura = create({
       host: 'ipfs.infura.io',
       port: 5001,
-      protocol: 'https'
+      protocol: 'https',
+      headers: {
+        'Access-Control-Request-Method': 'POST',
+        "Access-Control-Allow-Origin": '*',
+      }
     })
 
     const infuraResult = await infura.add(content)
@@ -91,10 +93,14 @@ export class IPFS {
 
   public async addAndPinSkyeKiwi(content: string) {
     // console.log("trying to pin to SkyeKiwi")
-    const skyekiwiNode = createClient({
+    const skyekiwiNode = create({
       host: 'sgnode.skye.kiwi',
       port: 5001,
-      protocol: 'http'
+      protocol: 'http',
+      headers: {
+        'Access-Control-Request-Method': 'POST',
+        "Access-Control-Allow-Origin": '*',
+      }
     })
 
     const skyekiwiResult = await skyekiwiNode.add(content)
@@ -134,10 +140,13 @@ export class IPFS {
     } catch(err) {
       try {
         console.log("public gateway failed. Trying Infura")
-        const infura = createClient({
+        const infura = create({
           host: 'ipfs.infura.io',
           port: 5001,
-          protocol: 'https'
+          protocol: 'https',
+          headers: {
+            "Access-Control-Allow-Origin": '*',
+          }
         })
         let result = ""
         const stream = infura.cat(cid)
@@ -148,10 +157,13 @@ export class IPFS {
       } catch (err) {
         try {
           console.log("public gateway & Infura failed. Trying SkyeKiwi")
-          const skyekiwiNode = createClient({
+          const skyekiwiNode = create({
             host: 'sgnode.skye.kiwi',
             port: 5001,
-            protocol: 'http'
+            protocol: 'http',
+            headers: {
+              "Access-Control-Allow-Origin": '*',
+            }
           })
           let result = ""
           const stream = skyekiwiNode.cat(cid)

@@ -1,12 +1,8 @@
 import * as SkyeKiwi from '../src/index'
 import { expect } from 'chai';
 import { randomBytes } from 'tweetnacl'
-import {
-  stringToU8a,
-  u8aToString
-} from '@polkadot/util'
 
-require('dotenv').config();
+// require('dotenv').config();
 
 describe('Encryption', () => {
 
@@ -16,12 +12,12 @@ describe('Encryption', () => {
   const asymmetric = new SkyeKiwi.Box(key)
 
   const message = '123456780123456'
-  const message_u8a = stringToU8a(message)
+  const message_u8a = SkyeKiwi.Util.stringToU8a(message)
 
   it('Symmetric: Encryption & Decryption Works', () => {
     const encrypted = symmetric.encrypt(message_u8a)
     const decrypted = SkyeKiwi.SecretBox.decrypt(key, encrypted)
-    const decrypted_string = u8aToString(decrypted)
+    const decrypted_string = SkyeKiwi.Util.u8aToString(decrypted)
     expect(decrypted_string).to.equal(message)
   })
 
@@ -34,7 +30,7 @@ describe('Encryption', () => {
     const encrypted = asymmetric.encrypt(message_u8a, receiver_publicKey)
 
     const decrypted = SkyeKiwi.Box.decrypt(encrypted, receiver_privateKey, sender_publicKey)
-    const decrypted_string = u8aToString(decrypted)
+    const decrypted_string = SkyeKiwi.Util.u8aToString(decrypted)
     expect(decrypted_string).to.equal(message)
   })
 
