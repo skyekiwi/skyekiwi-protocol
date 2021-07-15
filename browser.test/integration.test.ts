@@ -1,12 +1,62 @@
 import * as SkyeKiwi from '../src/index'
 import { mnemonicToMiniSecret } from '@polkadot/util-crypto'
 import { expect } from 'chai'
-import fs from 'fs'
 import { randomBytes } from 'tweetnacl';
+import path from 'path'
 
-require('dotenv').config()
+import fs from 'fs'
+const SEED_PHRASE = 'riot hand shuffle card company must rocket jealous present hurt lava multiply'
 
-const { setup, downstreamPath, cleanup} = require('./setup.ts')
+let files_path = []
+
+async function del(file) {
+  return new Promise((res, rej) => {
+    fs.unlink(file, (err) => {
+      if (err) rej(err)
+      res(true)
+    });
+  });
+}
+
+async function setup(num: number) {
+
+  let files = []
+  for (let i = 0; i < num; i++) {
+    const content = randomBytes(12000000)
+    const filePath = path.join(__dirname, `./${i}.file`)
+    files_path.push(filePath)
+
+    try {
+      await del(filePath)
+    } catch (err) {
+      //pass
+    }
+
+    await SkyeKiwi.File.writeFile(Buffer.from(content), filePath, 'a')
+
+    files.push({
+      file: new SkyeKiwi.File(
+        `/tmp/${i}.file`,
+        fs.createReadStream(filePath, { highWaterMark: 1 * (10 ** 8) })
+      ),
+      content: content
+    })
+  }
+
+  return files
+}
+
+function downstreamPath(num: number) {
+  const x = path.join(__dirname, `./down${num}.file`)
+  files_path.push(x)
+  return x
+}
+
+const cleanup = async () => {
+  for (let p of files_path) {
+    try { await del(p) } catch (err) { }
+  }
+}
 
 describe('Integration', function() {
   this.timeout(0)
@@ -14,7 +64,7 @@ describe('Integration', function() {
   let vaultId1: number
   let vaultId2: number
   const abi = SkyeKiwi.getAbi()
-  const mnemonic = process.env.SEED_PHRASE
+  const mnemonic = SEED_PHRASE
 
   const blockchain = new SkyeKiwi.Blockchain(
     // seed phrase
@@ -41,7 +91,7 @@ describe('Integration', function() {
 
   it('upstream, author only', async () => {
 
-    const mnemonic = process.env.SEED_PHRASE
+    const mnemonic = SEED_PHRASE
     const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
       mnemonicToMiniSecret(mnemonic)
     )
@@ -90,7 +140,7 @@ describe('Integration', function() {
   const publicKey2 = SkyeKiwi.Box.getPublicKeyFromPrivateKey(privateKey2)
 
   it('upstream, two members + author', async () => {
-    const mnemonic = process.env.SEED_PHRASE
+    const mnemonic = SEED_PHRASE
     const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
       mnemonicToMiniSecret(mnemonic)
     )
@@ -144,7 +194,7 @@ describe('Integration', function() {
 
   // `vaultId1` is a vault with only the author can read
   it('update encryptionSchema & downstream again', async () => {
-    const mnemonic = process.env.SEED_PHRASE
+    const mnemonic = SEED_PHRASE
     const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
       mnemonicToMiniSecret(mnemonic)
     )

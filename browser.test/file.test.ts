@@ -4,16 +4,16 @@ import { randomBytes } from 'tweetnacl'
 
 import fs from 'fs'
 
-const file1Path = '/tmp/file.file1'
+const file1Path = './file.file1'
 const setup = async () => {
   // we are creating two files here:
   // tmp.file1 - a 1.2MB file with random bytes
 
-  try {
-    cleanup()
-  } catch (err) {
-    // pass
-  }
+  // try {
+  //   cleanup()
+  // } catch (err) {
+  //   // pass
+  // }
 
   const content1 = randomBytes(1200000)
   await SkyeKiwi.File.writeFile(content1, file1Path, 'a')
@@ -29,17 +29,17 @@ const setup = async () => {
 
   return { file1 }
 }
-const cleanup = async () => {
-  const unlink = (filePath) => {
-    return new Promise((res, rej) => {
-      fs.unlink(filePath, (err) => {
-        if (err) rej(err)
-        res(true)
-      });
-    });
-  }
-  await unlink(file1Path)
-}
+// const cleanup = async () => {
+//   const unlink = (filePath) => {
+//     return new Promise((res, rej) => {
+//       fs.unlink(filePath, (err) => {
+//         if (err) rej(err)
+//         res(true)
+//       });
+//     });
+//   }
+//   await unlink(file1Path)
+// }
 
 describe('File', function () {
   this.timeout(15000)
@@ -48,7 +48,7 @@ describe('File', function () {
     let { file1 } = await setup()
     const stream1 = file1.getReadStream()
 
-    
+
     let hash1
     for await (const chunk of stream1) {
       if (hash1 === undefined) {
@@ -59,7 +59,7 @@ describe('File', function () {
         )
       }
     }
-    await cleanup()
+    // await cleanup()
   })
 
   it('File: inflate & deflat work', async () => {
@@ -71,6 +71,6 @@ describe('File', function () {
 
       expect(inflatedChunk).to.deep.equal(chunk)
     }
-    await cleanup()
+    // await cleanup()
   })
 })

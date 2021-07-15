@@ -1,11 +1,7 @@
 const ipfs = require('ipfs-core')
+const fetch = require('node-fetch')
 
-let fetch
-if (typeof window === 'undefined') {
-  fetch = require('node-fetch')
-} else fetch = window.fetch
-
-const {create} = require('ipfs-http-client')
+const createClient = require('ipfs-http-client')
 // import { Util } from '../index'
 
 export class IPFS {
@@ -18,13 +14,16 @@ export class IPFS {
 
   public async init() { 
     try {
-      this.localIpfs = await ipfs.create()
+      console.log('init',this.localIpfs)
       this.localIpfsReady = true
+      this.localIpfs = await ipfs.create()
     } catch(err) {
+      console.error(err)
       // pass
       // this is where there is already an ipfs node running 
     }
   }
+
   public async stopIfRunning() {
     if (this.localIpfsReady) {
       await this.localIpfs.stop()
@@ -32,12 +31,19 @@ export class IPFS {
   }
 
   public async add(str: string) {
-    const remoteResult = await this.remoteGatewayAddAndPin(str)
-    if (remoteResult !== null) return remoteResult
+    try {
+      const remoteResult = await this.remoteGatewayAddAndPin(str)
+      if (remoteResult !== null) return remoteResult
+    } catch (err) {
+      // pass
+    }
 
     console.log(`all remote push failed, fallback to local IPFS, you need to keep the local IPFS running`)
     try {
       await this.init()
+
+      console.log(this.localIpfs)
+
       const cid = await this.localIpfs.add(str);
       const fileStat = await this.localIpfs.files.stat("/ipfs/" + cid.path)
       return {
@@ -72,7 +78,7 @@ export class IPFS {
 
   public async addAndPinInfura(content: string) {
     // console.log("trying to pin to Infura")
-    const infura = create({
+    const infura = createClient({
       host: 'ipfs.infura.io',
       port: 5001,
       protocol: 'https',
@@ -93,7 +99,7 @@ export class IPFS {
 
   public async addAndPinSkyeKiwi(content: string) {
     // console.log("trying to pin to SkyeKiwi")
-    const skyekiwiNode = create({
+    const skyekiwiNode = createClient({
       host: 'sgnode.skye.kiwi',
       port: 5001,
       protocol: 'http',
@@ -116,9 +122,11 @@ export class IPFS {
     try {
       return await this.addAndPinSkyeKiwi(content)
     } catch (err) {
+      console.error('skyekiwi pin', err)
       try {
         return await this.addAndPinInfura(content)
       } catch (err) {
+        console.error('infura pin', err)
         throw new Error("all remote pin failed - ipfs.remoteGatewayAddAndPin")
       }
     }
@@ -126,11 +134,11 @@ export class IPFS {
   public async fetchFileFromRemote(cid: string) {
     try {
       const requests = [
-        fetch(`http://ipfs.io/ipfs/${cid}`),
-        fetch(`http://gateway.ipfs.io/ipfs/${cid}`),
-        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`),
-        fetch(`http://ipfs.fleek.co/ipfs/${cid}`),
-        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`)
+        fetch(`http://ipfs.io/ipfs/${cid}`, {mode: 'no-cors'}),
+        fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {mode: 'no-cors'}),
+        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {mode: 'no-cors'}),
+        fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {mode: 'no-cors'}),
+        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {mode: 'no-cors'})
       ]
       const result = await Promise.race(requests)
       if (result.status != 200) {
@@ -138,9 +146,10 @@ export class IPFS {
       }
       return await result.text()
     } catch(err) {
+      console.error('public gateway',err)
       try {
         console.log("public gateway failed. Trying Infura")
-        const infura = create({
+        const infura = createClient({
           host: 'ipfs.infura.io',
           port: 5001,
           protocol: 'https',
@@ -155,9 +164,10 @@ export class IPFS {
         }
         return result
       } catch (err) {
+        console.error('infura gateway',err)
         try {
           console.log("public gateway & Infura failed. Trying SkyeKiwi")
-          const skyekiwiNode = create({
+          const skyekiwiNode = createClient({
             host: 'sgnode.skye.kiwi',
             port: 5001,
             protocol: 'http',
@@ -172,6 +182,7 @@ export class IPFS {
           }
           return result
         } catch (err) {
+          console.error('skyekiwi gateway', err)
           throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote')
         }
       }

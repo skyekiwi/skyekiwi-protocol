@@ -2,7 +2,7 @@ import * as SkyeKiwi from '../src/index'
 import { expect } from 'chai';
 import { randomBytes } from 'tweetnacl'
 
-require('dotenv').config();
+const SEED_PHRASE = 'riot hand shuffle card company must rocket jealous present hurt lava multiply'
 
 describe('Blockchain', function () {
 
@@ -10,8 +10,9 @@ describe('Blockchain', function () {
 
   const abi = SkyeKiwi.getAbi()
 
+  console.log(SEED_PHRASE)
   it('Blockchain: send contract tx & storage order works', async () => {
-    const mnemonic = process.env.SEED_PHRASE
+    const mnemonic = SEED_PHRASE
     const blockchain = new SkyeKiwi.Blockchain(
       mnemonic,
       '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg',
@@ -28,10 +29,10 @@ describe('Blockchain', function () {
     let content = []
     for (let i = 0; i < 3; i++) {
       content.push(await ipfs.add(
-          SkyeKiwi.Util.u8aToHex(
-            randomBytes(1000)
-          )
+        SkyeKiwi.Util.u8aToHex(
+          randomBytes(1000)
         )
+      )
       )
     }
 

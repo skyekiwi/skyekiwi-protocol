@@ -2,7 +2,6 @@ import * as SkyeKiwi from '../src/index'
 import { expect } from 'chai';
 import { randomBytes } from 'tweetnacl'
 
-// require('dotenv').config();
 
 describe('Encryption', () => {
 

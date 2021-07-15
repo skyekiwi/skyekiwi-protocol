@@ -1,15 +1,7 @@
 import pako from 'pako'
-
-let FileSaver, fs, crypto
-
-if (typeof window === 'undefined') {
-  try {
-    fs = require('fs')
-    crypto = require('crypto')
-  } catch (e) {}
-} else {
-  FileSaver = require('file-saver')
-}
+import fs from 'fs'
+import FileSaver from 'file-saver'
+import crypto from 'crypto'
 
 export class File {
 
@@ -61,15 +53,13 @@ export class File {
     filePath: string, 
     flags: string
   ) {
-    if (fs !== undefined) {
-      return new Promise((res, rej) => {
-        const stream = fs.createWriteStream(filePath, { flags: flags })
-        stream.write(content)
-        stream.end()
-        stream.on('finish', () => res(true))
-        stream.on('error', rej)
-      })
-    } else throw new Error("writeFile is for node.js, use File.saveAs instead - File.writeFile")
+    return new Promise((res, rej) => {
+      const stream = fs.createWriteStream(filePath, { flags: flags })
+      stream.write(content)
+      stream.end()
+      stream.on('finish', () => res(true))
+      stream.on('error', rej)
+    })
   }
   
   public static saveAs(
