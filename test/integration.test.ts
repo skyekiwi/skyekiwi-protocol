@@ -1,8 +1,8 @@
 import * as SkyeKiwi from '../src/index'
 import { mnemonicToMiniSecret } from '@polkadot/util-crypto'
 import { expect } from 'chai'
+import { randomBytes } from 'tweetnacl'
 import fs from 'fs'
-import { randomBytes } from 'tweetnacl';
 
 require('dotenv').config()
 

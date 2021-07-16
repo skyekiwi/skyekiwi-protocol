@@ -1,6 +1,6 @@
 import { EncryptionSchema } from './EncryptionSchema'
 import { Seal } from './Seal'
-import {IPFS, Util} from '../index'
+import {IPFS, Util, SecretBox} from '../index'
 
 export {
   Seal, EncryptionSchema
@@ -77,8 +77,10 @@ export class Metadata {
     }
     chunk = Util.trimEnding(chunk)
     const chunkU8a = Util.stringToU8a(chunk)
-    const chunkHex = Util.u8aToHex(chunkU8a)
 
+    const encryptedChunk = (new SecretBox(this.seal.sealingKey)).encrypt(chunkU8a)
+    const chunkHex = Util.u8aToHex(encryptedChunk)
+    
     const cid = await this.ipfs.add(chunkHex)
 
     this.chunkListCID = {
@@ -109,7 +111,11 @@ export class Metadata {
     const version = preSealData.slice(96, 100)
     const chunksCID = Util.u8aToString(preSealData.slice(100))
 
-    const chunks = (await ipfs.cat(chunksCID)).split(' ')
+    const encryptedChunks = Util.hexToU8a(await ipfs.cat(chunksCID))
+
+    const _chunks = SecretBox.decrypt(slk, encryptedChunks)
+    const chunks = Util.u8aToString(_chunks).split(' ')
+
     return {
       sealingKey: slk,
       hash: hash,

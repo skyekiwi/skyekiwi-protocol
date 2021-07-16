@@ -146,7 +146,7 @@ class Driver {
 
     let currentHash : Uint8Array
     for (let chunkCID of chunks) {
-      let chunk: any = await ipfs.cat(Util.u8aToString(Util.hexToU8a(chunkCID)))
+      let chunk: any = await ipfs.cat(chunkCID)
       chunk = Util.hexToU8a(chunk)
 
       chunk = SecretBox.decrypt(sealingKey, chunk)
