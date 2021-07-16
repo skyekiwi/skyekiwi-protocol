@@ -1,24 +1,37 @@
 ## Integrate SkyeKiwi
 
+The SkyeKiwi Protocol can be install via npm. 
+
+```bash
+yarn add @skyekiwi/protocol
+```
+
+And import with: 
+
+```javascript
+import * as SkyeKiwi from '@skyekiwi/protocol'
+```
 
 Please refer to the `test/integration.test.ts` folder which contains test cases for common useage.
 
+
+
 ```javascript
 const abi = SkyeKiwi.getAbi()
-  const mnemonic = process.env.SEED_PHRASE
+const mnemonic = process.env.SEED_PHRASE
 
-  const blockchain = new SkyeKiwi.Blockchain(
-    // seed phrase
-    mnemonic,
-    // contract address
-    '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-    // contract instance endpoint
-    'wss://jupiter-poa.elara.patract.io',
-    // storage network endpoint
-    'wss://rocky-api.crust.network/',
-    // contract abi
-    abi
-  )
+const blockchain = new SkyeKiwi.Blockchain(
+  // seed phrase
+  mnemonic,
+  // contract address
+  '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
+  // contract instance endpoint
+  'wss://jupiter-poa.elara.patract.io',
+  // storage network endpoint
+  'wss://rocky-api.crust.network/',
+  // contract abi
+  abi
+)
 
 const skyekiwi = new SkyeKiwi.Driver(
   encryptionSchema, // a SkyeKiwi.encryptionSchema instance - specify 
@@ -29,7 +42,7 @@ const skyekiwi = new SkyeKiwi.Driver(
 )
 
 skyekiwi.upstream() // upstream the file, it take two major actions: 
-// upload files to the Crust Network & Write to a smart contract to generate a vaultId 
+// upload files to the Crust Network & Write to a smart contract to generate a vaultId
 ```
 
 ```javascript
