@@ -19,6 +19,10 @@ export class File {
     return this.readStream;
   }
 
+  public closeStream() {
+    this.readStream.destroy()
+  }
+
   public static async getChunkHash(chunk: Uint8Array): Promise<Uint8Array> {
     if (typeof fs === undefined) {
       return new Uint8Array(await window.crypto.subtle.digest('SHA-256', chunk))

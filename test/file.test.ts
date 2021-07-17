@@ -59,6 +59,8 @@ describe('File', function () {
         )
       }
     }
+
+    file1.closeStream()
     await cleanup()
   })
 
@@ -71,6 +73,7 @@ describe('File', function () {
 
       expect(inflatedChunk).to.deep.equal(chunk)
     }
+    file1.closeStream()
     await cleanup()
   })
 })
