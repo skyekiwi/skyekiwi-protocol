@@ -19,7 +19,7 @@ export async function setup(num: number) {
   let files = []
   for (let i = 0; i < num; i ++) {
     const content = randomBytes(12000000)
-    const filePath = path.join(__dirname, `/tmp/${i}.file`)
+    const filePath = path.join(__dirname, `tmp/${i}.file`)
     files_path.push(filePath)
 
     try {
@@ -32,7 +32,7 @@ export async function setup(num: number) {
 
     files.push({
       file: new SkyeKiwi.File({
-        fileName: `./tmp/${i}.file`,
+        fileName: `tmp/${i}.file`,
         readStream: fs.createReadStream(filePath, { highWaterMark: 1 * (10 ** 8) })
       }),
       content: content
