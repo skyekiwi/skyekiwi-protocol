@@ -32,7 +32,7 @@ export async function setup(num: number) {
 
     files.push({
       file: new SkyeKiwi.File({
-        fileName: `/tmp/${i}.file`,
+        fileName: `./tmp/${i}.file`,
         readStream: fs.createReadStream(filePath, { highWaterMark: 1 * (10 ** 8) })
       }),
       content: content
@@ -43,7 +43,7 @@ export async function setup(num: number) {
 }
 
 export function downstreamPath(num: number) {
-  const x = path.join(__dirname, `/tmp/down${num}.file`)
+  const x = path.join(__dirname, `./tmp/down${num}.file`)
   files_path.push(x)
   return x
 }
