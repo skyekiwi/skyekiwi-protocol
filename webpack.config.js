@@ -6,7 +6,7 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 module.exports = {
   // devtool: 'inline-source-map',
   mode: 'production',
-	entry: './dist/browser.test/index.test.js',
+	entry: './dist/test/index.js',
 	output: {
 		filename: 'test.browser.js',
 		path: path.resolve(__dirname, 'browser.test')

@@ -5,15 +5,15 @@ import {
   Seal, Metadata, EncryptionSchema
 } from './Metadata'
 import {
-  Box,
-  SecretBox,
+  SymmetricEncryption,
+  AsymmetricEncryption,
   TSS,
   SKYEKIWI_SECRETS_ENDING
 } from './Encryption'
 import {
   Blockchain,
   Crust,
-  Contract, getAbi
+  Contract
 } from './Blockchain'
 import * as Util from './Util'
 
@@ -28,14 +28,14 @@ export {
   Metadata,
   EncryptionSchema,
 
-  Box,
-  SecretBox,
+  SymmetricEncryption,
+  AsymmetricEncryption,
   TSS,
   SKYEKIWI_SECRETS_ENDING,
 
   Blockchain,
   Crust,
-  Contract, getAbi,
+  Contract,
 
   Util
 }

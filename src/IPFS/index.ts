@@ -1,8 +1,7 @@
 const ipfs = require('ipfs-core')
 const fetch = require('node-fetch')
-
 const createClient = require('ipfs-http-client')
-// import { Util } from '../index'
+const promiseAny = require('promise.any')
 
 export class IPFS {
   private localIpfsReady: boolean
@@ -14,11 +13,10 @@ export class IPFS {
 
   public async init() { 
     try {
-      console.log('init',this.localIpfs)
       this.localIpfsReady = true
       this.localIpfs = await ipfs.create()
     } catch(err) {
-      console.error(err)
+      console.warn(err)
       // pass
       // this is where there is already an ipfs node running 
     }
@@ -62,17 +60,19 @@ export class IPFS {
       const remoteResult = await this.fetchFileFromRemote(cid)
       return remoteResult
     } catch (err) {
-      try {
-        let result = ''
-        await this.init()
-        for await (const chunk of this.localIpfs.cat(cid)) {
-          result += chunk
-        }
-        return result
-      } catch (err) {
-        console.error(err)
-        throw (new Error('IPFS Failure: ipfs.cat'))
-      }
+      throw (new Error('IPFS Failure: ipfs.cat'))
+      // try {
+      //   let result = ''
+      //   await this.init()
+      //   return this.fetchFileFromLocal(cid)
+      //   for await (const chunk of this.localIpfs.cat(cid)) {
+      //     result += chunk
+      //   }
+      //   return result
+      // } catch (err) {
+      //   console.error(err)
+      //   throw (new Error('IPFS Failure: ipfs.cat'))
+      // }
     }
   }
 
@@ -140,7 +140,7 @@ export class IPFS {
         fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {mode: 'no-cors'}),
         fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {mode: 'no-cors'})
       ]
-      const result = await Promise.race(requests)
+      const result = await promiseAny(requests)
       if (result.status != 200) {
         throw new Error("public gateway non-200 response - ipfs.fetchFileFromRemote")
       }

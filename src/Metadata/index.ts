@@ -1,6 +1,6 @@
 import { EncryptionSchema } from './EncryptionSchema'
 import { Seal } from './Seal'
-import {IPFS, Util, SecretBox} from '../index'
+import { IPFS, Util, SymmetricEncryption} from '../index'
 
 export {
   Seal, EncryptionSchema
@@ -23,11 +23,12 @@ export class Metadata {
     'cid': string,
     'size': number
   }
+  public seal: Seal
 
-  constructor (
-    public seal: Seal,
-    public ipfs: IPFS
-  ) {
+  constructor (config: {
+    seal: Seal
+  }) {
+    this.seal = config.seal
     this.chunkList = {}
   }
 
@@ -47,9 +48,11 @@ export class Metadata {
     return cids;
   }
 
-  public writeChunkResult(
+  public writeChunkResult(config: {
     chunkId: number, rawChunkSize: number, ipfsChunkSize: number, ipfsCID: string
-  ) {
+  }) {
+    const {chunkId, rawChunkSize, ipfsChunkSize, ipfsCID} = config
+
     if (ipfsCID.length !== 46) {
       throw new Error('IPFS CID Length Err - ChunkMetadata.writeChunkResult');
     }
@@ -78,10 +81,11 @@ export class Metadata {
     chunk = Util.trimEnding(chunk)
     const chunkU8a = Util.stringToU8a(chunk)
 
-    const encryptedChunk = (new SecretBox(this.seal.sealingKey)).encrypt(chunkU8a)
+    const encryptedChunk = SymmetricEncryption.encrypt(this.seal.sealingKey, chunkU8a)
     const chunkHex = Util.u8aToHex(encryptedChunk)
     
-    const cid = await this.ipfs.add(chunkHex)
+    const ipfs = new IPFS()
+    const cid = await ipfs.add(chunkHex)
 
     this.chunkListCID = {
       'cid': cid.cid.toString(),
@@ -100,7 +104,7 @@ export class Metadata {
     return Metadata.packageSealed(this.seal, preSealData)
   }
 
-  public static async recoverPreSealData(preSealData: Uint8Array, ipfs: IPFS) {
+  public static async recoverPreSealData(preSealData: Uint8Array) {
     if (preSealData.length != 146) {
       throw new Error("wrong length of pre-sealed data - Metadata.recover")
     }
@@ -111,9 +115,10 @@ export class Metadata {
     const version = preSealData.slice(96, 100)
     const chunksCID = Util.u8aToString(preSealData.slice(100))
 
+    const ipfs = new IPFS()
     const encryptedChunks = Util.hexToU8a(await ipfs.cat(chunksCID))
 
-    const _chunks = SecretBox.decrypt(slk, encryptedChunks)
+    const _chunks = SymmetricEncryption.decrypt(slk, encryptedChunks)
     const chunks = Util.u8aToString(_chunks).split(' ')
 
     return {

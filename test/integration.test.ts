@@ -6,14 +6,13 @@ import fs from 'fs'
 
 require('dotenv').config()
 
-const { setup, downstreamPath, cleanup} = require('./setup.ts')
+const { setup, downstreamPath, cleanup} = require('./setup')
 
 describe('Integration', function() {
   this.timeout(0)
 
   let vaultId1: number
   let vaultId2: number
-  const abi = SkyeKiwi.getAbi()
   const mnemonic = process.env.SEED_PHRASE
 
   const blockchain = new SkyeKiwi.Blockchain(
@@ -25,8 +24,6 @@ describe('Integration', function() {
     'wss://ws.jupiter-poa.patract.cn',
     // storage network endpoint
     'wss://rocky-api.crust.network/',
-    // contract abi
-    abi
   )
 
   // generate 3 files
@@ -42,87 +39,82 @@ describe('Integration', function() {
   it('upstream, author only', async () => {
 
     const mnemonic = process.env.SEED_PHRASE
-    const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
+    const author = SkyeKiwi.AsymmetricEncryption.getPublicKey(
       mnemonicToMiniSecret(mnemonic)
     )
 
-    const ipfs = new SkyeKiwi.IPFS()
-    const encryptionSchema = new SkyeKiwi.EncryptionSchema(
-      2, 2, author, 1
-    )
+    const encryptionSchema = new SkyeKiwi.EncryptionSchema({
+      numOfShares: 2, 
+      threshold: 2, 
+      author: author, 
+      unencryptedPieceCount: 1
+    })
     encryptionSchema.addMember(author, 1)
     
-    const key = new SkyeKiwi.Seal(encryptionSchema, mnemonic)
-    const skyekiwi = new SkyeKiwi.Driver(
-      encryptionSchema,
-      fileHandle[0].file,
-      key,
-      ipfs,
-      blockchain
-    )
+    const key = new SkyeKiwi.Seal({
+      encryptionSchema: encryptionSchema, 
+      seed: mnemonic
+    })
 
-    vaultId1 = await skyekiwi.upstream()
-
-    await ipfs.stopIfRunning()
+    vaultId1 = await SkyeKiwi.Driver.upstream({
+      file: fileHandle[0].file,
+      seal: key,
+      blockchain: blockchain
+    })
   })
 
   it('downstream, author only', async () => {
-    const ipfs = new SkyeKiwi.IPFS()
-
-    await SkyeKiwi.Driver.downstream(
-      vaultId1, blockchain, ipfs,
-      downstreamPath(0), [mnemonicToMiniSecret(mnemonic)]
-    )
+    await SkyeKiwi.Driver.downstream({
+      vaultId: vaultId1,
+      blockchain: blockchain,
+      outputPath: downstreamPath(0),
+      keys: [mnemonicToMiniSecret(mnemonic)]
+    })
 
     const downstreamContent = fs.readFileSync(downstreamPath(0))
     expect(Buffer.compare(
       downstreamContent, 
       Buffer.from(fileHandle[0].content)
     )).to.equal(0)
-    
-    await ipfs.stopIfRunning()
   })
 
   const privateKey1 = randomBytes(32)
   const privateKey2 = randomBytes(32)
-
-  const publicKey1 = SkyeKiwi.Box.getPublicKeyFromPrivateKey(privateKey1)
-  const publicKey2 = SkyeKiwi.Box.getPublicKeyFromPrivateKey(privateKey2)
+  const publicKey1 = SkyeKiwi.AsymmetricEncryption.getPublicKey(privateKey1)
+  const publicKey2 = SkyeKiwi.AsymmetricEncryption.getPublicKey(privateKey2)
 
   it('upstream, two members + author', async () => {
     const mnemonic = process.env.SEED_PHRASE
-    const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
+    const author = SkyeKiwi.AsymmetricEncryption.getPublicKey(
       mnemonicToMiniSecret(mnemonic)
     )
 
-    const ipfs = new SkyeKiwi.IPFS()
-
     // Author can decrypt
     // two members can decrypt together but not by themselves
-    const encryptionSchema = new SkyeKiwi.EncryptionSchema(
-      5, 3, author, 1
-    )
+    const encryptionSchema = new SkyeKiwi.EncryptionSchema({
+      numOfShares: 5,
+      threshold: 3,
+      author: author,
+      unencryptedPieceCount: 1
+    })
+
     encryptionSchema.addMember(author, 2)
     encryptionSchema.addMember(publicKey1, 1)
     encryptionSchema.addMember(publicKey2, 1)
 
-    const key = new SkyeKiwi.Seal(encryptionSchema, mnemonic)
+    const key = new SkyeKiwi.Seal({
+      encryptionSchema: encryptionSchema, 
+      seed: mnemonic
+    })
 
-    const skyekiwi = new SkyeKiwi.Driver(
-      encryptionSchema,
-      fileHandle[1].file,
-      key,
-      ipfs,
-      blockchain
-    )
-    vaultId2 = await skyekiwi.upstream()
-
-    await ipfs.stopIfRunning()
+    vaultId2 = await SkyeKiwi.Driver.upstream({
+      file: fileHandle[1].file,
+      seal: key,
+      blockchain: blockchain
+    })
   })
 
   it('downstream, two members + author', async () => {
-    const ipfs = new SkyeKiwi.IPFS()
-
     // Author can decrypt
     // await SkyeKiwi.Driver.downstream(
     //   vaultId, blockchain, ipfs, mnemonic,
@@ -130,53 +122,62 @@ describe('Integration', function() {
     //   [mnemonicToMiniSecret(mnemonic)]
     // )
 
-    await SkyeKiwi.Driver.downstream(
-      vaultId2, blockchain, ipfs,
-      downstreamPath(1),
-      [privateKey1, privateKey2]
-    )
+    await SkyeKiwi.Driver.downstream({
+      vaultId: vaultId2,
+      blockchain: blockchain,
+      outputPath: downstreamPath(1),
+      keys: [privateKey1, privateKey2]
+    })
 
     const downstreamContent = fs.readFileSync(downstreamPath(1))
-    expect(Buffer.compare(downstreamContent, Buffer.from(fileHandle[1].content))).to.equal(0)
-
-    await ipfs.stopIfRunning()
+    expect(Buffer.compare(
+      downstreamContent,
+      Buffer.from(fileHandle[1].content)
+    )).to.equal(0)
   })
 
   // `vaultId1` is a vault with only the author can read
   it('update encryptionSchema & downstream again', async () => {
     const mnemonic = process.env.SEED_PHRASE
-    const author = SkyeKiwi.Box.getPublicKeyFromPrivateKey(
+    const author = SkyeKiwi.AsymmetricEncryption.getPublicKey(
       mnemonicToMiniSecret(mnemonic)
     )
-
-    const ipfs = new SkyeKiwi.IPFS()
 
     // updated encryptionSchema
 
     // Author can decrypt
     // two members can decrypt together but not by themselves
-    const encryptionSchema = new SkyeKiwi.EncryptionSchema(
-      5, 3, author, 1
-    )
+    const encryptionSchema = new SkyeKiwi.EncryptionSchema({
+      numOfShares: 5,
+      threshold: 3,
+      author: author,
+      unencryptedPieceCount: 1
+    })
+
     encryptionSchema.addMember(author, 2)
     encryptionSchema.addMember(publicKey1, 1)
-    encryptionSchema.addMember(publicKey2, 1)    
+    encryptionSchema.addMember(publicKey2, 1)
 
-    await SkyeKiwi.Driver.updateEncryptionSchema(
-      vaultId1, encryptionSchema, mnemonic,
-      [mnemonicToMiniSecret(mnemonic)], ipfs, blockchain
-    )
-    await ipfs.stopIfRunning()
+    await SkyeKiwi.Driver.updateEncryptionSchema({
+      vaultId: vaultId1,
+      newEncryptionSchema: encryptionSchema,
+      seed: mnemonic,
+      keys: [mnemonicToMiniSecret(mnemonic)],
+      blockchain: blockchain
+    })
 
-    await SkyeKiwi.Driver.downstream(
-      vaultId1, blockchain, new SkyeKiwi.IPFS(),
-      downstreamPath(3),
-      [privateKey1, privateKey2]
-    )
+    await SkyeKiwi.Driver.downstream({
+      vaultId: vaultId1,
+      blockchain: blockchain,
+      outputPath: downstreamPath(3),
+      keys: [privateKey1, privateKey2]
+    })
 
     const downstreamContent = fs.readFileSync(downstreamPath(3))
-    expect(Buffer.compare(downstreamContent, Buffer.from(fileHandle[0].content))).to.equal(0)
+    expect(Buffer.compare(
+      downstreamContent,
+      Buffer.from(fileHandle[0].content)
+    )).to.equal(0)
 
-    await ipfs.stopIfRunning()
   })
 })

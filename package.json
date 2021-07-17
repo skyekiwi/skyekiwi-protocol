@@ -26,6 +26,7 @@
     "ipfs-core": "^0.6.1",
     "ipfs-http-client": "^49.0.2",
     "pako": "^2.0.3",
+    "promise.any": "^2.0.2",
     "stream-browserify": "^3.0.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
@@ -55,7 +56,6 @@
     "test:ipfs": "mocha -r ts-node/register ./test/ipfs.test.ts",
     "test:all": "mocha -r ts-node/register ./test/*.test.ts",
     "test": "yarn test:all",
-    "test:browser": "tsc && yarn build:browser",
     "build": "yarn build:node && yarn build:browser",
     "build:node": "tsc",
     "build:browser": "webpack --mode production",

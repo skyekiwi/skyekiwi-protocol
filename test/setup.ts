@@ -31,10 +31,10 @@ export async function setup(num: number) {
     await SkyeKiwi.File.writeFile(Buffer.from(content), filePath, 'a')
 
     files.push({
-      file: new SkyeKiwi.File(
-        `/tmp/${i}.file`,
-        fs.createReadStream(filePath, { highWaterMark: 1 * (10 ** 8) })
-      ),
+      file: new SkyeKiwi.File({
+        fileName: `/tmp/${i}.file`,
+        readStream: fs.createReadStream(filePath, { highWaterMark: 1 * (10 ** 8) })
+      }),
       content: content
     })
   }

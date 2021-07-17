@@ -20,12 +20,12 @@ const setup = async () => {
 
   // SkyeKiwi.File has a default chunk size of 100MB.
   // we are making it 0.1MB here to demostrate it works
-  const file1 = new SkyeKiwi.File(
-    'tmp.file1',
-    fs.createReadStream(file1Path, {
+  const file1 = new SkyeKiwi.File({
+    fileName: 'tmp.file1',
+    readStream: fs.createReadStream(file1Path, {
       highWaterMark: 1 * (10 ** 5)
     })
-  )
+  })
 
   return { file1 }
 }

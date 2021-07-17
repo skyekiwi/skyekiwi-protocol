@@ -2,12 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EncryptionSchema = void 0;
 class EncryptionSchema {
-    constructor(numOfShares, threshold, author, unencryptedPieceCount) {
-        this.numOfShares = numOfShares;
-        this.threshold = threshold;
-        this.author = author;
-        this.unencryptedPieceCount = unencryptedPieceCount;
+    constructor(config) {
         this.members = [];
+        this.numOfShares = config.numOfShares;
+        this.threshold = config.threshold;
+        this.author = config.author;
+        this.unencryptedPieceCount = config.unencryptedPieceCount;
     }
     getNumOfParticipants() {
         // get all unique publicKey in this.members and 

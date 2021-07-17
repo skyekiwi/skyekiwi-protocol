@@ -18,38 +18,28 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const SkyeKiwi = __importStar(require("../src/index"));
 const chai_1 = require("chai");
 const tweetnacl_1 = require("tweetnacl");
-require('dotenv').config();
 describe('IPFS Client', function () {
     this.timeout(0);
     const ipfs = new SkyeKiwi.IPFS();
-    it('ipfs works', () => __awaiter(this, void 0, void 0, function* () {
+    it('ipfs works', async () => {
         const cids = [];
         let data = [];
         for (let i = 0; i < 5; i++) {
             data.push(tweetnacl_1.randomBytes(10000));
             const data_hex = SkyeKiwi.Util.u8aToHex(data[i]);
-            cids.push(yield ipfs.add(data_hex));
+            cids.push(await ipfs.add(data_hex));
             chai_1.expect(cids[i].size).to.greaterThanOrEqual(10000 * 2);
         }
         for (let i = 0; i < 5; i++) {
             console.log('fetching', i, cids[i].cid);
-            const content = yield ipfs.cat(cids[i].cid);
+            const content = await ipfs.cat(cids[i].cid);
             chai_1.expect(content).to.equal(SkyeKiwi.Util.u8aToHex(data[i]));
         }
-        yield ipfs.stopIfRunning();
-    }));
+        await ipfs.stopIfRunning();
+    });
 });
 //# sourceMappingURL=ipfs.test.js.map

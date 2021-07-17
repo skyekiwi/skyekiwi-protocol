@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Metadata = exports.SKYEKIWI_VERSION = exports.EncryptionSchema = exports.Seal = void 0;
 const EncryptionSchema_1 = require("./EncryptionSchema");
@@ -18,9 +9,8 @@ const index_1 = require("../index");
 // version code in Uint8Array
 exports.SKYEKIWI_VERSION = new Uint8Array([0, 0, 0, 1]);
 class Metadata {
-    constructor(seal, ipfs) {
-        this.seal = seal;
-        this.ipfs = ipfs;
+    constructor(config) {
+        this.seal = config.seal;
         this.chunkList = {};
     }
     getCIDList() {
@@ -36,7 +26,8 @@ class Metadata {
         }
         return cids;
     }
-    writeChunkResult(chunkId, rawChunkSize, ipfsChunkSize, ipfsCID) {
+    writeChunkResult(config) {
+        const { chunkId, rawChunkSize, ipfsChunkSize, ipfsCID } = config;
         if (ipfsCID.length !== 46) {
             throw new Error('IPFS CID Length Err - ChunkMetadata.writeChunkResult');
         }
@@ -49,53 +40,52 @@ class Metadata {
             "ipfsCID": ipfsCID
         };
     }
-    generatePreSealingMetadata() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let chunk = "";
-            for (let chunksId in this.chunkList) {
-                // 46 char
-                chunk += this.chunkList[chunksId].ipfsCID;
-                // 1 char divider
-                chunk += '-';
-            }
-            chunk = index_1.Util.trimEnding(chunk);
-            const chunkU8a = index_1.Util.stringToU8a(chunk);
-            const chunkHex = index_1.Util.u8aToHex(chunkU8a);
-            const cid = yield this.ipfs.add(chunkHex);
-            this.chunkListCID = {
-                'cid': cid.cid.toString(),
-                'size': cid.size
-            };
-            const chunkCIDU8a = index_1.Util.stringToU8a(this.chunkListCID.cid);
-            return Metadata.packagePreSeal(this.seal, this.hash, chunkCIDU8a);
-        });
+    async generatePreSealingMetadata() {
+        let chunk = "";
+        for (let chunksId in this.chunkList) {
+            // 46 char
+            chunk += this.chunkList[chunksId].ipfsCID;
+            // 1 char divider
+            chunk += '-';
+        }
+        chunk = index_1.Util.trimEnding(chunk);
+        const chunkU8a = index_1.Util.stringToU8a(chunk);
+        const encryptedChunk = index_1.SymmetricEncryption.encrypt(this.seal.sealingKey, chunkU8a);
+        const chunkHex = index_1.Util.u8aToHex(encryptedChunk);
+        const ipfs = new index_1.IPFS();
+        const cid = await ipfs.add(chunkHex);
+        this.chunkListCID = {
+            'cid': cid.cid.toString(),
+            'size': cid.size
+        };
+        const chunkCIDU8a = index_1.Util.stringToU8a(this.chunkListCID.cid);
+        return Metadata.packagePreSeal(this.seal, this.hash, chunkCIDU8a);
     }
-    generateSealedMetadata() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const preSealData = yield this.generatePreSealingMetadata();
-            return Metadata.packageSealed(this.seal, preSealData);
-        });
+    async generateSealedMetadata() {
+        const preSealData = await this.generatePreSealingMetadata();
+        return Metadata.packageSealed(this.seal, preSealData);
     }
-    static recoverPreSealData(preSealData, ipfs) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (preSealData.length != 146) {
-                throw new Error("wrong length of pre-sealed data - Metadata.recover");
-            }
-            const slk = preSealData.slice(0, 32);
-            const hash = preSealData.slice(32, 64);
-            const author = preSealData.slice(64, 96);
-            const version = preSealData.slice(96, 100);
-            const chunksCID = index_1.Util.u8aToString(preSealData.slice(100));
-            const chunks = (yield ipfs.cat(chunksCID)).split(' ');
-            return {
-                sealingKey: slk,
-                hash: hash,
-                author: author,
-                version: version,
-                chunks: chunks,
-                chunksCID: chunksCID
-            };
-        });
+    static async recoverPreSealData(preSealData) {
+        if (preSealData.length != 146) {
+            throw new Error("wrong length of pre-sealed data - Metadata.recover");
+        }
+        const slk = preSealData.slice(0, 32);
+        const hash = preSealData.slice(32, 64);
+        const author = preSealData.slice(64, 96);
+        const version = preSealData.slice(96, 100);
+        const chunksCID = index_1.Util.u8aToString(preSealData.slice(100));
+        const ipfs = new index_1.IPFS();
+        const encryptedChunks = index_1.Util.hexToU8a(await ipfs.cat(chunksCID));
+        const _chunks = index_1.SymmetricEncryption.decrypt(slk, encryptedChunks);
+        const chunks = index_1.Util.u8aToString(_chunks).split(' ');
+        return {
+            sealingKey: slk,
+            hash: hash,
+            author: author,
+            version: version,
+            chunks: chunks,
+            chunksCID: chunksCID
+        };
     }
     static recoverSealedData(hex) {
         const pieces = hex.split('-');

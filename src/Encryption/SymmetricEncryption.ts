@@ -1,15 +1,9 @@
 import { secretbox, randomBytes } from "tweetnacl";
 
-class SecretBox {
-  private key: Uint8Array;
-
-  constructor(key: Uint8Array) {
-    this.key = key;
-  }
-
-  public encrypt(message: Uint8Array): Uint8Array {
+export class SymmetricEncryption {
+  public static encrypt(key: Uint8Array, message: Uint8Array): Uint8Array {
     const nonce = randomBytes(secretbox.nonceLength);
-    const box = secretbox(message, nonce, this.key);
+    const box = secretbox(message, nonce, key);
 
     const fullMessage = new Uint8Array(nonce.length + box.length);
     fullMessage.set(nonce);
@@ -32,5 +26,3 @@ class SecretBox {
     return decrypted;
   }
 }
-
-export { SecretBox }

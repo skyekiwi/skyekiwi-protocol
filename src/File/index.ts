@@ -4,11 +4,16 @@ import FileSaver from 'file-saver'
 import crypto from 'crypto'
 
 export class File {
+  public fileName: string
+  public readStream?: any
 
-  constructor(
-    public fileName: string,
-    public readStream?: any
-  ) {}
+  constructor(config: {
+    fileName: string,
+    readStream?: any
+  }) {
+    this.fileName = config.fileName
+    this.readStream = config.readStream
+  }
 
   public getReadStream() {
     return this.readStream;
@@ -67,21 +72,14 @@ export class File {
     fileName?: string,
     fileType?: string,
   ) {
-    
-    if (typeof fs === undefined) {
-      return new Promise((res, rej) => {
-        try {
-          FileSaver.saveAs(
-            new Blob([content], { type: fileType }),
-            fileName
-          )
-          res(true)
-        } catch(err) {
-          rej()
-        }
-      })
-    } else {
-      throw new Error("save as is for browsers, use File.writeFiles instead - File.saveAs")
-    }
+    return new Promise((res, rej) => {
+      try {
+        FileSaver.saveAs(
+          new Blob([content], { type: fileType }),
+          fileName
+        )
+        res(true)
+      } catch(err) { rej() }
+    })
   }
 }

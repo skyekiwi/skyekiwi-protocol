@@ -1,22 +1,17 @@
 import { box, randomBytes } from 'tweetnacl';
 
-class Box {
-  private key: Uint8Array;
-
-  constructor(secretKey: Uint8Array) {
-    this.key = secretKey;
-  }
-
-  public getPublicKey() : Uint8Array {
-    return box.keyPair.fromSecretKey(this.key).publicKey
-  }
-  public static getPublicKeyFromPrivateKey(secretKey: Uint8Array): Uint8Array {
+export class AsymmetricEncryption {
+  public static getPublicKey (secretKey: Uint8Array): Uint8Array {
     return box.keyPair.fromSecretKey(secretKey).publicKey
   }
 
-  public encrypt(message: Uint8Array, receiverPublicKey: Uint8Array): Uint8Array {
+  public static encrypt(
+    key: Uint8Array, 
+    message: Uint8Array, 
+    receiverPublicKey: Uint8Array
+  ): Uint8Array {
     const nonce = randomBytes(box.nonceLength);
-    const encrypted = box(message, nonce, receiverPublicKey, this.key);
+    const encrypted = box(message, nonce, receiverPublicKey, key);
 
     const fullMessage = new Uint8Array(nonce.length + encrypted.length);
     fullMessage.set(nonce);
@@ -26,8 +21,8 @@ class Box {
   }
 
   public static decrypt(
-    messageWithNonce: Uint8Array, 
     privateKey: Uint8Array,
+    messageWithNonce: Uint8Array,
     senderPublicKey: Uint8Array
   ): Uint8Array {
     const nonce = messageWithNonce.slice(0, box.nonceLength);
@@ -44,4 +39,3 @@ class Box {
   }
 
 }
-export {Box};

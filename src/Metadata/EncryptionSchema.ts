@@ -1,14 +1,22 @@
 export class EncryptionSchema {
   public members: Uint8Array[]
 
-  constructor(
-    public numOfShares: number,
-    public threshold: number,
+  public numOfShares: number
+  public threshold: number
+  public author: Uint8Array
+  public unencryptedPieceCount: number
 
-    public author: Uint8Array,
-    public unencryptedPieceCount: number,
-  ) {
+  constructor(config: {
+    numOfShares: number,
+    threshold: number,
+    author: Uint8Array,
+    unencryptedPieceCount: number
+  }) {
     this.members = []
+    this.numOfShares = config.numOfShares
+    this.threshold = config.threshold
+    this.author = config.author
+    this.unencryptedPieceCount = config.unencryptedPieceCount
   }
 
   public getNumOfParticipants() : number{

@@ -7,7 +7,7 @@ exports.SKYEKIWI_SECRETS_ENDING = exports.TSS = void 0;
 const secrets_1 = __importDefault(require("@skyekiwi/secrets"));
 const index_1 = require("../index");
 // 32 bytes
-const SKYEKIWI_SECRETS_ENDING = "244ccad30a21fbadd7330bf9d187a6dd26d464cb4da4eb4a61a55670b37b2619";
+const SKYEKIWI_SECRETS_ENDING = "1122334455667788990011223344556677889900112233445566778899002619";
 exports.SKYEKIWI_SECRETS_ENDING = SKYEKIWI_SECRETS_ENDING;
 // TODO: secret.js needs to be replaced by a better impl
 // the padding issue is stupid

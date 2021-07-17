@@ -8,8 +8,6 @@ describe('Blockchain', function () {
 
   this.timeout(0)
 
-  const abi = SkyeKiwi.getAbi()
-
   it('Blockchain: send contract tx & storage order works', async () => {
     const mnemonic = process.env.SEED_PHRASE
     const blockchain = new SkyeKiwi.Blockchain(
@@ -17,7 +15,7 @@ describe('Blockchain', function () {
       '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg',
       'wss://ws.jupiter-poa.patract.cn',
       'wss://rocky-api.crust.network/',
-      abi)
+    )
 
     await blockchain.init()
 

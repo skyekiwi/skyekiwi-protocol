@@ -19,7 +19,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Util = exports.getAbi = exports.Contract = exports.Crust = exports.Blockchain = exports.SKYEKIWI_SECRETS_ENDING = exports.TSS = exports.SecretBox = exports.Box = exports.EncryptionSchema = exports.Metadata = exports.Seal = exports.File = exports.IPFS = exports.Driver = void 0;
+exports.Util = exports.Contract = exports.Crust = exports.Blockchain = exports.SKYEKIWI_SECRETS_ENDING = exports.TSS = exports.AsymmetricEncryption = exports.SymmetricEncryption = exports.EncryptionSchema = exports.Metadata = exports.Seal = exports.File = exports.IPFS = exports.Driver = void 0;
 const IPFS_1 = require("./IPFS");
 Object.defineProperty(exports, "IPFS", { enumerable: true, get: function () { return IPFS_1.IPFS; } });
 const driver_1 = require("./driver");
@@ -31,15 +31,14 @@ Object.defineProperty(exports, "Seal", { enumerable: true, get: function () { re
 Object.defineProperty(exports, "Metadata", { enumerable: true, get: function () { return Metadata_1.Metadata; } });
 Object.defineProperty(exports, "EncryptionSchema", { enumerable: true, get: function () { return Metadata_1.EncryptionSchema; } });
 const Encryption_1 = require("./Encryption");
-Object.defineProperty(exports, "Box", { enumerable: true, get: function () { return Encryption_1.Box; } });
-Object.defineProperty(exports, "SecretBox", { enumerable: true, get: function () { return Encryption_1.SecretBox; } });
+Object.defineProperty(exports, "SymmetricEncryption", { enumerable: true, get: function () { return Encryption_1.SymmetricEncryption; } });
+Object.defineProperty(exports, "AsymmetricEncryption", { enumerable: true, get: function () { return Encryption_1.AsymmetricEncryption; } });
 Object.defineProperty(exports, "TSS", { enumerable: true, get: function () { return Encryption_1.TSS; } });
 Object.defineProperty(exports, "SKYEKIWI_SECRETS_ENDING", { enumerable: true, get: function () { return Encryption_1.SKYEKIWI_SECRETS_ENDING; } });
 const Blockchain_1 = require("./Blockchain");
 Object.defineProperty(exports, "Blockchain", { enumerable: true, get: function () { return Blockchain_1.Blockchain; } });
 Object.defineProperty(exports, "Crust", { enumerable: true, get: function () { return Blockchain_1.Crust; } });
 Object.defineProperty(exports, "Contract", { enumerable: true, get: function () { return Blockchain_1.Contract; } });
-Object.defineProperty(exports, "getAbi", { enumerable: true, get: function () { return Blockchain_1.getAbi; } });
 const Util = __importStar(require("./Util"));
 exports.Util = Util;
 //# sourceMappingURL=index.js.map

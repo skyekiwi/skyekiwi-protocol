@@ -1,10 +1,10 @@
-import { Box } from './Box'
-import { SecretBox } from './SecretBox'
+import { AsymmetricEncryption } from './AsymmetricEncryption'
+import { SymmetricEncryption } from './SymmetricEncryption'
 import { TSS, SKYEKIWI_SECRETS_ENDING } from './TSS'
 
 export { 
-  Box, 
-  SecretBox, 
+  AsymmetricEncryption,
+  SymmetricEncryption,
   TSS, 
   SKYEKIWI_SECRETS_ENDING
 };

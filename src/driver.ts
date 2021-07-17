@@ -4,50 +4,41 @@ import {
   File, Util, Blockchain,
 
   IPFS,
-  SecretBox
+  SymmetricEncryption
 } from './index'
 
 class Driver {
 
-  private metadata: Metadata
-
-  constructor(
-    public encryptionSchema: EncryptionSchema,
-    public file: File,
-    public seal: Seal,
-    public ipfs: IPFS,
-    public blockchain: Blockchain
-  ) {
-    this.metadata = new Metadata(
-      seal, ipfs
-    )
-  }
-
-  public async upstream() {
+  public static async upstream(config: {
+    file: File, seal: Seal, blockchain: Blockchain
+  }) {
+    
+    const ipfs = new IPFS()
+    const {file, seal, blockchain} = config
+    const metadata = new Metadata({seal: seal})
     
     let chunkCount = 0;
-    const readStream = this.file.getReadStream()
+    const readStream = file.getReadStream()
 
     for await (const chunk of readStream) {
-      await this.upstreamChunkProcessingPipeLine(chunk, chunkCount++, this.ipfs);
-      // console.log("finished", chunkCount)
+      await Driver.upstreamChunkProcessingPipeLine(
+        metadata, chunk, chunkCount++
+      );
     }
 
     // @ts-ignore
-    let cidList:[{cid: string, size: number}] = this.metadata.getCIDList()
+    let cidList:[{cid: string, size: number}] = metadata.getCIDList()
+    let sealedData : string = await metadata.generateSealedMetadata()
 
-    // now let's compress and process the sealedData
-    let sealedData : string = await this.metadata.generateSealedMetadata()
-
-    const result = await this.ipfs.add(sealedData)
+    const result = await ipfs.add(sealedData)
     cidList.push({
       'cid': result.cid,
       'size': result.size
     })
     
-    await this.blockchain.init()
-    const storage = this.blockchain.storage
-    const contract = this.blockchain.contract
+    await blockchain.init()
+    const storage = blockchain.storage
+    const contract = blockchain.contract
 
     const storageResult = await storage.placeBatchOrderWithCIDList(cidList)
 
@@ -61,19 +52,19 @@ class Driver {
     }
   }
 
-  private async upstreamChunkProcessingPipeLine(
-    chunk: Uint8Array, chunkId: number, ipfs: IPFS
+  private static async upstreamChunkProcessingPipeLine(
+    metadata: Metadata, chunk: Uint8Array, chunkId: number
   ) {
     // 0. get raw chunk size
     const rawChunkSize = chunk.length;
 
     // 1. get hash, if this is the first chunk, get the hash
     //          else, get hash combined with last hash
-    if (this.metadata.hash === undefined) {
-      this.metadata.hash = await File.getChunkHash(chunk);
+    if (metadata.hash === undefined) {
+      metadata.hash = await File.getChunkHash(chunk);
     } else {
-      this.metadata.hash = await File.getCombinedChunkHash(
-        this.metadata.hash, chunk
+      metadata.hash = await File.getCombinedChunkHash(
+        metadata.hash, chunk
       );
     }
 
@@ -81,49 +72,57 @@ class Driver {
     chunk = await File.deflatChunk(chunk);
 
     // 3. SecretBox encryption
-    chunk = (new SecretBox(this.metadata.seal.sealingKey)).encrypt(chunk)
+    chunk = SymmetricEncryption.encrypt(metadata.seal.sealingKey, chunk)
 
     // 4. upload to IPFS
+    const ipfs = new IPFS()
     const IPFS_CID = await ipfs.add(Util.u8aToHex(chunk))
 
     // 5. write to chunkMetadata
-    this.metadata.writeChunkResult(
-      chunkId, rawChunkSize, chunk.length, IPFS_CID.cid.toString()
-    );
+    metadata.writeChunkResult({
+      chunkId: chunkId,
+      rawChunkSize: rawChunkSize,
+      ipfsChunkSize: IPFS_CID.size,
+      ipfsCID: IPFS_CID.cid.toString()
+    });
   }
 
   public static async getMetadataByVaultId(
     vaultId: number, 
     blockchain: Blockchain, 
-    ipfs: IPFS,
     keys: Uint8Array[]
   ) {
     await blockchain.init()
     const contract = blockchain.contract
+    const contractResult = (await contract
+        .queryContract('getMetadata', [vaultId])
+      ).output.toString()
 
-    const contractResult = (await contract.queryContract('getMetadata', [vaultId])).output.toString()
-
+    const ipfs = new IPFS()
     let metadata: any = await ipfs.cat(contractResult)
 
     // revert the metadata compressing process 
     metadata = Metadata.recoverSealedData(metadata)
-    let unsealed: any = Seal.recover(
-      metadata.public, metadata.private, keys, metadata.author
-    )
+    let unsealed: any = Seal.recover({
+      public_pieces: metadata.public,
+      private_pieces: metadata.private,
+      keys: keys,
+      orignalAuthor: metadata.author
 
-    unsealed = await Metadata.recoverPreSealData(unsealed, ipfs)
-    // console.log(unsealed)
+    })
+
+    unsealed = await Metadata.recoverPreSealData(unsealed)
     return unsealed
   }
 
-  public static async downstream(
+  public static async downstream(config: {
     vaultId: number,
-    blockchain: Blockchain, 
-    ipfs: IPFS, 
+    blockchain: Blockchain,
     outputPath: string,
     keys: Uint8Array[]
-  ) {
-    const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
+  }) {
+    const {vaultId, blockchain, outputPath, keys} = config
+    const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, keys)
 
     const sealingKey = unsealed.sealingKey
     const chunks = unsealed.chunks
@@ -132,7 +131,7 @@ class Driver {
 
 
     return await this.downstreamChunkProcessingPipeLine(
-      chunks, hash, sealingKey, ipfs, outputPath
+      chunks, hash, sealingKey, outputPath
     )
   }
 
@@ -140,16 +139,16 @@ class Driver {
     chunks: [string], 
     hash: Uint8Array, 
     sealingKey: Uint8Array, 
-    ipfs: IPFS, 
     outputPath: string
   ) {
 
+    const ipfs = new IPFS()
     let currentHash : Uint8Array
     for (let chunkCID of chunks) {
       let chunk: any = await ipfs.cat(chunkCID)
       chunk = Util.hexToU8a(chunk)
 
-      chunk = SecretBox.decrypt(sealingKey, chunk)
+      chunk = SymmetricEncryption.decrypt(sealingKey, chunk)
       chunk = await File.inflatDeflatedChunk(chunk)
       
       if (currentHash === undefined) {
@@ -170,17 +169,23 @@ class Driver {
     return true
   }
 
-  public static async updateEncryptionSchema(
+  public static async updateEncryptionSchema(config: {
     vaultId: number, 
     newEncryptionSchema: EncryptionSchema,
     seed: string,
     keys: Uint8Array[],
-    ipfs: IPFS,
     blockchain: Blockchain
-  ) {
-    const unsealed = await Driver.getMetadataByVaultId(vaultId, blockchain, ipfs, keys)
+  }) {
+    const { vaultId, newEncryptionSchema, seed, keys, blockchain} = config
 
-    const newSeal = new Seal(newEncryptionSchema, seed, unsealed.sealingKey)
+    const unsealed = await Driver.getMetadataByVaultId(vaultId, blockchain, keys)
+
+    const newSeal = new Seal({
+      encryptionSchema: newEncryptionSchema, 
+      seed: seed, 
+      sealingKey: unsealed.sealingKey
+    })
+
     const reSealed = Metadata.packageSealed(
       newSeal,
       Metadata.packagePreSeal(
@@ -192,6 +197,7 @@ class Driver {
     const storage = blockchain.storage
     const contract = blockchain.contract
 
+    const ipfs = new IPFS()
     const result = await ipfs.add(reSealed)
     const cidList = [{
       'cid': result.cid.toString(),

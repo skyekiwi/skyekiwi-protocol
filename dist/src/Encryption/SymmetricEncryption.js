@@ -1,14 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SecretBox = void 0;
+exports.SymmetricEncryption = void 0;
 const tweetnacl_1 = require("tweetnacl");
-class SecretBox {
-    constructor(key) {
-        this.key = key;
-    }
-    encrypt(message) {
+class SymmetricEncryption {
+    static encrypt(key, message) {
         const nonce = tweetnacl_1.randomBytes(tweetnacl_1.secretbox.nonceLength);
-        const box = tweetnacl_1.secretbox(message, nonce, this.key);
+        const box = tweetnacl_1.secretbox(message, nonce, key);
         const fullMessage = new Uint8Array(nonce.length + box.length);
         fullMessage.set(nonce);
         fullMessage.set(box, nonce.length);
@@ -24,5 +21,5 @@ class SecretBox {
         return decrypted;
     }
 }
-exports.SecretBox = SecretBox;
-//# sourceMappingURL=SecretBox.js.map
+exports.SymmetricEncryption = SymmetricEncryption;
+//# sourceMappingURL=SymmetricEncryption.js.map

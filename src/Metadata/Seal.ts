@@ -1,4 +1,4 @@
-import { EncryptionSchema, TSS, Box, Util } from '../index'
+import { EncryptionSchema, TSS, AsymmetricEncryption, Util } from '../index'
 import { randomBytes } from 'tweetnacl'
 import { mnemonicGenerate, mnemonicToMiniSecret } from '@polkadot/util-crypto'
 
@@ -13,34 +13,29 @@ export class Seal {
 
   public encryptionSchema: EncryptionSchema
 
-  private box: Box
+  constructor(config: {
+    encryptionSchema: EncryptionSchema,
+    seed?: string,
+    sealingKey?: Uint8Array
+  }) {
 
-  constructor(encryptionSchema: EncryptionSchema, 
-    mnemonic?: string, sealingKey?: Uint8Array) {
-
-    if (!mnemonic) {
-      mnemonic = mnemonicGenerate()
-    }
-
-    this.mnemonic = mnemonic
+    this.mnemonic = config.seed ? config.seed : mnemonicGenerate()
 
     // if no secretBoxKey supplied, generate a random key
-    this.sealingKey = sealingKey ? sealingKey : randomBytes(32);
+    this.sealingKey = config.sealingKey ? config.sealingKey : randomBytes(32);
 
     // mnemonic has 12 words
-    if (mnemonic.split(' ').length !== 12) {
+    if (this.mnemonic.split(' ').length !== 12) {
       throw new Error('mnemonic length error - Seal.constructor');
     }
 
     // SecretBoxKey is 32 bytes long
-    if (sealingKey && sealingKey.length !== 32) {
+    if (config.sealingKey && config.sealingKey.length !== 32) {
       throw new Error('SecretBox key length error, should be 32 bytes long - Seal.contructor');
     }
 
-    this.blockchainPrivateKey = mnemonicToMiniSecret(mnemonic);
-
-    this.encryptionSchema = encryptionSchema
-    this.box = new Box(this.blockchainPrivateKey)
+    this.blockchainPrivateKey = mnemonicToMiniSecret(this.mnemonic);
+    this.encryptionSchema = config.encryptionSchema
   }
 
   public seal(message: Uint8Array) {
@@ -61,7 +56,8 @@ export class Seal {
       throw new Error("wrong encryptionSchema supplied - Seal.seal")
     }
     
-    this.encryptionSchema.author = this.box.getPublicKey()
+    this.encryptionSchema.author = AsymmetricEncryption
+      .getPublicKey(this.blockchainPrivateKey)
 
     const shares = TSS.generateShares(
       message,
@@ -74,8 +70,13 @@ export class Seal {
     }
 
     for (let index in this.encryptionSchema.members) {
-      private_shares.push(this.box.encrypt(shares.pop(), 
-        this.encryptionSchema.members[index]))
+      private_shares.push(
+        AsymmetricEncryption.encrypt(
+          this.blockchainPrivateKey,
+          shares.pop(),
+          this.encryptionSchema.members[index]
+        )
+      )
     }
 
     let publicSharesHex = ""
@@ -84,13 +85,11 @@ export class Seal {
     for (let share of public_shares) {
       publicSharesHex += Util.u8aToHex(share) + "|"
     }
-
     publicSharesHex = Util.trimEnding(publicSharesHex)
 
     for (let share of private_shares) {
       privateSharesHex += Util.u8aToHex(share) + "|"
     }
-
     privateSharesHex = Util.trimEnding(privateSharesHex)
     return {
       "public": publicSharesHex,
@@ -98,16 +97,23 @@ export class Seal {
     }
   }
 
-  public static recover(public_pieces: Uint8Array[], private_pieces: Uint8Array[], 
-    keys: Uint8Array[], orignalAuthor: Uint8Array) : Uint8Array {
+  public static recover(config: {
+    public_pieces: Uint8Array[], 
+    private_pieces: Uint8Array[], 
+    keys: Uint8Array[], 
+    orignalAuthor: Uint8Array
+  }) : Uint8Array {
+
+
+    const {public_pieces, private_pieces, keys, orignalAuthor} = config
 
     let shares: Uint8Array[] = []
     shares = [...public_pieces]
     for (let piece of private_pieces) {
       for (let key in keys) {
         try {
-          const decrypted = Box.decrypt(
-            piece, keys[key], orignalAuthor
+          const decrypted = AsymmetricEncryption.decrypt(
+            keys[key], piece, orignalAuthor
           )
           if (decrypted) shares.push(decrypted)
         } catch(err) {
@@ -119,19 +125,10 @@ export class Seal {
   }
 
   public getPublicSealingKey() : Uint8Array {
-    return Box.getPublicKeyFromPrivateKey(this.sealingKey)
+    return AsymmetricEncryption.getPublicKey(this.sealingKey)
   }
 
   public getPublicAuthorKey() : Uint8Array {
-    return Box.getPublicKeyFromPrivateKey(this.blockchainPrivateKey)
-  }
-
-  public digestEncryptionSchema() {
-    return {
-      'numOfShares': this.encryptionSchema.numOfShares,
-      'threshold': this.encryptionSchema.threshold,
-      'numOfParticipants': this.encryptionSchema.getNumOfParticipants(),
-      'author': Util.u8aToHex(this.encryptionSchema.author)
-    }
+    return AsymmetricEncryption.getPublicKey(this.blockchainPrivateKey)
   }
 }

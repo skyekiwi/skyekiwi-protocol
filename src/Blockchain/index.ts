@@ -16,14 +16,13 @@ export class Blockchain {
 
   constructor(
     public seed: string,
-    private contract_address: string,
-    private contract_endpoint: string,
-    private crust_endpoint: string,
-    private contract_abi: {},
-    private types?: any
+    public contract_address: string,
+    public contract_endpoint: string,
+    public crust_endpoint: string,
+    public types?: any
   ) {
     this.isReady = false
-    this.types = types ? types : {
+    types = types ? types : {
       "LookupSource": "MultiAddress",
       "Address": "MultiAddress",
       "AccountInfo": "AccountInfoWithTripleRefCount",
@@ -83,22 +82,18 @@ export class Blockchain {
     let contract_instance = new ContractPromise(
       // @ts-ignore
       contract_api, 
-      this.contract_abi, 
+      getAbi(), 
       this.contract_address
     )
 
-    this.contract = new Contract(
-      keyring, contract_instance
-    )
+    this.contract = new Contract(keyring, contract_instance)
 
-    this.storage = new Crust(
-      keyring, crust_api
-    )
+    this.storage = new Crust(keyring, crust_api)
     
     this.isReady = true
   }
 }
 
 export {
-  sendTx, Crust, Contract, getAbi
+  sendTx, Crust, Contract
 }
