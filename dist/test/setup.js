@@ -42,7 +42,7 @@ async function setup(num) {
     let files = [];
     for (let i = 0; i < num; i++) {
         const content = tweetnacl_1.randomBytes(12000000);
-        const filePath = path_1.default.join(__dirname, `/tmp/${i}.file`);
+        const filePath = path_1.default.join(__dirname, `tmp/${i}.file`);
         files_path.push(filePath);
         try {
             await del(filePath);
@@ -53,7 +53,7 @@ async function setup(num) {
         await SkyeKiwi.File.writeFile(Buffer.from(content), filePath, 'a');
         files.push({
             file: new SkyeKiwi.File({
-                fileName: `/tmp/${i}.file`,
+                fileName: `tmp/${i}.file`,
                 readStream: fs_1.default.createReadStream(filePath, { highWaterMark: 1 * (10 ** 8) })
             }),
             content: content
@@ -63,7 +63,7 @@ async function setup(num) {
 }
 exports.setup = setup;
 function downstreamPath(num) {
-    const x = path_1.default.join(__dirname, `/tmp/down${num}.file`);
+    const x = path_1.default.join(__dirname, `./tmp/down${num}.file`);
     files_path.push(x);
     return x;
 }

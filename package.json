@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/protocol",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": "./dist/index.js",
   "repository": {
     "type": "git",
@@ -52,9 +52,9 @@
     "webpack-dev-server": "^3.11.2"
   },
   "scripts": {
-    "test:integration": "mocha -r ts-node/register ./test/integration.test.ts",
-    "test:ipfs": "mocha -r ts-node/register ./test/ipfs.test.ts",
-    "test:all": "mocha -r ts-node/register ./test/*.test.ts",
+    "test:integration": "mocha -r ts-node/register ./test/integration.test.ts --exit",
+    "test:ipfs": "mocha -r ts-node/register ./test/ipfs.test.ts --exit",
+    "test:all": "mocha -r ts-node/register ./test/*.test.ts --exit",
     "test": "yarn test:all",
     "build": "yarn build:node && yarn build:browser",
     "build:node": "tsc",
