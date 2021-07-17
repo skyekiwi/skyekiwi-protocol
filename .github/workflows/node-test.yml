@@ -31,5 +31,5 @@ jobs:
     - run: npm run build --if-present
     - name: Run Tests
       run: npm test
-        env:
+      env:
           SEED_PHRASE: ${{ secrets.SEED_PHRASE }}
