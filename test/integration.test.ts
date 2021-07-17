@@ -10,7 +10,6 @@ const { setup, downstreamPath, cleanup} = require('./setup')
 
 describe('Integration', function() {
   this.timeout(0)
-  this.retries(2);
 
   let vaultId1: number
   let vaultId2: number
@@ -65,14 +64,11 @@ describe('Integration', function() {
   })
 
   it('downstream, author only', async () => {
-
-    const stream = fs.createWriteStream(downstreamPath(0))
-
     await SkyeKiwi.Driver.downstream({
       vaultId: vaultId1,
       blockchain: blockchain,
-      keys: [mnemonicToMiniSecret(mnemonic)],
-      writeStream: stream,
+      outputPath: downstreamPath(0),
+      keys: [mnemonicToMiniSecret(mnemonic)]
     })
 
     const downstreamContent = fs.readFileSync(downstreamPath(0))
@@ -126,12 +122,11 @@ describe('Integration', function() {
     //   [mnemonicToMiniSecret(mnemonic)]
     // )
 
-    const stream = fs.createWriteStream(downstreamPath(1))
     await SkyeKiwi.Driver.downstream({
       vaultId: vaultId2,
       blockchain: blockchain,
-      keys: [privateKey1, privateKey2],
-      writeStream: stream
+      outputPath: downstreamPath(1),
+      keys: [privateKey1, privateKey2]
     })
 
     const downstreamContent = fs.readFileSync(downstreamPath(1))
@@ -171,12 +166,11 @@ describe('Integration', function() {
       blockchain: blockchain
     })
 
-    const stream = fs.createWriteStream(downstreamPath(3))
     await SkyeKiwi.Driver.downstream({
       vaultId: vaultId1,
       blockchain: blockchain,
-      keys: [privateKey1, privateKey2],
-      writeStream: stream
+      outputPath: downstreamPath(3),
+      keys: [privateKey1, privateKey2]
     })
 
     const downstreamContent = fs.readFileSync(downstreamPath(3))

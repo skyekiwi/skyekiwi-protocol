@@ -118,10 +118,10 @@ class Driver {
   public static async downstream(config: {
     vaultId: number,
     blockchain: Blockchain,
-    keys: Uint8Array[],
-    writeStream: any,
+    outputPath: string,
+    keys: Uint8Array[]
   }) {
-    const { vaultId, blockchain, keys, writeStream} = config
+    const {vaultId, blockchain, outputPath, keys} = config
     const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, keys)
 
     const sealingKey = unsealed.sealingKey
@@ -129,8 +129,9 @@ class Driver {
 
     let hash = unsealed.hash
 
+
     return await this.downstreamChunkProcessingPipeLine(
-      chunks, hash, sealingKey, writeStream
+      chunks, hash, sealingKey, outputPath
     )
   }
 
@@ -138,7 +139,7 @@ class Driver {
     chunks: [string], 
     hash: Uint8Array, 
     sealingKey: Uint8Array, 
-    writeStream: any,
+    outputPath: string
   ) {
 
     const ipfs = new IPFS()
@@ -156,11 +157,16 @@ class Driver {
         currentHash = await File.getCombinedChunkHash(currentHash, chunk)
       }
 
-      writeStream.write(chunk)
+      await Driver.fileReady(chunk, outputPath)
     }
     if (Util.u8aToHex(currentHash) !== Util.u8aToHex(hash)) {
       throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine')
     }
+  }
+
+  public static async fileReady(chunk: Uint8Array, outputPath: string) {
+    await File.writeFile(chunk, outputPath, 'a')
+    return true
   }
 
   public static async updateEncryptionSchema(config: {
