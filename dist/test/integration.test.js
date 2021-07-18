@@ -72,11 +72,12 @@ describe('Integration', function () {
         });
     });
     it('downstream, author only', async () => {
+        const stream = fs_1.default.createWriteStream(downstreamPath(0), { flags: 'a' });
         await SkyeKiwi.Driver.downstream({
             vaultId: vaultId1,
             blockchain: blockchain,
-            outputPath: downstreamPath(0),
-            keys: [util_crypto_1.mnemonicToMiniSecret(mnemonic)]
+            keys: [util_crypto_1.mnemonicToMiniSecret(mnemonic)],
+            writeStream: stream,
         });
         const downstreamContent = fs_1.default.readFileSync(downstreamPath(0));
         chai_1.expect(Buffer.compare(downstreamContent, Buffer.from(fileHandle[0].content))).to.equal(0);
@@ -116,11 +117,12 @@ describe('Integration', function () {
         //   downstreamPath, 
         //   [mnemonicToMiniSecret(mnemonic)]
         // )
+        const stream = fs_1.default.createWriteStream(downstreamPath(1), { flags: 'a' });
         await SkyeKiwi.Driver.downstream({
             vaultId: vaultId2,
             blockchain: blockchain,
-            outputPath: downstreamPath(1),
-            keys: [privateKey1, privateKey2]
+            keys: [privateKey1, privateKey2],
+            writeStream: stream,
         });
         const downstreamContent = fs_1.default.readFileSync(downstreamPath(1));
         chai_1.expect(Buffer.compare(downstreamContent, Buffer.from(fileHandle[1].content))).to.equal(0);
@@ -148,11 +150,12 @@ describe('Integration', function () {
             keys: [util_crypto_1.mnemonicToMiniSecret(mnemonic)],
             blockchain: blockchain
         });
+        const stream = fs_1.default.createWriteStream(downstreamPath(3), { flags: 'a' });
         await SkyeKiwi.Driver.downstream({
             vaultId: vaultId1,
             blockchain: blockchain,
-            outputPath: downstreamPath(3),
-            keys: [privateKey1, privateKey2]
+            keys: [privateKey1, privateKey2],
+            writeStream: stream,
         });
         const downstreamContent = fs_1.default.readFileSync(downstreamPath(3));
         chai_1.expect(Buffer.compare(downstreamContent, Buffer.from(fileHandle[0].content))).to.equal(0);
