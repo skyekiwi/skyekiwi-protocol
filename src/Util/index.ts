@@ -1,5 +1,4 @@
 import { stringToU8a, u8aToString } from '@polkadot/util';
-import {logger} from './logger'
 const hexToU8a = (hex: string) => {
   if (isValidHex(hex)) {
     return new Uint8Array(hex.match(/[0-9A-Fa-f]{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -25,6 +24,33 @@ const trimEnding = (str: string) => {
     return str.substring(0, len - 1)
   } else return str
 }
+
+
+// fatal = 60
+// error = 50
+// warn = 40
+// info = 30
+// debug = 20
+// trace = 10
+// silent = inf
+
+require('dotenv').config()
+const logger = require('pino')({
+  prettyPrint: {
+    colorize: true,
+    translateTime: 'yyyy-mm-dd HH:MM:ss',
+    ignore: 'hostname',
+    singleLine: true,
+  },
+})
+const getLogger = (module: string, level?: string) => {
+  return logger.child({
+    module: module,
+    level: level ? level :
+      process.env.LOG_LEVEL ?
+        process.env.LOG_LEVEL : 'info',
+  })
+}
 export {
   hexToU8a, u8aToHex, isValidHex, 
     
@@ -32,5 +58,5 @@ export {
   
   stringToU8a, u8aToString, trimEnding, 
   
-  logger
+  getLogger
 }

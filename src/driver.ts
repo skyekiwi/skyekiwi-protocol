@@ -57,7 +57,7 @@ class Driver {
   ) {
     // 0. get raw chunk size
     const rawChunkSize = chunk.length;
-
+    
     // 1. get hash, if this is the first chunk, get the hash
     //          else, get hash combined with last hash
     if (metadata.hash === undefined) {
