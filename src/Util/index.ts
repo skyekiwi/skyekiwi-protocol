@@ -1,5 +1,5 @@
 import { stringToU8a, u8aToString } from '@polkadot/util';
-
+import {logger} from './logger'
 const hexToU8a = (hex: string) => {
   if (isValidHex(hex)) {
     return new Uint8Array(hex.match(/[0-9A-Fa-f]{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -30,5 +30,7 @@ export {
     
   numberPadding,
   
-  stringToU8a, u8aToString, trimEnding
+  stringToU8a, u8aToString, trimEnding, 
+  
+  logger
 }

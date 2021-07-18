@@ -134,11 +134,31 @@ export class IPFS {
   public async fetchFileFromRemote(cid: string) {
     try {
       const requests = [
-        fetch(`http://ipfs.io/ipfs/${cid}`, {mode: 'no-cors'}),
-        fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {mode: 'no-cors'}),
-        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {mode: 'no-cors'}),
-        fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {mode: 'no-cors'}),
-        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {mode: 'no-cors'})
+        fetch(`http://ipfs.io/ipfs/${cid}`, {mode: 'no-cors'}).then(res => {
+          if (res.ok) {return res.json()} else {
+            throw new Error('public gateway non-200 response')
+          }
+        }),
+        fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {mode: 'no-cors'}).then(res => {
+          if (res.ok) {return res.json()} else {
+            throw new Error('public gateway non-200 response')
+          }
+        }),
+        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {mode: 'no-cors'}).then(res => {
+          if (res.ok) {return res.json()} else {
+            throw new Error('public gateway non-200 response')
+          }
+        }),
+        fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {mode: 'no-cors'}).then(res => {
+          if (res.ok) {return res.json()} else {
+            throw new Error('public gateway non-200 response')
+          }
+        }),
+        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {mode: 'no-cors'}).then(res => {
+          if (res.ok) {return res.json()} else {
+            throw new Error('public gateway non-200 response')
+          }
+        })
       ]
       const result = await promiseAny(requests)
       if (result.status != 200) {
