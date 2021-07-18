@@ -17,9 +17,7 @@ Please refer to the `test/integration.test.ts` folder which contains test cases 
 
 
 ```javascript
-const abi = SkyeKiwi.getAbi()
 const mnemonic = process.env.SEED_PHRASE
-
 const blockchain = new SkyeKiwi.Blockchain(
   // seed phrase
   mnemonic,
@@ -29,42 +27,47 @@ const blockchain = new SkyeKiwi.Blockchain(
   'wss://jupiter-poa.elara.patract.io',
   // storage network endpoint
   'wss://rocky-api.crust.network/',
-  // contract abi
-  abi
 )
 
-const skyekiwi = new SkyeKiwi.Driver(
-  encryptionSchema, // a SkyeKiwi.encryptionSchema instance - specify 
-  fileHandle, // a SkyeKiwi.File instance - specify which file to upload
-  key, // a SkyeKiwi.Seal instance - specify keys used
-  ipfs, // a SkyeKiwi.ipfs instance - specify which IPFS to be used
-  blockchain // a SkyeKiwi.Blockchain - blockchain connection instance
-)
+const encryptionSchema = new SkyeKiwi.EncryptionSchema({
+  numOfShares: 2, 
+  threshold: 2, 
+  author: author, 
+  unencryptedPieceCount: 1
+})
+encryptionSchema.addMember(author, 1)
 
-skyekiwi.upstream() // upstream the file, it take two major actions: 
+const key = new SkyeKiwi.Seal({
+  encryptionSchema: encryptionSchema, 
+  seed: mnemonic
+})
+
+// upstream the file, it take two major actions: 
 // upload files to the Crust Network & Write to a smart contract to generate a vaultId
+await SkyeKiwi.Driver.upstream({
+  file: fileHandle[0].file,
+  seal: key,
+  blockchain: blockchain
+})
 ```
 
 ```javascript
-await SkyeKiwi.Driver.downstream(
-  vaultId, // the file id from the smart contract
-  blockchain, // SkyeKiwi.Blockchain instance
-  ipfs,
-  downstreamPath, // where to keep the recorvered file 
-  [privateKey1, privateKey2] // keys used to decrypt 
-)
-// upon finishing, the file will be download and recovered to the destination path
+const stream = fs.createWriteStream(outputPath, {flags: 'a'})
+await SkyeKiwi.Driver.downstream({
+  vaultId: vaultId,
+  blockchain: blockchain,
+  keys: [key1, key2 ... ], // private key of recipeints
+  writeStream: stream,
+})
 ```
 
-
 ```javascript
-await SkyeKiwi.Driver.updateEncryptionSchema(
-  vaultId, // vaultId from the smart contract
-  encryptionSchema, // the new encryptionSchema
-  mnemonic, // blockchain seed phrase
-  [mnemonicToMiniSecret(mnemonic)],  // an array of keys used to decrypt the seal
-  ipfs,  
-  blockchain
-)
 // upon finishing, the encryptionSchema will be updated
+await SkyeKiwi.Driver.updateEncryptionSchema({
+  vaultId: vaultId,
+  newEncryptionSchema: encryptionSchema,
+  seed: mnemonic,
+  keys: [key1, key2 ... ], // private key of recipeints
+  blockchain: blockchain
+})
 ```

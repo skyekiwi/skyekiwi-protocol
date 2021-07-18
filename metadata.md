@@ -12,15 +12,15 @@ There are two types of Metadata handled by the SkyeKiwi Protocol.
 Reference: [driver.ts](https://github.com/skyekiwi/skyekiwi-protocol/blob/master/src/driver.ts) at
 
 ```javascript
-private async upstreamChunkProcessingPipeLine(
-  chunk: Uint8Array, chunkId: number, ipfs: IPFS
+private static async upstreamChunkProcessingPipeLine(
+  metadata: Metadata, chunk: Uint8Array, chunkId: number
 ) 
 ```
 
 Inputing byte stream will be divided into chunks. Size of chunks can be optimized according to network situation. These chunks will:
 
 - Calculate Hash of Chunks
-- Compressed
+- Compress
 - Symmetrically Encrypted with a `sealingKey`. The Sealing Key is a randomly generated 32 bytes array. 
 - Upload to IPFS
 - Write CID and IPFS File Size to the **Pre-Seal Metadata**

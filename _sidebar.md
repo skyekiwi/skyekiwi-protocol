@@ -8,5 +8,4 @@
   - [File Structure](structure.md)
   - [Project Structure](project.md)
   - [Metadata Structure](metadata.md)
-
-- Demos
+  - [Logger](logger.md)
