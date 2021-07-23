@@ -1,13 +1,8 @@
 {
   "name": "@skyekiwi/protocol",
-<<<<<<< HEAD
-  "version": "0.1.5",
-  "main": "./dist/index.js",
-  "browser": "./dist/index.js",
-=======
-  "version": "0.1.7",
+  "version": "0.2.0",
   "main": "./dist/src/index.js",
->>>>>>> 7441ff68343ab973e333473d6665ad15a026b67a
+  "browser": "./dist/skyekiwi-protocol.js",
   "repository": {
     "type": "git",
     "url": "https://github.com//skyekiwi/skyekiwi-protocol.git "
@@ -32,8 +27,8 @@
     "ipfs-core": "^0.6.1",
     "ipfs-http-client": "^49.0.2",
     "pako": "^2.0.3",
-    "pino": "^6.12.0",
-    "pino-pretty": "^5.1.1",
+    "pino": "^7.0.0-rc.1",
+    "pino-pretty": "^5.1.2",
     "promise.any": "^2.0.2",
     "stream-browserify": "^3.0.0",
     "tweetnacl": "^1.0.3",
@@ -44,7 +39,6 @@
     "@types/mocha": "^8.0.3",
     "@types/node": "^10.11.4",
     "chai": "^4.2.0",
-    "crypto-browserify": "^3.12.0",
     "memfs": "^3.2.2",
     "mocha": "^9.0.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
@@ -60,9 +54,9 @@
     "webpack-dev-server": "^3.11.2"
   },
   "scripts": {
-    "test:integration": "mocha -r ts-node/register ./test/integration.test.ts --exit",
-    "test:ipfs": "mocha -r ts-node/register ./test/ipfs.test.ts --exit",
-    "test:all": "mocha -r ts-node/register ./test/*.test.ts --exit",
+    "test:integration": "mocha -r ts-node/register ./test/integration.test.ts",
+    "test:ipfs": "mocha -r ts-node/register ./test/ipfs.test.ts",
+    "test:all": "mocha -r ts-node/register ./test/*.test.ts",
     "test": "yarn test:all",
     "build": "yarn build:node && yarn build:browser",
     "build:node": "tsc",

@@ -1,6 +1,6 @@
 export function getAbi() {
   try {
-    return require('../../abi/skyekiwi.json');
+    return require('./skyekiwi.json');
   } catch (e) {
     try {
       return require('../../../abi/skyekiwi.json');

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendTx = exports.getAbi = void 0;
 function getAbi() {
     try {
-        return require('../../abi/skyekiwi.json');
+        return require('./skyekiwi.json');
     }
     catch (e) {
         try {
