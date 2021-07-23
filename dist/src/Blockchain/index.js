@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Contract = exports.Crust = exports.sendTx = exports.Blockchain = void 0;
+exports.getAbi = exports.Contract = exports.Crust = exports.sendTx = exports.Blockchain = void 0;
 const Util_1 = require("./Util");
 Object.defineProperty(exports, "sendTx", { enumerable: true, get: function () { return Util_1.sendTx; } });
+Object.defineProperty(exports, "getAbi", { enumerable: true, get: function () { return Util_1.getAbi; } });
 const Crust_1 = require("./Crust");
 Object.defineProperty(exports, "Crust", { enumerable: true, get: function () { return Crust_1.Crust; } });
 const Contract_1 = require("./Contract");

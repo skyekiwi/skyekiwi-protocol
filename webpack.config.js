@@ -23,14 +23,14 @@ var config = {
   }
 };
 
-const mainLib = Object.assign({}, config, {
-  mode: 'production',
-	entry: './dist/src/index.js',
-	output: {
-		filename: 'skyekiwi-protocol.js',
-		path: path.resolve(__dirname, 'dist')
-	},
-});
+// const mainLib = Object.assign({}, config, {
+//   mode: 'production',
+// 	entry: './dist/src/index.js',
+// 	output: {
+// 		filename: 'skyekiwi-protocol.js',
+// 		path: path.resolve(__dirname, 'dist')
+// 	},
+// });
 
 const browserTest = Object.assign({}, config, {
   mode: 'production',
@@ -42,5 +42,6 @@ const browserTest = Object.assign({}, config, {
 });
 
 module.exports = [
-  mainLib, browserTest,
+  // mainLib, 
+  browserTest,
 ];

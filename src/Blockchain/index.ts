@@ -95,5 +95,5 @@ export class Blockchain {
 }
 
 export {
-  sendTx, Crust, Contract
+  sendTx, Crust, Contract, getAbi
 }
