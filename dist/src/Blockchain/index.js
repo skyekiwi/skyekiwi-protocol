@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAbi = exports.Contract = exports.Crust = exports.sendTx = exports.Blockchain = void 0;
+exports.sendTx = exports.Contract = exports.Crust = exports.Blockchain = void 0;
 const Util_1 = require("./Util");
 Object.defineProperty(exports, "sendTx", { enumerable: true, get: function () { return Util_1.sendTx; } });
-Object.defineProperty(exports, "getAbi", { enumerable: true, get: function () { return Util_1.getAbi; } });
 const Crust_1 = require("./Crust");
 Object.defineProperty(exports, "Crust", { enumerable: true, get: function () { return Crust_1.Crust; } });
 const Contract_1 = require("./Contract");
@@ -60,9 +59,10 @@ class Blockchain {
         if (this.isReady)
             return;
         await wasm_crypto_1.waitReady();
-        const keyring = (new keyring_1.Keyring({
-            type: 'sr25519',
-        })).addFromUri(this.seed);
+        const keyring = typeof this.seed === 'string' ?
+            (new keyring_1.Keyring({
+                type: 'sr25519',
+            })).addFromUri(this.seed) : this.seed;
         let crust_api = new api_1.ApiPromise({
             provider: new api_1.WsProvider(this.crust_endpoint),
             typesBundle: type_definitions_1.typesBundleForPolkadot,

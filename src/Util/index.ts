@@ -42,13 +42,12 @@ const logger = require('pino')({
     ignore: 'hostname',
     singleLine: true,
   },
+  level: process.env.LOG_LEVEL ?
+      process.env.LOG_LEVEL : 'info',
 })
-const getLogger = (module: string, level?: string) => {
+const getLogger = (module: string) => {
   return logger.child({
-    module: module,
-    level: level ? level :
-      process.env.LOG_LEVEL ?
-        process.env.LOG_LEVEL : 'info',
+    module: module
   })
 }
 export {

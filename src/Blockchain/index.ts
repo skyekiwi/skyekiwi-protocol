@@ -7,6 +7,7 @@ import { waitReady } from '@polkadot/wasm-crypto'
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { typesBundleForPolkadot } from '@crustio/type-definitions';
 import { Keyring } from '@polkadot/keyring';
+import { KeyringPair } from '@polkadot/keyring/types';
 
 export class Blockchain {
 
@@ -15,7 +16,7 @@ export class Blockchain {
   public isReady: boolean
 
   constructor(
-    public seed: string,
+    public seed: string | KeyringPair,
     public contract_address: string,
     public contract_endpoint: string,
     public crust_endpoint: string,
@@ -63,9 +64,11 @@ export class Blockchain {
 
     await waitReady()
 
-    const keyring = (new Keyring({
-      type: 'sr25519',
-    })).addFromUri(this.seed);
+    const keyring = typeof this.seed === 'string' ? 
+      (new Keyring({
+        type: 'sr25519',
+      })).addFromUri(this.seed as string) : this.seed
+    
 
     let crust_api = new ApiPromise({
       provider: new WsProvider(this.crust_endpoint),
@@ -95,5 +98,5 @@ export class Blockchain {
 }
 
 export {
-  sendTx, Crust, Contract, getAbi
+  Crust, Contract, sendTx
 }
