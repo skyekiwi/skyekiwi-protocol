@@ -64,11 +64,12 @@ describe('Integration', function() {
   })
 
   it('downstream, author only', async () => {
+    const stream = fs.createWriteStream(downstreamPath(0), {flags: 'a'})
     await SkyeKiwi.Driver.downstream({
       vaultId: vaultId1,
       blockchain: blockchain,
-      outputPath: downstreamPath(0),
-      keys: [mnemonicToMiniSecret(mnemonic)]
+      keys: [mnemonicToMiniSecret(mnemonic)],
+      writeStream: stream,
     })
 
     const downstreamContent = fs.readFileSync(downstreamPath(0))
@@ -122,11 +123,12 @@ describe('Integration', function() {
     //   [mnemonicToMiniSecret(mnemonic)]
     // )
 
+    const stream = fs.createWriteStream(downstreamPath(1), {flags: 'a'})
     await SkyeKiwi.Driver.downstream({
       vaultId: vaultId2,
       blockchain: blockchain,
-      outputPath: downstreamPath(1),
-      keys: [privateKey1, privateKey2]
+      keys: [privateKey1, privateKey2],
+      writeStream: stream,
     })
 
     const downstreamContent = fs.readFileSync(downstreamPath(1))
@@ -166,11 +168,12 @@ describe('Integration', function() {
       blockchain: blockchain
     })
 
+    const stream = fs.createWriteStream(downstreamPath(3), {flags: 'a'})
     await SkyeKiwi.Driver.downstream({
       vaultId: vaultId1,
       blockchain: blockchain,
-      outputPath: downstreamPath(3),
-      keys: [privateKey1, privateKey2]
+      keys: [privateKey1, privateKey2],
+      writeStream: stream,
     })
 
     const downstreamContent = fs.readFileSync(downstreamPath(3))

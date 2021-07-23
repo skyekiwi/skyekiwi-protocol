@@ -6,13 +6,22 @@
 > **A fun background story behind our logo** <br/><br/>
 > Little do people know that among all Greek letters, Sigma is a special one. Not only because it’s the Greek for S and S for  SkyeKiwi(duh..), but also because it’s the only Greek letter that can be written in three ways: uppercase “Σ”, lowercase “σ” and lowercase in word-final position “ς” and English likely adopt “ς” as “S” (they do look alike, right?). We make our logo to honor the Greeks’ letter Sigma but intentionally leave out the “ς” ( at a word-final position :) ), to keep this a secret (Shhhh... ). To read more on this fun Greek fact. [Link](https://en.wikipedia.org/wiki/Sigma)
 
+Documentation: [https://cdocs.skye.kiwi](https://cdocs.skye.kiwi)
 
 ## Introduction
 
-SkyeKiwi Protocol is a decentralized secret sharing protocol. It enables anyone to share a file of arbitrary size to an arbitrary number of people with ease. 
+## What is SkyeKiwi?
+SkyeKiwi is using a combination of various well-developed cryptographic schema to create a solution of securely sharing information in blockchain networks. The capacities of blockchain networks will be significantly enhanced when programable secrets can be processed through a decentralized network. We believe an innovative and unique new economic model will be created when secrets are processed on blockchains. 
 
+The SkyeKiwi Protocol client-side library is an early experimental library that is capable of sharing files of arbitrary size and type to thousands of people over a public IPFS network. 
+
+
+## How does it work?
+
+The SkyeKiwi Client Library reads in files/FormData in binary stream, divide them in chunks, generate a random sealing key of 32 bytes and symmetrically encrypt these chunks with the sealing key. Later on, a list of all CIDs and the sealing key will go through a Threshold secret sharing library then encrypted with the according public key of recipeints and pushed to a public IPFS network. The encrypted key shares will be composed into a metadata file and can be securely publicized. It will be stored on IPFS then publish the CID to a smart contract. 
 
 ![skyekiwi (6)](https://tva1.sinaimg.cn/large/008i3skNgy1gqz4x7dy5sj31ip0r0q4k.jpg)
+
 <br/><br/>
 ## Installation & Testing
 
@@ -107,7 +116,75 @@ Please refer to the `package.json`
 
 </p></details>
 
-### Run & test the core library 
+## Install
+
+```bash
+yarn add @skyekiwi/protocol
+```
+
+```javascript
+import * as SkyeKiwi from '@skyekiwi/protocol';
+```
+
+Please refer to the `test/integration.test.ts` folder which contains test cases for common useage.
+
+```javascript
+const mnemonic = process.env.SEED_PHRASE
+const blockchain = new SkyeKiwi.Blockchain(
+  // seed phrase
+  mnemonic,
+  // contract address
+  '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
+  // contract instance endpoint
+  'wss://jupiter-poa.elara.patract.io',
+  // storage network endpoint
+  'wss://rocky-api.crust.network/',
+)
+
+const encryptionSchema = new SkyeKiwi.EncryptionSchema({
+  numOfShares: 2, 
+  threshold: 2, 
+  author: author, 
+  unencryptedPieceCount: 1
+})
+encryptionSchema.addMember(author, 1)
+
+const key = new SkyeKiwi.Seal({
+  encryptionSchema: encryptionSchema, 
+  seed: mnemonic
+})
+
+// upstream the file, it take two major actions: 
+// upload files to the Crust Network & Write to a smart contract to generate a vaultId
+await SkyeKiwi.Driver.upstream({
+  file: fileHandle[0].file,
+  seal: key,
+  blockchain: blockchain
+})
+```
+
+```javascript
+const stream = fs.createWriteStream(outputPath, {flags: 'a'})
+await SkyeKiwi.Driver.downstream({
+  vaultId: vaultId,
+  blockchain: blockchain,
+  keys: [key1, key2 ... ], // private key of recipeints
+  writeStream: stream,
+})
+```
+
+```javascript
+// upon finishing, the encryptionSchema will be updated
+await SkyeKiwi.Driver.updateEncryptionSchema({
+  vaultId: vaultId,
+  newEncryptionSchema: encryptionSchema,
+  seed: mnemonic,
+  keys: [key1, key2 ... ], // private key of recipeints
+  blockchain: blockchain
+})
+```
+
+### Run Test
 
 1. Clone this repo to your local environment & install dependencies 
 
@@ -127,11 +204,12 @@ yarn global add ts-node
 
 ```
 SEED_PHRASE = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
+LOG_LEVEL = 'debug'
 ```
 
-3. Get some test-net tokens to interact with the blockchain. By default, SkyeKiwi uses the [Canvas Testnet](https://paritytech.github.io/ink-docs/canvas/) for smart contract runtime and [Crust Network - Rocky Testnet](https://wiki.crust.network/docs/en/buildRockyGuidance) for storage.
+3. Get some test-net tokens to interact with the blockchain. By default, SkyeKiwi uses the [Jupiter Network](https://github.com/patractlabs/jupiter/) for smart contract runtime and [Crust Network - Rocky Testnet](https://wiki.crust.network/docs/en/buildRockyGuidance) for storage.
 
-- Faucet on the Canvas Testnet is available at [LINK](https://riot.im/app/#/room/#canvas_faucet:matrix.parity.io)
+- Faucet on the Jupiter network is available at [LINK](https://patrastore.io/#/jupiter-a1/system/accounts)
 - Faucet on the Crust Network - Rocky Testnet is available at [LINK](https://github.com/decloudf/faucet-bot/issues)
 
 4. Run Tests. The process can take somewhere between 3minutes to 10 minutes, depends on network connection. 
@@ -140,174 +218,75 @@ SEED_PHRASE = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
 yarn test
 ```
 
-5. Relax. After a few minutes. It should produce something similar as:
-
-```
-$ yarn test:all
-$ mocha -r ts-node/register ./spec/*.test.ts
-
-  Blockchain
-    ✓ Blockchain: send contract tx & storage order works (33919ms)
-
-  Encryption
-    ✓ Symmetric: Encryption & Decryption Works
-    ✓ Asymmetric: Encryption & Decryption Works
-    ✓ Symmetric: Decryption Fails w/Wrong Key
-    ✓ Asymmetric: Decryption Fails w/Wrong Key
-    ✓ TSS: Sharing Works
-
-  File
-    ✓ File: file size reads well
-    ✓ File: file chunk count calculated correctly
-    ✓ File: chunk hash calculation works (44ms)
-    ✓ File: inflate & deflat work (147ms)
-
-  Integration
-    ✓ upstream, author only (59532ms)
-    ✓ downstream, author only (31919ms)
-    ✓ upstream, two members + author (69974ms)
-    ✓ downstream, two members + author (33960ms)
-    ✓ update encryptionSchema & downstream again (40926ms)
-
-  IPFS Client
-    ✓ ipfs works (65381ms)
-
-  Metadata
-    ✓ Seal: sealing & recover works
-    ✓ Chunks: chunks are recorded well & CID list matches (16470ms)
-
-
-  18 passing (6m)
-
-```
-
-### Run & test the sample smart contract
-The repository comes with a pre-compiled version of the smart contract included and a deployed version of it on the Jupiter testnet @ `3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM`
-
-1. Navigate to the `contract` directory, and use `yarn` to install dependencies.
-2. Fire up a local smart contract enabled blockchain. Please refer to the `Full Environment Setup` section. 
-```
-path-to-jupiter-repo/target/release/jupiter-prep --dev
-# OR with Canvas
-canvas --dev --tmp
-```
-3. Create a `.env` file with your seed phrase under the `skyekiwi-protocol/contract` directory
-```
-SEED_PHRASE = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
-```
-4. Transfer to your account some gas fee. Go to a [Substrate App](https://ipfs.io/ipns/dotapps.io/#/accounts) to interact with the your local blockchain.
-5. Run the test by `yarn test`. The process might take about 10 minutes. `Rust` is notoriously known to be slow in compiling.
-
-### Usage
-
-Please refer to the `spec/integration.test.ts` folder which contains test cases for common useage.
-
-```javascript
-const skyekiwi = new SkyeKiwi.Driver(
-  encryptionSchema, // a SkyeKiwi.encryptionSchema instance - specify 
-  fileHandle, // a SkyeKiwi.File instance - specify which file to upload
-  key, // a SkyeKiwi.Seal instance - specify keys used
-  ipfs // a SkyeKiwi.ipfs instance - specify which IPFS to be used 
-)
-
-skyekiwi.upstream() // upstream the file, it take two major actions: 
-// upload files to the Crust Network & Write to a smart contract to generate a vaultId 
-```
-
-```javascript
-await SkyeKiwi.Driver.downstream(
-  vaultId, // the file id from the smart contract
-  blockchain, // SkyeKiwi.Blockchain instance
-  ipfs,
-  downstreamPath, // where to keep the recorvered file 
-  [privateKey1, privateKey2] // keys used to decrypt 
-)
-// upon finishing, the file will be download and recovered to the destination path
-```
-
-
-```javascript
-await SkyeKiwi.Driver.updateEncryptionSchema(
-  vaultId, // vaultId from the smart contract
-  encryptionSchema, // the new encryptionSchema
-  mnemonic, // blockchain seed phrase
-  [mnemonicToMiniSecret(mnemonic)],  // an array of keys used to decrypt the seal
-  ipfs,  
-  blockchain
-)
-// upon finishing, the encryptionSchema will be updated
-```
+5. Relax. The test should be able to finish within 10 minutes.
 
 ### IPFS Pin Service
-
 By default, we use two IPFS remote pin service before the Crust Network is able to fetch the files. 
 
-- Decoo: https://decoo.io/
-Signup and get an API key, save it to the `.env` as `DECOO = 'xxxx'`
+- **SkyeKiwi Nodes**: Our own remote IPFS pinning server. 
 
-- Infura: https://infura.io/docs/ipfs
-You don't need to do anything with this, they are offering IPFS pinning without authorization for now. However, pinning to Infura might fail sometimes. 
+- **Infura**: https://infura.io/docs/ipfs: You don't need to do anything with this, they are offering IPFS pinning without authorization for now. However, pinning to Infura might fail sometimes. 
 
-When pushing content to IPFS, the IPFS module of the SkyeKiwi Protocol will try to push content to Decoo, if the HTTP request fails, or if you do not record an Decoo API key in the `.env` file, it will fall back to Infura IPFS. If Infura IPFS fails again, it will fallback to start a local IPFS node, in that case, you will be required to keep the local IPFS node running, so that the Crust Network can fetch the file. It might take up to 2 hours for the Crust Network to pick up the file. Please refer to [Crust Wiki](https://wiki.crust.network/docs/en/storageUserGuide) for file fetching. 
+When pushing content to IPFS, the IPFS module of the SkyeKiwi Protocol will try to push content to SkyeKiwi IPFS, if the HTTP request fails,, it will fall back to Infura IPFS. If Infura IPFS fails again, it will fallback to start a local IPFS node, in that case, you will be required to keep the local IPFS node running, so that the Crust Network can fetch the file. It might take up to 2 hours for the Crust Network to pick up the file. Please refer to [Crust Wiki](https://wiki.crust.network/docs/en/storageUserGuide) for file fetching. 
 
-Similarly, for `ipfs.cat`, it will try to use an Infura ipfs gateway first, if failed, it will fall back to a local node. 
+Similarly, for `ipfs.cat`, it will first try to fetch through a list of public IPFS gatewey, if failed, it will try to use an Infura ipfs gateway, if failed again, use SkyeKiwi IPFS Gateway, if failed again, it will fall back to a local node. 
 
 If an `ERR_LOCK_EXISTS` appears on `jsipfs`, it is because that you are trying to start another local IPFS node when there is already one running. Run `await ipfs.stopIfRunning()` to stop the local IPFS node. `stopIfRunning` will always do checks and if there is actually a local node running, if not, it will not do anything. Therefore, if a local IPFS node is not needed, always run `await ipfs.stopIfRunning()`. 
+
 
 ### Project Structure 
 ```
 .
 ├── LICENSE
 ├── README.md
-├── contract // a sample smart contract
-│   ├── LICENSE.txt 
-│   ├── artifacts // compiled smart contract
-│   │   ├── skyekiwi.contract 
-│   │   └── skyekiwi.json
-│   ├── contracts // smart contract source files
-│   │   ├── Cargo.lock
-│   │   ├── Cargo.toml
-│   │   └── lib.rs
-│   ├── package.json
-│   ├── redspot.config.ts // redspot configuration see https://github.com/patractlabs/redspot
-│   ├── scripts
-│   │   └── deploy.ts // script used to deploy to the Jupiter testnet
-│   ├── tests // smart contract testing
-│   │   └── skyekiwi.test.ts
-│   ├── tsconfig.json
-│   └── yarn.lock
+├── abi // where all smart contract information is stored
+│   ├── skyekiwi.contract
+│   └── skyekiwi.json
+├── browser.test // run index.html to run tests in browsers
+│   ├── index.html 
+│   ├── test.browser.js // generated by Webpack to include all tests
+│   └── test.browser.js.LICENSE.txt
+├── dist
+│   ├── src // compiled by TSC of src
+|   | .... 
+│   |── test // compiled by TSC of test
+│   └── .....
+├── src
+│   ├── Blockchain // blockchain adapter
+│   │   ├── Contract.ts // interact with smart contract
+│   │   ├── Crust.ts // interact with the Crust Network
+│   │   ├── Util.ts
+│   │   └── index.ts
+│   ├── Encryption // cryptographic module
+│   │   ├── AsymmetricEncryption.ts
+│   │   ├── SymmetricEncryption.ts
+│   │   ├── TSS.ts
+│   │   └── index.ts
+│   ├── File
+│   │   └── index.ts
+│   ├── IPFS
+│   │   └── index.ts
+│   ├── Metadata // core metadata packager
+│   │   ├── EncryptionSchema.ts
+│   │   ├── Seal.ts
+│   │   └── index.ts
+│   ├── Util
+│   │   └── index.ts
+│   ├── driver.ts // Driver module that export "upstream", "donwstream" and "updateEncryptionSchema"
+│   └── index.ts
+├── test // tests
+│   ├── blockchain.test.ts
+│   ├── encryption.test.ts
+│   ├── file.test.ts
+│   ├── index.ts // include all tests / used for browser
+│   ├── integration.test.ts
+│   ├── ipfs.test.ts
+│   ├── setup.ts
+│   └── tmp // temporary folder for generated files when tested on Node.js
 ├── package.json
-├── spec // testing for the main protocol
-│   ├── integration.test.ts 
-│   ├── tmp // temp folder for generated test file, if testing throws an error, try remove all files within this folder and restart
-│   └── unit.test.ts
-├── src 
-│   ├── Blockchain // Blockchain Adapter 
-│   │   ├── Contract.ts 
-│   │   ├── Crust.ts
-│   │   ├── index.ts
-│   │   └── sendTx.ts // helper function to send transactions, Credit: Crust Network
-│   ├── Encryption
-│   │   ├── Box.ts // public-key encryption
-│   │   ├── SecretBox.ts // symmetric encryption
-│   │   ├── TSS.ts // threshold secret sharing 
-│   │   └── index.ts
-│   ├── File // file handler
-│   │   └── index.ts
-│   ├── IPFS // ipfs client wrapper
-│   │   └── index.ts
-│   ├── Metadata // the heavy lifting Metadata handler
-│   │   ├── Chunks.ts // process all generated chunks, not encypted
-│   │   ├── EncryptionSchema.ts // normalized EncryptionSchema 
-│   │   ├── Seal.ts // encryption handler
-│   │   └── index.ts // main Metadata instance 
-│   ├── Util
-│   │   └── index.ts
-│   ├── driver.ts // entry point that wraps all functions with three main APIs: upstream, downstream & updateEncryptionSchema
-│   ├── index.ts
-│   └── types.ts
 ├── tsconfig.json
 ├── tslint.json
+├── webpack.config.js
 └── yarn.lock
 ```
 

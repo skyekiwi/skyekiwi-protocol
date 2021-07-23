@@ -78,14 +78,14 @@ class Driver {
         return unsealed;
     }
     static async downstream(config) {
-        const { vaultId, blockchain, outputPath, keys } = config;
+        const { vaultId, blockchain, keys, writeStream } = config;
         const unsealed = await this.getMetadataByVaultId(vaultId, blockchain, keys);
         const sealingKey = unsealed.sealingKey;
         const chunks = unsealed.chunks;
         let hash = unsealed.hash;
-        return await this.downstreamChunkProcessingPipeLine(chunks, hash, sealingKey, outputPath);
+        return await this.downstreamChunkProcessingPipeLine(chunks, hash, sealingKey, writeStream);
     }
-    static async downstreamChunkProcessingPipeLine(chunks, hash, sealingKey, outputPath) {
+    static async downstreamChunkProcessingPipeLine(chunks, hash, sealingKey, writeStream) {
         const ipfs = new index_1.IPFS();
         let currentHash;
         for (let chunkCID of chunks) {
@@ -99,15 +99,11 @@ class Driver {
             else {
                 currentHash = await index_1.File.getCombinedChunkHash(currentHash, chunk);
             }
-            await Driver.fileReady(chunk, outputPath);
+            writeStream.write(chunk);
         }
         if (index_1.Util.u8aToHex(currentHash) !== index_1.Util.u8aToHex(hash)) {
             throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine');
         }
-    }
-    static async fileReady(chunk, outputPath) {
-        await index_1.File.writeFile(chunk, outputPath, 'a');
-        return true;
     }
     static async updateEncryptionSchema(config) {
         const { vaultId, newEncryptionSchema, seed, keys, blockchain } = config;

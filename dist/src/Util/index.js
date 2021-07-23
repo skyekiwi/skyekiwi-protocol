@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.trimEnding = exports.u8aToString = exports.stringToU8a = exports.numberPadding = exports.isValidHex = exports.u8aToHex = exports.hexToU8a = void 0;
+exports.getLogger = exports.trimEnding = exports.u8aToString = exports.stringToU8a = exports.numberPadding = exports.isValidHex = exports.u8aToHex = exports.hexToU8a = void 0;
 const util_1 = require("@polkadot/util");
 Object.defineProperty(exports, "stringToU8a", { enumerable: true, get: function () { return util_1.stringToU8a; } });
 Object.defineProperty(exports, "u8aToString", { enumerable: true, get: function () { return util_1.u8aToString; } });
@@ -33,4 +33,29 @@ const trimEnding = (str) => {
         return str;
 };
 exports.trimEnding = trimEnding;
+// fatal = 60
+// error = 50
+// warn = 40
+// info = 30
+// debug = 20
+// trace = 10
+// silent = inf
+require('dotenv').config();
+const logger = require('pino')({
+    prettyPrint: {
+        colorize: true,
+        translateTime: 'yyyy-mm-dd HH:MM:ss',
+        ignore: 'hostname',
+        singleLine: true,
+    },
+});
+const getLogger = (module, level) => {
+    return logger.child({
+        module: module,
+        level: level ? level :
+            process.env.LOG_LEVEL ?
+                process.env.LOG_LEVEL : 'info',
+    });
+};
+exports.getLogger = getLogger;
 //# sourceMappingURL=index.js.map
