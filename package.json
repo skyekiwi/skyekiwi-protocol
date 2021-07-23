@@ -2,6 +2,7 @@
   "name": "@skyekiwi/protocol",
   "version": "0.1.5",
   "main": "./dist/index.js",
+  "browser": "./dist/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com//skyekiwi/skyekiwi-protocol.git "
