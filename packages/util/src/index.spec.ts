@@ -1,8 +1,10 @@
-import * as Util from './index'
+// Copyright 2021 @skyekiwi/dev authors & contributors
+// SPDX-License-Identifier: Apache-2.0
+
+import * as Util from './index';
 
 describe('@skyekiwi/util', function () {
-
-  it('works', async () => {
-    console.log('works')
+  it('works', () => {
+    console.log(Util.stringToU8a('test'));
   });
 });
