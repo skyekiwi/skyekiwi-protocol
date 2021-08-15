@@ -100,7 +100,7 @@ function gitSetup () {
   execSync('git config merge.ours.driver true');
   execSync('git config user.name "Github Actions"');
   execSync('git config user.email "action@github.com"');
-  execSync('git checkout song/multi-package');
+  execSync('git checkout master');
 }
 
 function gitBump () {
