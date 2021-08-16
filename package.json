@@ -1,22 +1,13 @@
 {
-  "version": "0.2.8-3",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
-  },
+  "repository": "https://github.com/skyekiwi/skyekiwi-protocol",
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "resolutions": {
     "typescript": "^4.3.5"
-  },
-  "author": "SkyeKiwi <hello@skye.kiwi>",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "@skyekiwi/dev": "workspace:packages/dev",
-    "@types/jest": "^26.0.24",
-    "copyfiles": "^2.4.1"
   },
   "scripts": {
     "build": "skyekiwi-dev-build-ts",
@@ -25,7 +16,15 @@
     "lint": "skyekiwi-dev-run-lint",
     "clean": "skyekiwi-dev-clean-build",
     "postinstall": "skyekiwi-dev-yarn-only",
-    "test": "skyekiwi-dev-run-test --coverage --runInBand --testPathIgnorePatterns crosscheck --testPathIgnorePatterns toMiniSecretCmp",
+    "test": "skyekiwi-dev-run-test --coverage --runInBand",
     "test:one": "skyekiwi-dev-run-test --runInBand"
-  }
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@skyekiwi/dev": "workspace:packages/dev",
+    "@types/ed2curve": "^0.2.2",
+    "@types/jest": "^26.0.24"
+  },
+  "version": "0.2.7",
+  "packageManager": "yarn@3.0.1"
 }
