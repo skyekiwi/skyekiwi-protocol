@@ -194,5 +194,5 @@ runCheck();
 runTest();
 runBuild();
 
-// gitPush();
+gitPush();
 loopFunc(npmPublish);
