@@ -6,7 +6,7 @@ import ipfs from 'ipfs-core';
 import createClient from 'ipfs-http-client';
 import fetch, { RequestInit } from 'node-fetch';
 
-import * as Util from '@skyekiwi/util';
+import { getLogger, Logger } from '@skyekiwi/util';
 
 export type IPFSResult = { cid: string, size: number };
 export class IPFS {
