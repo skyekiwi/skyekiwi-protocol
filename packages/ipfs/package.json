@@ -9,7 +9,7 @@
     "./detectPackage.cjs"
   ],
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "maintainers": [],
   "contributors": [],
@@ -20,10 +20,11 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/util": "0.2.9",
+    "@skyekiwi/util": "^0.2.9",
+    "abort-controller": "^3.0.0",
     "ipfs-core": "^0.6.1",
+    "ipfs-core-types": "0.7.0",
     "ipfs-http-client": "^49.0.2",
-    "node-fetch": "2.6.1",
-    "promise.any": "^2.0.2"
+    "node-fetch": "2.6.1"
   }
 }

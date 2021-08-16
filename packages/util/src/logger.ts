@@ -11,6 +11,7 @@
 
 import pino from 'pino';
 
+type Logger = pino.Logger;
 const logger = pino({
   level: 'info',
   prettyPrint: {
@@ -21,10 +22,10 @@ const logger = pino({
   }
 });
 
-const getLogger = (module: string) => {
+const getLogger = (module: string): Logger => {
   return logger.child({
     module: module
   });
 };
 
-export { getLogger };
+export { getLogger, Logger };

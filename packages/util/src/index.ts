@@ -3,7 +3,7 @@
 
 // import { stringToU8a, u8aToString } from '@polkadot/util';
 
-import { getLogger } from './logger';
+import { getLogger, Logger } from './logger';
 import { sendTx } from './sendTx';
 
 const hexToU8a = (hex: string): Uint8Array => {
@@ -41,5 +41,5 @@ export {
 
   trimEnding,
 
-  getLogger, sendTx
+  getLogger, Logger, sendTx
 };

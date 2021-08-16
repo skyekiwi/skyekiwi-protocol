@@ -25,6 +25,6 @@ module.exports = Object.assign({}, config, {
     '<rootDir>/packages/util/build',
     '<rootDir>/packages/wasm/build'
   ],
-  testTimeout: 30000,
+  testTimeout: 3_000_000,
   transformIgnorePatterns: ['/node_modules/(?!@skyekiwi)']
 });

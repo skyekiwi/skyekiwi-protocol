@@ -16,14 +16,14 @@
     "lint": "skyekiwi-dev-run-lint",
     "clean": "skyekiwi-dev-clean-build",
     "postinstall": "skyekiwi-dev-yarn-only",
-    "test": "skyekiwi-dev-run-test --coverage --runInBand",
+    "test": "skyekiwi-dev-run-test --coverage --runInBand --silent",
     "test:one": "skyekiwi-dev-run-test --runInBand"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@skyekiwi/dev": "workspace:packages/dev",
-    "@types/ed2curve": "^0.2.2",
-    "@types/jest": "^26.0.24"
+    "@types/jest": "^26.0.24",
+    "leaked-handles": "^5.2.0"
   },
   "version": "0.2.9",
   "packageManager": "yarn@3.0.1"

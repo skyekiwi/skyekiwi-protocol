@@ -4,7 +4,7 @@
 import * as Util from '.';
 
 describe('@skyekiwi/util', function () {
-  it('works', () => {
+  test('works', () => {
     console.log(Util.numberPadding(10));
   });
 });
