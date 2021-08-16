@@ -2169,15 +2169,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-rest-endpoint-methods@npm:5.7.0":
-  version: 5.7.0
-  resolution: "@octokit/plugin-rest-endpoint-methods@npm:5.7.0"
+"@octokit/plugin-rest-endpoint-methods@npm:5.8.0":
+  version: 5.8.0
+  resolution: "@octokit/plugin-rest-endpoint-methods@npm:5.8.0"
   dependencies:
-    "@octokit/types": ^6.24.0
+    "@octokit/types": ^6.25.0
     deprecation: ^2.3.1
   peerDependencies:
     "@octokit/core": ">=3"
-  checksum: 3335fb0ae7d43965f7d598cfc19b353e63e6d4befd150954826eefdde3c1779be2965b4fbaeb59725fe7071db73865132ccc3fa5945b4a3751644feb5bd7e7bf
+  checksum: 35571a61bb7e1a67dd3907034b47481fbd20dc65b82101f3b024ff5aa0109c7dbc8ff98091f7127de672fe037c16728fcc8af67665e0be92cc48c8b28f6136a7
   languageName: node
   linkType: hard
 
@@ -2207,18 +2207,18 @@ __metadata:
   linkType: hard
 
 "@octokit/rest@npm:^18.0.9":
-  version: 18.9.0
-  resolution: "@octokit/rest@npm:18.9.0"
+  version: 18.9.1
+  resolution: "@octokit/rest@npm:18.9.1"
   dependencies:
     "@octokit/core": ^3.5.0
     "@octokit/plugin-paginate-rest": ^2.6.2
     "@octokit/plugin-request-log": ^1.0.2
-    "@octokit/plugin-rest-endpoint-methods": 5.7.0
-  checksum: 16402f0df79b2461af334c1615dec1614afe2c739ba2bfaa1e169d9f9d833f063736ddd1a968d86f91bf8d3311b362ef19e9b7bdd249747923e0b9f1d4a0221f
+    "@octokit/plugin-rest-endpoint-methods": 5.8.0
+  checksum: 0707943274bc85014e7ed0c584d33a0d1f73a61bf9d4ff730ed4eb5b40a6d5010c925727114ada84b276a5c6005494628a810ca1b8ab07c2aa1f21295f44d650
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:^6.0.3, @octokit/types@npm:^6.16.1, @octokit/types@npm:^6.24.0":
+"@octokit/types@npm:^6.0.3, @octokit/types@npm:^6.16.1, @octokit/types@npm:^6.24.0, @octokit/types@npm:^6.25.0":
   version: 6.25.0
   resolution: "@octokit/types@npm:6.25.0"
   dependencies:
@@ -2891,7 +2891,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
-    "@skyekiwi/util": "workspace:packages/util"
+    "@skyekiwi/util": ^0.2.9
     abort-controller: ^3.0.0
     ipfs-core: ^0.6.1
     ipfs-core-types: 0.7.0
@@ -2900,7 +2900,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@^0.2.9, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:
@@ -3173,15 +3173,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ed2curve@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "@types/ed2curve@npm:0.2.2"
-  dependencies:
-    tweetnacl: ^1.0.0
-  checksum: f1ab16d46c5eed50d51539effef76c87806bb53ab45ecff78c19a632e63825fd08d604984b08778f8201c79be0bd43120565dad38cc5d45ba65a6c7de5bf4ace
-  languageName: node
-  linkType: hard
-
 "@types/estree@npm:*":
   version: 0.0.50
   resolution: "@types/estree@npm:0.0.50"
@@ -3298,13 +3289,6 @@ __metadata:
   version: 2.3.2
   resolution: "@types/prettier@npm:2.3.2"
   checksum: c4313e16650811f47b07a0fa7ac0742e966f61283a7292eb667fd4626d760bf3b7d896be3eaabb3354ad45fdbe3a340299b018dd3bcce1ff753d030a8cd2479c
-  languageName: node
-  linkType: hard
-
-"@types/promise.any@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@types/promise.any@npm:2.0.0"
-  checksum: 27989bbe75af7429a9bd284e8b46569f55df0a4ac4d73db7b7eea13f32c954596582f3e83a38b5bedb88a651282a1325e4af497fe4bdaea3b9dd04ff80b3ac95
   languageName: node
   linkType: hard
 
@@ -3479,7 +3463,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/typescript-estree@npm:4.29.1, @typescript-eslint/typescript-estree@npm:^4.8.2":
+"@typescript-eslint/types@npm:4.29.2":
+  version: 4.29.2
+  resolution: "@typescript-eslint/types@npm:4.29.2"
+  checksum: 0bcab66bb1848e2361bb366abebe1f94baa56d7d2058b62467f14c054b969b72d1aa17717a52c11f48e9cfb50846f0e227e49ccc7f06ff750b9eb28ca8b064de
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/typescript-estree@npm:4.29.1":
   version: 4.29.1
   resolution: "@typescript-eslint/typescript-estree@npm:4.29.1"
   dependencies:
@@ -3497,6 +3488,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typescript-eslint/typescript-estree@npm:^4.8.2":
+  version: 4.29.2
+  resolution: "@typescript-eslint/typescript-estree@npm:4.29.2"
+  dependencies:
+    "@typescript-eslint/types": 4.29.2
+    "@typescript-eslint/visitor-keys": 4.29.2
+    debug: ^4.3.1
+    globby: ^11.0.3
+    is-glob: ^4.0.1
+    semver: ^7.3.5
+    tsutils: ^3.21.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 90342d27f3f0837ad39f9b7e7d7c3c0b6de9c5b0770f5a18d490ebaf7be78efa65ba46ce0ca3004ad946ca1adc5865c5d3ba3b049c95b3b193bfdf0eb5e23095
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/visitor-keys@npm:4.29.1":
   version: 4.29.1
   resolution: "@typescript-eslint/visitor-keys@npm:4.29.1"
@@ -3504,6 +3513,16 @@ __metadata:
     "@typescript-eslint/types": 4.29.1
     eslint-visitor-keys: ^2.0.0
   checksum: a99db94f80331a0bdd2e4828d43daa7d391312d6edf77d8f80fcd37530ea9eacbf8014dc3378a26e9e22891e0d97c5637fcde2d6272ed091de74ede22bec0224
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/visitor-keys@npm:4.29.2":
+  version: 4.29.2
+  resolution: "@typescript-eslint/visitor-keys@npm:4.29.2"
+  dependencies:
+    "@typescript-eslint/types": 4.29.2
+    eslint-visitor-keys: ^2.0.0
+  checksum: 34185d8c6466340aba746d69b36d357da2d06577d73f58358648c142bd0f181d7fae01ca1138188a665ef074ea7e1bc6306ef9d50f29914c8bcea4e9ea1f82f2
   languageName: node
   linkType: hard
 
@@ -5908,9 +5927,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.3.793":
-  version: 1.3.806
-  resolution: "electron-to-chromium@npm:1.3.806"
-  checksum: cba7104935f8fe9d5d466a7ade478021a7ede8d8c8ad5a13bf11022ebbc316270065bb2ed7ecd3fb450bbf1351628d123d4efadd600001f97c05e6628f0de59d
+  version: 1.3.807
+  resolution: "electron-to-chromium@npm:1.3.807"
+  checksum: 89f42db6f8ffcb25f13b4d9b770d58049eff5ce102a6fd7361b9b9885d247b42dd1cf9b685946454607247dd4a4a060cbca11d635120784fa1fdeab8aa2e8486
   languageName: node
   linkType: hard
 
@@ -10303,17 +10322,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leaked-handles@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "leaked-handles@npm:5.2.0"
-  dependencies:
-    process: ^0.10.0
-    weakmap-shim: ^1.1.0
-    xtend: ^4.0.0
-  checksum: 4d4d950a01a42ff9084a8ed9f70df47e94ebbf9553846ad7fe269821382c97f4ac97034a023c4dad6457514877e0ae427443c326e7723ad87e73b73e5045cb8f
-  languageName: node
-  linkType: hard
-
 "level-codec@npm:^10.0.0":
   version: 10.0.0
   resolution: "level-codec@npm:10.0.0"
@@ -12881,13 +12889,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"process@npm:^0.10.0":
-  version: 0.10.1
-  resolution: "process@npm:0.10.1"
-  checksum: bdaaa28a8edf96d5daa0f5c1faf4adfedce512ebca829a82e846d991492780c34eb934decf4fa5b311c698881d07a8d4592b4d7ea53ec03d51580a2f364d3e30
-  languageName: node
-  linkType: hard
-
 "progress-stream@npm:^2.0.0":
   version: 2.0.0
   resolution: "progress-stream@npm:2.0.0"
@@ -13690,10 +13691,7 @@ resolve@^2.0.0-next.3:
   dependencies:
     "@babel/core": ^7.15.0
     "@skyekiwi/dev": "workspace:packages/dev"
-    "@types/ed2curve": ^0.2.2
     "@types/jest": ^26.0.24
-    "@types/promise.any": ^2.0.0
-    leaked-handles: ^5.2.0
   languageName: unknown
   linkType: soft
 
@@ -15004,7 +15002,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"tweetnacl@npm:1.x.x, tweetnacl@npm:^1.0.0, tweetnacl@npm:^1.0.3":
+"tweetnacl@npm:1.x.x, tweetnacl@npm:^1.0.3":
   version: 1.0.3
   resolution: "tweetnacl@npm:1.0.3"
   checksum: e4a57cac188f0c53f24c7a33279e223618a2bfb5fea426231991652a13247bea06b081fd745d71291fcae0f4428d29beba1b984b1f1ce6f66b06a6d1ab90645c
@@ -15515,13 +15513,6 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"weakmap-shim@npm:^1.1.0":
-  version: 1.1.1
-  resolution: "weakmap-shim@npm:1.1.1"
-  checksum: 27669feb2a05d881211a298fafb1e771fd960a5e308b89a66db2902328f0afdb9c91524bd401d45700918baa84f082017c70cbd56a89ae37c18584c0f00ee0e6
-  languageName: node
-  linkType: hard
-
 "web-encoding@npm:^1.0.2, web-encoding@npm:^1.0.6":
   version: 1.1.5
   resolution: "web-encoding@npm:1.1.5"
@@ -15788,7 +15779,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"xtend@npm:^4.0.0, xtend@npm:~4.0.1":
+"xtend@npm:~4.0.1":
   version: 4.0.2
   resolution: "xtend@npm:4.0.2"
   checksum: ac5dfa738b21f6e7f0dd6e65e1b3155036d68104e67e5d5d1bde74892e327d7e5636a076f625599dc394330a731861e87343ff184b0047fef1360a7ec0a5a36a

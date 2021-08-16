@@ -3,10 +3,10 @@
 
 import { randomBytes } from 'tweetnacl';
 
-import * as Util from '../../util/src';
+import * as Util from '@skyekiwi/util';
+
 import { IPFS } from '.';
 
-// require("leaked-handles");
 describe('@skyekiwi/ipfs', function () {
   const ipfs = new IPFS();
 

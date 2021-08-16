@@ -22,8 +22,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@skyekiwi/dev": "workspace:packages/dev",
-    "@types/jest": "^26.0.24",
-    "leaked-handles": "^5.2.0"
+    "@types/jest": "^26.0.24"
   },
   "version": "0.2.9",
   "packageManager": "yarn@3.0.1"
