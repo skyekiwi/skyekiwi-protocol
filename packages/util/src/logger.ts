@@ -11,7 +11,7 @@
 
 import pino from 'pino';
 
-type Logger = pino.Logger;
+export type Logger = pino.Logger;
 const logger = pino({
   level: 'info',
   prettyPrint: {
@@ -28,4 +28,4 @@ const getLogger = (module: string): Logger => {
   });
 };
 
-export { getLogger, Logger };
+export { getLogger };
