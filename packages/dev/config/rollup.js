@@ -43,7 +43,7 @@ export function createOutput (_pkg, external, globals) {
   const pkg = sanitizePkg(_pkg);
 
   return {
-    file: `packages/${pkg}/build/bundle-polkadot-${pkg}.js`,
+    file: `packages/${pkg}/build/bundle-skyekiwi-${pkg}.js`,
     format: 'iife',
     globals: external.reduce((all, pkg) => ({
       [pkg]: createName(pkg),

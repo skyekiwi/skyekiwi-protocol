@@ -3,4 +3,6 @@
 
 import pino from 'pino';
 
-export type Logger = pino.Logger;
+type Logger = pino.Logger
+
+export type { Logger };

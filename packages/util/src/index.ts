@@ -1,8 +1,6 @@
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// import { stringToU8a, u8aToString } from '@polkadot/util';
-
 import { getLogger } from './logger';
 import { sendTx } from './sendTx';
 
