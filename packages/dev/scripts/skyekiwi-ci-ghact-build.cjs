@@ -21,7 +21,7 @@ const argv = require('yargs')
 const copySync = require('./copySync.cjs');
 const execSync = require('./execSync.cjs');
 
-const repo = 'git@github.com:skyekiwi/skyekiwi-protocol-mono.git';
+const repo = `https://${process.env.GH_PAT}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
 
 console.log('$ skyekiwi-ci-ghact-build', process.argv.slice(2).join(' '));
 
