@@ -24,6 +24,6 @@
     "@skyekiwi/dev": "^0.3.0",
     "@types/jest": "^26.0.24"
   },
-  "version": "0.2.10-0",
+  "version": "0.2.10-1",
   "packageManager": "yarn@3.0.1"
 }

@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/util",
-  "version": "0.2.10-0",
+  "version": "0.2.10-1",
   "type": "module",
   "description": "a collection of utility functions for @skyekiwi",
   "main": "index.js",
@@ -32,28 +32,23 @@
       "require": "./index.cjs",
       "default": "./index.js"
     },
-    "./index.d.ts": "./index.d.ts",
     "./logger": {
       "require": "./logger.cjs",
       "default": "./logger.js"
     },
-    "./logger.d.ts": "./logger.d.ts",
     "./package.json": "./package.json",
     "./packageInfo": {
       "require": "./packageInfo.cjs",
       "default": "./packageInfo.js"
     },
-    "./packageInfo.d.ts": "./packageInfo.d.ts",
     "./README.md": "./README.md",
     "./sendTx": {
       "require": "./sendTx.cjs",
       "default": "./sendTx.js"
     },
-    "./sendTx.d.ts": "./sendTx.d.ts",
     "./types": {
       "require": "./types.cjs",
       "default": "./types.js"
-    },
-    "./types.d.ts": "./types.d.ts"
+    }
   }
 }
