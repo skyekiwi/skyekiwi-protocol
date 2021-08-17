@@ -3643,7 +3643,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer-from@npm:1.x, buffer-from@npm:^1.0.0":
+"buffer-from@npm:^1.0.0":
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
@@ -4155,12 +4155,12 @@ __metadata:
   linkType: hard
 
 "core-js-compat@npm:^3.14.0, core-js-compat@npm:^3.16.0":
-  version: 3.16.1
-  resolution: "core-js-compat@npm:3.16.1"
+  version: 3.16.2
+  resolution: "core-js-compat@npm:3.16.2"
   dependencies:
     browserslist: ^4.16.7
     semver: 7.0.0
-  checksum: fbbc054f6d1cc0e172846b39b264c7c9ef5405390a6d5e1ff7bda7c71457932e112fcf861e1c6171505a2e407407db32b99cd24badcc79a5d08fd04e46076c4d
+  checksum: 48fc6c5f2a389e58855f7f0c77623878e78b95dad268ec25cbc38fbc98ee60d3241f4b653543252427b26e378a8cbf5e9ae323e16afe00c29c3c47b3a6a7b655
   languageName: node
   linkType: hard
 
@@ -4716,9 +4716,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.3.793":
-  version: 1.3.807
-  resolution: "electron-to-chromium@npm:1.3.807"
-  checksum: 89f42db6f8ffcb25f13b4d9b770d58049eff5ce102a6fd7361b9b9885d247b42dd1cf9b685946454607247dd4a4a060cbca11d635120784fa1fdeab8aa2e8486
+  version: 1.3.809
+  resolution: "electron-to-chromium@npm:1.3.809"
+  checksum: e240167ef046b588c03413bb10a8e3cc9df007b6028cd7daaae44b0c80f44e80eb836f2629a61ad3830d66f91c06607ae264e63d4a3fc90d0735210d2d7488bc
   languageName: node
   linkType: hard
 
@@ -6588,11 +6588,11 @@ __metadata:
   linkType: hard
 
 "is-core-module@npm:^2.2.0, is-core-module@npm:^2.4.0":
-  version: 2.5.0
-  resolution: "is-core-module@npm:2.5.0"
+  version: 2.6.0
+  resolution: "is-core-module@npm:2.6.0"
   dependencies:
     has: ^1.0.3
-  checksum: e007de6ca5c391f8a669b9335192967d8815f9119f97d81fc4cde07febe09143263bc0146e86e813120223ea9a034cf0608d15b53b0269e19b4dc0a220ce0b4f
+  checksum: 183b3b96fed19822b13959876b0317e61fc2cb5ebcbc21639904c81f7ae328af57f8e18cc4750a9c4abebd686130c70d34a89521e57dbe002edfa4614507ce18
   languageName: node
   linkType: hard
 
@@ -8357,7 +8357,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:1.x, mkdirp@npm:^1.0.3, mkdirp@npm:^1.0.4":
+"mkdirp@npm:^1.0.3, mkdirp@npm:^1.0.4":
   version: 1.0.4
   resolution: "mkdirp@npm:1.0.4"
   bin:
@@ -10988,22 +10988,20 @@ resolve@^2.0.0-next.3:
   linkType: hard
 
 "ts-jest@npm:^27.0.4":
-  version: 27.0.4
-  resolution: "ts-jest@npm:27.0.4"
+  version: 27.0.5
+  resolution: "ts-jest@npm:27.0.5"
   dependencies:
     bs-logger: 0.x
-    buffer-from: 1.x
     fast-json-stable-stringify: 2.x
     jest-util: ^27.0.0
     json5: 2.x
     lodash: 4.x
     make-error: 1.x
-    mkdirp: 1.x
     semver: 7.x
     yargs-parser: 20.x
   peerDependencies:
     "@babel/core": ">=7.0.0-beta.0 <8"
-    "@types/jest": ^26.0.0
+    "@types/jest": ^27.0.0
     babel-jest: ">=27.0.0 <28"
     jest: ^27.0.0
     typescript: ">=3.8 <5.0"
@@ -11016,7 +11014,7 @@ resolve@^2.0.0-next.3:
       optional: true
   bin:
     ts-jest: cli.js
-  checksum: 0f6013e35bb84bf5e65a1a85ea7ed5febff13ad40745dcf5bd6a40854b6d9cff3ffcd382994028941cb7f4548ec835f6fcfc502f5a3bf69deaec0cd92fa89f9b
+  checksum: fd53cdb6f913cbe802799d2b491f70f33c52c840c4b8483cecf600ff360efbd00c8d7ed9eb0dd677219f330ee38928b7b9890e9853e9f4d3574b9d8e1dcf4a30
   languageName: node
   linkType: hard
 
