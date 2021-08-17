@@ -9,9 +9,9 @@
 // trace = 10
 // silent = inf
 
-import pino from 'pino';
+import type { Logger } from './types';
 
-import { Logger } from './types';
+import pino from 'pino';
 
 const logger = pino({
   level: 'info',
