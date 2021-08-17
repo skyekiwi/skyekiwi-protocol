@@ -7,7 +7,7 @@
 //
 const execSync = require('./execSync.cjs');
 
-const repo = 'git@github.com:skyekiwi/skyekiwi-protocol.git';
+const repo = 'git@github.com:skyekiwi/skyekiwi-protocol-mono.git';
 
 console.log('$ skyekiwi-ci-ghact-docs', process.argv.slice(2).join(' '));
 

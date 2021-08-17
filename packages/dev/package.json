@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/dev",
-  "version": "0.2.9",
+  "version": "0.2.10-0",
   "type": "module",
   "description": "A collection of shared CI scripts and development environment used by @skyekiwi projects",
   "bin": {

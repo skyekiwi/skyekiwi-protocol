@@ -1,6 +1,5 @@
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
 // fatal = 60
 // error = 50
 // warn = 40
@@ -8,11 +7,7 @@
 // debug = 20
 // trace = 10
 // silent = inf
-
 import pino from 'pino';
-
-import { Logger } from './types';
-
 const logger = pino({
   level: 'info',
   prettyPrint: {
@@ -23,7 +18,7 @@ const logger = pino({
   }
 });
 
-const getLogger = (module: string): Logger => {
+const getLogger = module => {
   return logger.child({
     module: module
   });

@@ -1,6 +1,16 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getLogger = void 0;
+
+var _pino = _interopRequireDefault(require("pino"));
+
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
-
 // fatal = 60
 // error = 50
 // warn = 40
@@ -8,12 +18,7 @@
 // debug = 20
 // trace = 10
 // silent = inf
-
-import pino from 'pino';
-
-import { Logger } from './types';
-
-const logger = pino({
+const logger = (0, _pino.default)({
   level: 'info',
   prettyPrint: {
     colorize: true,
@@ -23,10 +28,10 @@ const logger = pino({
   }
 });
 
-const getLogger = (module: string): Logger => {
+const getLogger = module => {
   return logger.child({
     module: module
   });
 };
 
-export { getLogger };
+exports.getLogger = getLogger;
