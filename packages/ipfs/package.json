@@ -1,8 +1,8 @@
 {
-  "name": "@skyekiwi/util",
+  "name": "@skyekiwi/ipfs",
   "version": "0.2.11",
   "type": "module",
-  "description": "a collection of utility functions for @skyekiwi",
+  "description": "ipfs wrapper for @skyekiwi",
   "main": "index.js",
   "sideEffects": [
     "./detectPackage.js",
@@ -20,11 +20,10 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/api": "5.5.1",
-    "@polkadot/keyring": "7.0.3",
-    "@polkadot/util": "7.0.3",
-    "dotenv": "^10.0.0",
-    "pino": "^7.0.0-rc.1",
-    "pino-pretty": "^5.1.2"
+    "abort-controller": "^3.0.0",
+    "ipfs-core": "^0.6.1",
+    "ipfs-core-types": "0.7.0",
+    "ipfs-http-client": "^49.0.2",
+    "node-fetch": "2.6.1"
   }
 }
