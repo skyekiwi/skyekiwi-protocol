@@ -26,5 +26,29 @@
     "dotenv": "^10.0.0",
     "pino": "^7.0.0-rc.1",
     "pino-pretty": "^5.1.2"
+  },
+  "exports": {
+    ".": {
+      "require": "./index.cjs",
+      "default": "./index.js"
+    },
+    "./logger": {
+      "require": "./logger.cjs",
+      "default": "./logger.js"
+    },
+    "./package.json": "./package.json",
+    "./packageInfo": {
+      "require": "./packageInfo.cjs",
+      "default": "./packageInfo.js"
+    },
+    "./README.md": "./README.md",
+    "./sendTx": {
+      "require": "./sendTx.cjs",
+      "default": "./sendTx.js"
+    },
+    "./types": {
+      "require": "./types.cjs",
+      "default": "./types.js"
+    }
   }
 }
