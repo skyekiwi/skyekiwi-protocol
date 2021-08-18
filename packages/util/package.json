@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/util",
-  "version": "0.2.11",
+  "version": "0.2.11-0",
   "type": "module",
   "description": "a collection of utility functions for @skyekiwi",
   "main": "index.js",
@@ -21,9 +21,7 @@
   },
   "dependencies": {
     "@polkadot/api": "5.5.1",
-    "@polkadot/keyring": "7.0.3",
-    "@polkadot/util": "7.0.3",
-    "dotenv": "^10.0.0",
+    "@polkadot/keyring": "^7.2.1",
     "pino": "^7.0.0-rc.1",
     "pino-pretty": "^5.1.2"
   }

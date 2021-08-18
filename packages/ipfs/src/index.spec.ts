@@ -1,9 +1,10 @@
-// Copyright 2021 @skyekiwi/dev authors & contributors
+// Copyright 2021 @skyekiwi/ipfs authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { randomBytes } from 'tweetnacl';
 
-import * as Util from '../../util/src';
+import { u8aToHex } from '@skyekiwi/util';
+
 import { IPFS } from '.';
 
 describe('@skyekiwi/ipfs', function () {
@@ -15,7 +16,7 @@ describe('@skyekiwi/ipfs', function () {
 
     for (let i = 0; i < 5; i++) {
       data.push(randomBytes(10000));
-      const hex = Util.u8aToHex(data[i]);
+      const hex = u8aToHex(data[i]);
 
       cids.push(await ipfs.add(hex));
       expect(cids[i].size).toBeGreaterThanOrEqual(10000 * 2);
@@ -24,7 +25,7 @@ describe('@skyekiwi/ipfs', function () {
     for (let i = 0; i < 5; i++) {
       const content = await ipfs.cat(cids[i].cid);
 
-      expect(content).toEqual(Util.u8aToHex(data[i]));
+      expect(content).toEqual(u8aToHex(data[i]));
     }
 
     await ipfs.stopIfRunning();

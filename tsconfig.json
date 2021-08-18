@@ -4,23 +4,17 @@
     "build/**/*",
     "**/build/**/*"
   ],
-
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@skyekiwi/crypto": [ "packages/crypto" ],
       "@skyekiwi/ipfs": [ "packages/ipfs" ],
-      "@skyekiwi/driver": [ "packages/driver" ],
-      "@skyekiwi/crust": [ "packages/crust" ],
-      "@skyekiwi/wasm-contract": [ "packages/wasm-contract" ],
-      "@skyekiwi/file": [ "packages/file" ],
-      "@skyekiwi/metadata": [ "packages/metadata" ],
       "@skyekiwi/util": [ "packages/util" ],
       "@skyekiwi/dev": [ "packages/dev" ],
     },
     "skipLibCheck": true,
     "typeRoots": [
-      "./node_modules/@skyekiwi/ts",
+      "./node_modules/@polkadot/ts",
       "./node_modules/@types"
     ]
   },
