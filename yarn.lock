@@ -2771,7 +2771,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
-    "@skyekiwi/util": 0.2.12-0
+    "@skyekiwi/util": 0.2.12-1
     abort-controller: ^3.0.0
     ipfs-core: ^0.6.1
     ipfs-core-types: 0.7.0
@@ -2780,7 +2780,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/util@0.2.12-0, @skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@0.2.12-1, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:
