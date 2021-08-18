@@ -7,10 +7,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@skyekiwi/crypto": [ "packages/crypto" ],
-      "@skyekiwi/ipfs": [ "packages/ipfs" ],
-      "@skyekiwi/util": [ "packages/util" ],
-      "@skyekiwi/dev": [ "packages/dev" ],
+      "@skyekiwi/crypto": [ "packages/crypto/src" ],
+      "@skyekiwi/crypto/*": [ "packages/crypto/src/*" ],
+      "@skyekiwi/ipfs": [ "packages/ipfs/src" ],
+      "@skyekiwi/ipfs/*": [ "packages/ipfs/src/*" ],
+      "@skyekiwi/util": [ "packages/util/src" ],
+      "@skyekiwi/util/*": [ "packages/util/src/*" ],
     },
     "skipLibCheck": true,
     "typeRoots": [
