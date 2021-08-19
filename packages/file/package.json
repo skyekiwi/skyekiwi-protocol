@@ -1,0 +1,32 @@
+{
+  "name": "@skyekiwi/file",
+  "version": "0.2.12-0",
+  "type": "module",
+  "description": "a collection of utility functions for @skyekiwi",
+  "main": "index.js",
+  "sideEffects": [
+    "./detectPackage.js",
+    "./detectPackage.cjs"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "maintainers": [],
+  "contributors": [],
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
+  },
+  "dependencies": {
+    "file-saver": "^2.0.5",
+    "pako": "^2.0.4"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.3",
+    "@types/pako": "^1.0.2",
+    "@types/readable-stream": "^2.3.11",
+    "tweetnacl": "^1.0.3"
+  }
+}

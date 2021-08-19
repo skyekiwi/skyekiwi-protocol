@@ -1,4 +1,4 @@
-// Copyright 2021 @skyekiwi/dev authors & contributors
+// Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { numberPadding } from '.';

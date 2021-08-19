@@ -5,6 +5,7 @@
     "**/build/**/*"
   ],
   "compilerOptions": {
+    "allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@skyekiwi/crypto": [ "packages/crypto/src" ],
@@ -13,6 +14,8 @@
       "@skyekiwi/ipfs/*": [ "packages/ipfs/src/*" ],
       "@skyekiwi/util": [ "packages/util/src" ],
       "@skyekiwi/util/*": [ "packages/util/src/*" ],
+      "@skyekiwi/crust-network": [ "packages/crust-network/src" ],
+      "@skyekiwi/crust-network/*": [ "packages/crust-network/src/*" ],
     },
     "skipLibCheck": true,
     "typeRoots": [
