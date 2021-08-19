@@ -31,6 +31,8 @@ describe('@skyekiwi/crust-network', () => {
     const crustResult = await crust.placeBatchOrderWithCIDList(content);
 
     expect(crustResult).toEqual(true);
+
     await ipfs.stopIfRunning();
+    await crust.disconnect();
   });
 });

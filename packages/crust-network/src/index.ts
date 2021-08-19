@@ -15,24 +15,22 @@ export class Crust {
   #signer: string | KeyringPair
   #api: ApiPromise
   #isReady: boolean
+  #provider: WsProvider
 
   constructor (signer: string | KeyringPair, testnet = true) {
     this.#signer = signer;
     this.#isReady = false;
 
-    if (testnet) {
-      this.#api = new ApiPromise({
-        provider: new WsProvider('wss://rpc-rocky.crust.network/'),
-        typesBundle: typesBundleForPolkadot
-      });
-    } else {
-      this.#api = new ApiPromise({
-        provider: new WsProvider('wss://rpc.crust.network/'),
-        typesBundle: typesBundleForPolkadot
-      });
-    }
+    this.#provider = testnet ? new WsProvider('wss://rpc-rocky.crust.network/') : new WsProvider('wss://rpc.crust.network/')
+    this.#api = new ApiPromise({
+      provider: this.#provider,
+      typesBundle: typesBundleForPolkadot
+    });
   }
 
+  public async disconnect(): Promise<void> {
+    await this.#provider.disconnect();
+  }
   public async init (): Promise<boolean> {
     try {
       await waitReady();
