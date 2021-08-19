@@ -1,13 +1,13 @@
 {
   "metadataVersion": "0.1.0",
   "source": {
-    "hash": "0xc1f380c4eba0108e7bc277599c21165b36a17592bc95152d977de4f4b440969e",
-    "language": "ink! 3.0.0-rc2",
+    "hash": "0x1340c498ababdd0329a8736e0d7fcfd2d46f0a3162a3fec949ab9a85238db39d",
+    "language": "ink! 3.0.0-rc4",
     "compiler": "rustc 1.53.0-nightly"
   },
   "contract": {
     "name": "skyekiwi",
-    "version": "3.0.0-rc2",
+    "version": "3.0.0-rc4",
     "authors": [
       "SkyeKiwi Team <hello@skye.kiwi>"
     ]

@@ -5,7 +5,7 @@
     "**/build/**/*"
   ],
   "compilerOptions": {
-    "allowJs": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
       "@skyekiwi/crypto": [ "packages/crypto/src" ],
