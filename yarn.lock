@@ -2699,8 +2699,8 @@ __metadata:
     "@polkadot/api": ^5.5.1
     "@polkadot/keyring": ^7.2.1
     "@polkadot/wasm-crypto": ^4.1.2
-    "@skyekiwi/ipfs": 0.2.12-1
-    "@skyekiwi/util": 0.2.12-1
+    "@skyekiwi/ipfs": 0.2.12-2
+    "@skyekiwi/util": 0.2.12-2
   languageName: unknown
   linkType: soft
 
@@ -2709,7 +2709,7 @@ __metadata:
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
     "@skyekiwi/secrets": ^2.0.1
-    "@skyekiwi/util": "workspace:packages/util"
+    "@skyekiwi/util": 0.2.12-2
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -2820,11 +2820,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/ipfs@0.2.12-1, @skyekiwi/ipfs@workspace:packages/ipfs":
+"@skyekiwi/ipfs@0.2.12-2, @skyekiwi/ipfs@workspace:packages/ipfs":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
-    "@skyekiwi/util": 0.2.12-1
+    "@skyekiwi/util": 0.2.12-2
     abort-controller: ^3.0.0
     ipfs-core: ^0.6.1
     ipfs-core-types: 0.7.0
@@ -2840,7 +2840,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/util@0.2.12-1, @skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@0.2.12-2, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:
