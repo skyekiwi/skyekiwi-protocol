@@ -21,16 +21,17 @@ export class Crust {
     this.#signer = signer;
     this.#isReady = false;
 
-    this.#provider = testnet ? new WsProvider('wss://rpc-rocky.crust.network/') : new WsProvider('wss://rpc.crust.network/')
+    this.#provider = testnet ? new WsProvider('wss://rpc-rocky.crust.network/') : new WsProvider('wss://rpc.crust.network/');
     this.#api = new ApiPromise({
       provider: this.#provider,
       typesBundle: typesBundleForPolkadot
     });
   }
 
-  public async disconnect(): Promise<void> {
+  public async disconnect (): Promise<void> {
     await this.#provider.disconnect();
   }
+
   public async init (): Promise<boolean> {
     try {
       await waitReady();
