@@ -2804,10 +2804,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/crypto@workspace:packages/crypto":
+"@skyekiwi/crypto@0.2.12-2, @skyekiwi/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
+    "@skyekiwi/metadata": "workspace:packages/metadata"
     "@skyekiwi/secrets": ^2.0.1
     "@skyekiwi/util": 0.2.12-2
     tweetnacl: ^1.0.3
@@ -2930,6 +2931,17 @@ __metadata:
     ipfs-core-types: 0.7.0
     ipfs-http-client: ^49.0.2
     node-fetch: 2.6.1
+  languageName: unknown
+  linkType: soft
+
+"@skyekiwi/metadata@workspace:packages/metadata":
+  version: 0.0.0-use.local
+  resolution: "@skyekiwi/metadata@workspace:packages/metadata"
+  dependencies:
+    "@polkadot/util-crypto": ^7.2.1
+    "@skyekiwi/crypto": 0.2.12-2
+    "@skyekiwi/util": 0.2.12-2
+    tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
 

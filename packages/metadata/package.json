@@ -1,0 +1,28 @@
+{
+  "name": "@skyekiwi/metadata",
+  "version": "0.2.12-2",
+  "type": "module",
+  "description": "core metadata handler for @skyekiwi protocol",
+  "main": "index.js",
+  "sideEffects": [
+    "./detectPackage.js",
+    "./detectPackage.cjs"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "maintainers": [],
+  "contributors": [],
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
+  },
+  "dependencies": {
+    "@polkadot/util-crypto": "^7.2.1",
+    "@skyekiwi/crypto": "0.2.12-2",
+    "@skyekiwi/util": "0.2.12-2",
+    "tweetnacl": "^1.0.3"
+  }
+}

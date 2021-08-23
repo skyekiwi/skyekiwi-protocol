@@ -68,7 +68,7 @@ export class WASMContract {
     }
   }
 
-  async execContract (message: string, params: unknown[]) {
+  async execContract (message: string, params: unknown[]): Promise<AnyJson> {
     if (this.#isReady === false) {
       throw new Error('initialization error, run .init() first - WASMContract.execContract');
     }
