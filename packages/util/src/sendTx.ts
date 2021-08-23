@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /* eslint-disable node/no-extraneous-import */
+import type { KeyringPair } from '@polkadot/keyring/types';
+
 import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import { KeyringPair } from '@polkadot/keyring/types';
+
 // Ported from
 // https://github.com/crustio/crust.js/blob/main/packages/crust-pin/src/util.ts
 // With minor modifications
