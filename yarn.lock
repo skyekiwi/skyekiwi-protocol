@@ -2243,21 +2243,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/api-derive@npm:5.5.1":
-  version: 5.5.1
-  resolution: "@polkadot/api-derive@npm:5.5.1"
-  dependencies:
-    "@babel/runtime": ^7.15.3
-    "@polkadot/api": 5.5.1
-    "@polkadot/rpc-core": 5.5.1
-    "@polkadot/types": 5.5.1
-    "@polkadot/util": ^7.2.1
-    "@polkadot/util-crypto": ^7.2.1
-    rxjs: ^7.3.0
-  checksum: 780506c88e0e85e7e969e4ace1698a760604a9521715774d421c0826ec3834d2258160377c58cc06e41b6319b0df4e17ed781480caa525dab8cdab064e991758
-  languageName: node
-  linkType: hard
-
 "@polkadot/api-derive@npm:5.6.1":
   version: 5.6.1
   resolution: "@polkadot/api-derive@npm:5.6.1"
@@ -2270,25 +2255,6 @@ __metadata:
     "@polkadot/util-crypto": ^7.2.1
     rxjs: ^7.3.0
   checksum: 109eaf45de1cf06819787cdf07a44ac3251b22d355c2e2aa3d6b52d9f106b2833c22ddef3be72246fe556dc9d5b5d7855a4fd1b2ce0e07fa68f017a6870e1c33
-  languageName: node
-  linkType: hard
-
-"@polkadot/api@npm:5.5.1":
-  version: 5.5.1
-  resolution: "@polkadot/api@npm:5.5.1"
-  dependencies:
-    "@babel/runtime": ^7.15.3
-    "@polkadot/api-derive": 5.5.1
-    "@polkadot/keyring": ^7.2.1
-    "@polkadot/rpc-core": 5.5.1
-    "@polkadot/rpc-provider": 5.5.1
-    "@polkadot/types": 5.5.1
-    "@polkadot/types-known": 5.5.1
-    "@polkadot/util": ^7.2.1
-    "@polkadot/util-crypto": ^7.2.1
-    eventemitter3: ^4.0.7
-    rxjs: ^7.3.0
-  checksum: f39aff2e718c294df83e44c5e43f255ce6fbb76c6dbfb8867b7e4b1af899bc23f9e4a29caffa8e01b41d6599bff6920852b77a498a21f54bec1ed111fa5a0020
   languageName: node
   linkType: hard
 
@@ -2334,19 +2300,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/rpc-core@npm:5.5.1":
-  version: 5.5.1
-  resolution: "@polkadot/rpc-core@npm:5.5.1"
-  dependencies:
-    "@babel/runtime": ^7.15.3
-    "@polkadot/rpc-provider": 5.5.1
-    "@polkadot/types": 5.5.1
-    "@polkadot/util": ^7.2.1
-    rxjs: ^7.3.0
-  checksum: e83b2ba063a1334b08f4801001ed061929ea5523c96f4d073925fcc8116f5bcd78550b2d68524f2a025e293c65088413cb801fa3e85877b8cb2728d1988c9212
-  languageName: node
-  linkType: hard
-
 "@polkadot/rpc-core@npm:5.6.1":
   version: 5.6.1
   resolution: "@polkadot/rpc-core@npm:5.6.1"
@@ -2357,22 +2310,6 @@ __metadata:
     "@polkadot/util": ^7.2.1
     rxjs: ^7.3.0
   checksum: 2745d34bfe9b45108b63b61f8c7ff4b0910f00670b5ff1d63e0a25f6e992b6e1ae0dd96a2c6547a026bd8e1ea5f12c8275088d28b010ba032feecabc6e8bc7c4
-  languageName: node
-  linkType: hard
-
-"@polkadot/rpc-provider@npm:5.5.1":
-  version: 5.5.1
-  resolution: "@polkadot/rpc-provider@npm:5.5.1"
-  dependencies:
-    "@babel/runtime": ^7.15.3
-    "@polkadot/types": 5.5.1
-    "@polkadot/util": ^7.2.1
-    "@polkadot/util-crypto": ^7.2.1
-    "@polkadot/x-fetch": ^7.2.1
-    "@polkadot/x-global": ^7.2.1
-    "@polkadot/x-ws": ^7.2.1
-    eventemitter3: ^4.0.7
-  checksum: 21fbef2b71e2cf334540525c323f366da2ff873b768f43c4272f6b277d9f350414ff6650a8fc6d648907f84c46f0f5fd6c6648ccbf09cdbf6aee3c16ce1883b8
   languageName: node
   linkType: hard
 
@@ -2392,18 +2329,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/types-known@npm:5.5.1":
-  version: 5.5.1
-  resolution: "@polkadot/types-known@npm:5.5.1"
-  dependencies:
-    "@babel/runtime": ^7.15.3
-    "@polkadot/networks": ^7.2.1
-    "@polkadot/types": 5.5.1
-    "@polkadot/util": ^7.2.1
-  checksum: b11b65263de04b80f6609b40f0b5b5120ed741ef4e2563772561fc8679a20d185b5c211e600d731faf4f841519f1d9cd21e4a66ab544a956510b1270ee424115
-  languageName: node
-  linkType: hard
-
 "@polkadot/types-known@npm:5.6.1":
   version: 5.6.1
   resolution: "@polkadot/types-known@npm:5.6.1"
@@ -2413,18 +2338,6 @@ __metadata:
     "@polkadot/types": 5.6.1
     "@polkadot/util": ^7.2.1
   checksum: 7d67f5a977a0fc0042e3606d3cebd547722768d0c3d5289f8d39ce2d9949f2016d5cbc919885cb531a9ab8155197336e4ebb0104ff932deed8a8253f89414228
-  languageName: node
-  linkType: hard
-
-"@polkadot/types@npm:5.5.1":
-  version: 5.5.1
-  resolution: "@polkadot/types@npm:5.5.1"
-  dependencies:
-    "@babel/runtime": ^7.15.3
-    "@polkadot/util": ^7.2.1
-    "@polkadot/util-crypto": ^7.2.1
-    rxjs: ^7.3.0
-  checksum: 67bf61010498fc4169ccbce86e34c300894254753f2c322505ea11bbd72c41044c5db21f9ae7d9a17dc39dd2010ca1cb9ab9c3cc2eab439714373f5005981651
   languageName: node
   linkType: hard
 
@@ -2799,28 +2712,17 @@ __metadata:
     "@polkadot/api": ^5.6.1
     "@polkadot/keyring": ^7.2.1
     "@polkadot/wasm-crypto": ^4.1.2
-    "@skyekiwi/ipfs": 0.2.12-3
-    "@skyekiwi/util": 0.2.12-3
+    "@skyekiwi/ipfs": 0.2.12-4
+    "@skyekiwi/util": 0.2.12-4
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/crypto@npm:0.2.12-2":
-  version: 0.2.12-2
-  resolution: "@skyekiwi/crypto@npm:0.2.12-2"
-  dependencies:
-    "@skyekiwi/secrets": ^2.0.1
-    "@skyekiwi/util": 0.2.12-2
-    tweetnacl: ^1.0.3
-  checksum: 0de1c653580c0c0e59ca46801dbab9374095b91d97afea492df590b8c8a2a095a1ec71f99cace0d6e1357ef5a0e4fdf47bc59864045ce3f8c037ad218f968a69
-  languageName: node
-  linkType: hard
-
-"@skyekiwi/crypto@workspace:packages/crypto":
+"@skyekiwi/crypto@0.2.12-4, @skyekiwi/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
     "@skyekiwi/secrets": ^2.0.1
-    "@skyekiwi/util": 0.2.12-3
+    "@skyekiwi/util": 0.2.12-4
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -2931,11 +2833,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/ipfs@0.2.12-3, @skyekiwi/ipfs@workspace:packages/ipfs":
+"@skyekiwi/ipfs@0.2.12-4, @skyekiwi/ipfs@workspace:packages/ipfs":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
-    "@skyekiwi/util": 0.2.12-3
+    "@skyekiwi/util": 0.2.12-4
     abort-controller: ^3.0.0
     ipfs-core: ^0.6.1
     ipfs-core-types: 0.7.0
@@ -2949,8 +2851,8 @@ __metadata:
   resolution: "@skyekiwi/metadata@workspace:packages/metadata"
   dependencies:
     "@polkadot/util-crypto": ^7.2.1
-    "@skyekiwi/crypto": 0.2.12-2
-    "@skyekiwi/util": 0.2.12-2
+    "@skyekiwi/crypto": 0.2.12-4
+    "@skyekiwi/util": 0.2.12-4
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -2962,7 +2864,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/util@0.2.12-3, @skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@0.2.12-4, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:
@@ -2973,18 +2875,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/util@npm:0.2.12-2":
-  version: 0.2.12-2
-  resolution: "@skyekiwi/util@npm:0.2.12-2"
-  dependencies:
-    "@polkadot/api": 5.5.1
-    "@polkadot/keyring": ^7.2.1
-    pino: ^7.0.0-rc.1
-    pino-pretty: ^5.1.2
-  checksum: 90db80ab499acca127a29658fcc7adc512753364064b2f8cddf6fe4cf3d289cd32417495f36eda2864b7f16b457d050dd10a623581a94a9c20ab4e0147d13dc9
-  languageName: node
-  linkType: hard
-
 "@skyekiwi/wasm-contract@workspace:packages/wasm-contract":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/wasm-contract@workspace:packages/wasm-contract"
@@ -2994,7 +2884,7 @@ __metadata:
     "@polkadot/keyring": ^7.2.1
     "@polkadot/types": ^5.6.1
     "@polkadot/wasm-crypto": ^4.1.2
-    "@skyekiwi/util": 0.2.12-3
+    "@skyekiwi/util": 0.2.12-4
   languageName: unknown
   linkType: soft
 
