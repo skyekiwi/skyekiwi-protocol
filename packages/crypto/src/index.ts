@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AsymmetricEncryption } from './asymmetric';
-import { ACryptor, DefaultACryptor, DefaultSCryptor, SCryptor } from './cryptor';
 import { EncryptionSchema } from './encryptionSchema';
-import { Seal, Sealer } from './seal';
+import { Seal } from './seal';
+import { DefaultSealer, Sealer } from './sealer';
 import { SymmetricEncryption } from './symmetric';
 import { SKYEKIWI_SECRETS_ENDING, TSS } from './tss';
 
@@ -14,9 +14,7 @@ export {
   TSS,
   SKYEKIWI_SECRETS_ENDING,
 
-  ACryptor, DefaultACryptor,
-  SCryptor, DefaultSCryptor,
-  Sealer, Seal,
+  Sealer, DefaultSealer, Seal,
 
   EncryptionSchema
 };

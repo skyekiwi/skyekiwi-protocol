@@ -7,7 +7,7 @@ import { stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 import { AsymmetricEncryption, SymmetricEncryption, TSS } from '.';
 
-describe('Encryption', () => {
+describe('@skyekiwi/crypto', () => {
   const key: Uint8Array = randomBytes(32);
 
   const message = '123456780123456';

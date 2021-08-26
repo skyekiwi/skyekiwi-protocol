@@ -10,7 +10,7 @@ import { File } from '.';
 
 const file1Path = '/tmp/file.file1';
 
-describe('File', function () {
+describe('@skyekiwi/file', function () {
   it('File: chunk hash calculation works', async () => {
     const file1 = await setup();
     const stream1 = file1.getReadStream();
@@ -35,7 +35,7 @@ describe('File', function () {
     const stream1 = file1.getReadStream();
 
     for await (const chunk of stream1) {
-      const deflatedChunk = File.deflatChunk(chunk);
+      const deflatedChunk = File.deflateChunk(chunk);
       const inflatedChunk = File.inflatDeflatedChunk(deflatedChunk);
 
       expect(u8aToHex(inflatedChunk)).toBe(u8aToHex(chunk));

@@ -51,7 +51,7 @@ export class File {
     return await File.getChunkHash(combined);
   }
 
-  public static deflatChunk (chunk: Uint8Array): Uint8Array {
+  public static deflateChunk (chunk: Uint8Array): Uint8Array {
     return pako.deflate(chunk);
   }
 

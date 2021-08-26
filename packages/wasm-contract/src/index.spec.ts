@@ -1,8 +1,8 @@
 // Copyright 2021 @skyekiwi/wasm-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import abi from './mock/skyekiwi.json';
-import types from './mock/types';
+import abi from '../mock/skyekiwi.json';
+import types from '../mock/types';
 import { WASMContract } from '.';
 
 // eslint-disable-next-line

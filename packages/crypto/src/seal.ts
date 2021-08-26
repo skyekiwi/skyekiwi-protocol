@@ -1,23 +1,18 @@
 // Copyright 2021 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Sealed } from '@skyekiwi/metadata/types';
 import type { EncryptionSchema } from './encryptionSchema';
-import type { Sealed } from './types';
 
 import { hexToU8a, trimEnding, u8aToHex } from '@skyekiwi/util';
 
-import { ACryptor, SCryptor, TSS } from '.';
-
-export class Sealer {
-  public aCryptor: ACryptor
-  public sCryptor: SCryptor
-}
+import { Sealer, TSS } from '.';
 
 export class Seal {
   public static seal (
     message: Uint8Array,
     encryptionSchema: EncryptionSchema,
-    aCryptor: ACryptor
+    sealer: Sealer
   ): Sealed {
     if (!encryptionSchema.verify()) {
       throw new Error('encryptionSchema Failer - Seal.seal');
@@ -40,11 +35,11 @@ export class Seal {
 
     for (const member of encryptionSchema.members) {
       privateSharesHex += u8aToHex(
-        aCryptor.encrypt(shares.pop(), member)
+        sealer.encrypt(shares.pop(), member)
       ) + '|';
     }
 
-    privateSharesHex = trimEnding(publicSharesHex);
+    privateSharesHex = trimEnding(privateSharesHex);
 
     return {
       private: privateSharesHex,
@@ -56,7 +51,7 @@ export class Seal {
     sealed: Sealed,
     keys: Uint8Array[],
     orignalAuthor: Uint8Array,
-    aCryptor: ACryptor
+    sealer: Sealer
   ): Uint8Array {
     const pub = sealed.public.split('|').map(hexToU8a);
     const priv = sealed.private.split('|').map(hexToU8a);
@@ -64,14 +59,11 @@ export class Seal {
     const shares: Uint8Array[] = [...pub];
 
     for (const share of priv) {
-      try {
-        const decrypted = aCryptor.decryptWithKeys(
-          keys, share, orignalAuthor
-        );
+      for (const key of keys) {
+        sealer.key = key;
+        const decrypted = sealer.decrypt(share, orignalAuthor);
 
         if (decrypted) { shares.push(decrypted); }
-      } catch (err) {
-        // pass
       }
     }
 

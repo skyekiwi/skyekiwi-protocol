@@ -20,6 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
+    "@skyekiwi/metadata": "0.2.12-4",
     "@skyekiwi/secrets": "^2.0.1",
     "@skyekiwi/util": "0.2.12-4",
     "tweetnacl": "^1.0.3"

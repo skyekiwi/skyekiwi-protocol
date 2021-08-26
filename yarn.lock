@@ -2703,7 +2703,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/crust-network@workspace:packages/crust-network":
+"@skyekiwi/crust-network@0.2.12-4, @skyekiwi/crust-network@workspace:packages/crust-network":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crust-network@workspace:packages/crust-network"
   dependencies:
@@ -2714,6 +2714,7 @@ __metadata:
     "@polkadot/wasm-crypto": ^4.1.2
     "@skyekiwi/ipfs": 0.2.12-4
     "@skyekiwi/util": 0.2.12-4
+    dotenv: ^10.0.0
   languageName: unknown
   linkType: soft
 
@@ -2721,6 +2722,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
+    "@skyekiwi/metadata": 0.2.12-4
     "@skyekiwi/secrets": ^2.0.1
     "@skyekiwi/util": 0.2.12-4
     tweetnacl: ^1.0.3
@@ -2820,7 +2822,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/file@workspace:packages/file":
+"@skyekiwi/driver@workspace:packages/driver":
+  version: 0.0.0-use.local
+  resolution: "@skyekiwi/driver@workspace:packages/driver"
+  dependencies:
+    "@polkadot/util-crypto": ^7.2.1
+    "@skyekiwi/crust-network": 0.2.12-4
+    "@skyekiwi/crypto": 0.2.12-4
+    "@skyekiwi/file": 0.2.12-4
+    "@skyekiwi/ipfs": 0.2.12-4
+    "@skyekiwi/metadata": 0.2.12-4
+    "@skyekiwi/util": 0.2.12-4
+    "@skyekiwi/wasm-contract": 0.2.12-4
+    dotenv: ^10.0.0
+  languageName: unknown
+  linkType: soft
+
+"@skyekiwi/file@0.2.12-4, @skyekiwi/file@workspace:packages/file":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/file@workspace:packages/file"
   dependencies:
@@ -2846,12 +2864,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/metadata@workspace:packages/metadata":
+"@skyekiwi/metadata@0.2.12-4, @skyekiwi/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/metadata@workspace:packages/metadata"
   dependencies:
     "@polkadot/util-crypto": ^7.2.1
     "@skyekiwi/crypto": 0.2.12-4
+    "@skyekiwi/ipfs": 0.2.12-4
     "@skyekiwi/util": 0.2.12-4
     tweetnacl: ^1.0.3
   languageName: unknown
@@ -2875,7 +2894,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/wasm-contract@workspace:packages/wasm-contract":
+"@skyekiwi/wasm-contract@0.2.12-4, @skyekiwi/wasm-contract@workspace:packages/wasm-contract":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/wasm-contract@workspace:packages/wasm-contract"
   dependencies:
@@ -5860,9 +5879,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.3.811":
-  version: 1.3.814
-  resolution: "electron-to-chromium@npm:1.3.814"
-  checksum: 5d74e2fdb46a2edff9d3940a7419aaa950ec07ef0bb89e843a4320222fe14b811b34079ffeac2f04cd21c468c71c10f6921b7e13648b6309f98f5cd42030726d
+  version: 1.3.815
+  resolution: "electron-to-chromium@npm:1.3.815"
+  checksum: 2c848bbd4c727186dc73b8322b35ebaa9d42560251fb2b2605d6bfc9e2660ce9386d20a9d56c552ab840673221dad759ffeadb77dca996162ecf852cf3636497
   languageName: node
   linkType: hard
 

@@ -27,5 +27,8 @@
     "@polkadot/wasm-crypto": "^4.1.2",
     "@skyekiwi/ipfs": "0.2.12-4",
     "@skyekiwi/util": "0.2.12-4"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0"
   }
 }

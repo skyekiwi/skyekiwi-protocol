@@ -1,8 +1,8 @@
 {
-  "name": "@skyekiwi/metadata",
+  "name": "@skyekiwi/driver",
   "version": "0.2.12-4",
   "type": "module",
-  "description": "core metadata handler for @skyekiwi protocol",
+  "description": "core driver of the SkyeKiwi Protocol client lib for @skyekiwi",
   "main": "index.js",
   "sideEffects": [
     "./detectPackage.js",
@@ -20,10 +20,16 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/util-crypto": "^7.2.1",
+    "@skyekiwi/crust-network": "0.2.12-4",
     "@skyekiwi/crypto": "0.2.12-4",
+    "@skyekiwi/file": "0.2.12-4",
     "@skyekiwi/ipfs": "0.2.12-4",
+    "@skyekiwi/metadata": "0.2.12-4",
     "@skyekiwi/util": "0.2.12-4",
-    "tweetnacl": "^1.0.3"
+    "@skyekiwi/wasm-contract": "0.2.12-4"
+  },
+  "devDependencies": {
+    "@polkadot/util-crypto": "^7.2.1",
+    "dotenv": "^10.0.0"
   }
 }
