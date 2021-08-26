@@ -1,5 +1,0 @@
-import './encryption.test'
-import './file.test'
-import './ipfs.test'
-import './blockchain.test'
-import './integration.test'

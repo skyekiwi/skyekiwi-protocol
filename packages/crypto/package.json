@@ -1,0 +1,28 @@
+{
+  "name": "@skyekiwi/crypto",
+  "version": "0.2.12-5",
+  "type": "module",
+  "description": "cryptographic wrapper for @skyekiwi",
+  "main": "index.js",
+  "sideEffects": [
+    "./detectPackage.js",
+    "./detectPackage.cjs"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "maintainers": [],
+  "contributors": [],
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
+  },
+  "dependencies": {
+    "@skyekiwi/metadata": "0.2.12-5",
+    "@skyekiwi/secrets": "^2.0.1",
+    "@skyekiwi/util": "0.2.12-5",
+    "tweetnacl": "^1.0.3"
+  }
+}

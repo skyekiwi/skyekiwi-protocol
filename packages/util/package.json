@@ -1,0 +1,28 @@
+{
+  "name": "@skyekiwi/util",
+  "version": "0.2.12-5",
+  "type": "module",
+  "description": "a collection of utility functions for @skyekiwi",
+  "main": "index.js",
+  "sideEffects": [
+    "./detectPackage.js",
+    "./detectPackage.cjs"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "maintainers": [],
+  "contributors": [],
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
+  },
+  "dependencies": {
+    "@polkadot/api": "^5.6.1",
+    "@polkadot/keyring": "^7.2.1",
+    "pino": "^7.0.0-rc.1",
+    "pino-pretty": "^5.1.2"
+  }
+}
