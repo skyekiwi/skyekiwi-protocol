@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/crust-network",
-  "version": "0.2.12-4",
+  "version": "0.2.12-5",
   "type": "module",
   "description": "a collection of utility functions for @skyekiwi",
   "main": "index.js",
@@ -25,8 +25,8 @@
     "@polkadot/api": "^5.6.1",
     "@polkadot/keyring": "^7.2.1",
     "@polkadot/wasm-crypto": "^4.1.2",
-    "@skyekiwi/ipfs": "0.2.12-4",
-    "@skyekiwi/util": "0.2.12-4"
+    "@skyekiwi/ipfs": "0.2.12-5",
+    "@skyekiwi/util": "0.2.12-5"
   },
   "devDependencies": {
     "dotenv": "^10.0.0"
