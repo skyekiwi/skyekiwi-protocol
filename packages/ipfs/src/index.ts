@@ -109,7 +109,6 @@ export class IPFS {
 
         return result;
       } catch (err) {
-        logger.error(err);
         throw (new Error('IPFS Failure: ipfs.cat'));
       }
     }
@@ -203,14 +202,14 @@ export class IPFS {
 
     try {
       const requests = [
-        fetch(`http://ipfs.io/ipfs/${cid}`, {
-          mode: 'no-cors',
-          signal: controller.signal
-        } as RequestInit).then((res) => {
-          if (res.ok) { return res; } else {
-            throw new Error('public gateway non-200 response');
-          }
-        }),
+        // fetch(`http://ipfs.io/ipfs/${cid}`, {
+        //   mode: 'no-cors',
+        //   signal: controller.signal
+        // } as RequestInit).then((res) => {
+        //   if (res.ok) { return res; } else {
+        //     throw new Error('public gateway non-200 response');
+        //   }
+        // }),
         fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {
           mode: 'no-cors',
           signal: controller.signal

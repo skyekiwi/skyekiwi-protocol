@@ -106,6 +106,10 @@ const cleanup = async () => {
     });
   };
 
-  await unlink(filePath);
-  await unlink(downstreamPath);
+  try {
+    await unlink(filePath);
+    await unlink(downstreamPath);
+  } catch (err) {
+    // pass
+  }
 };
