@@ -5,6 +5,7 @@ import { AsymmetricEncryption } from './asymmetric';
 import { EncryptionSchema } from './encryptionSchema';
 import { Seal } from './seal';
 import { DefaultSealer, Sealer } from './sealer';
+import { EthereumSign, Sign } from './sign';
 import { SymmetricEncryption } from './symmetric';
 import { SKYEKIWI_SECRETS_ENDING, TSS } from './tss';
 
@@ -16,5 +17,5 @@ export {
 
   Sealer, DefaultSealer, Seal,
 
-  EncryptionSchema
+  EncryptionSchema, Sign, EthereumSign
 };

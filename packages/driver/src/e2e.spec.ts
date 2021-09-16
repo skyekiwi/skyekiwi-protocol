@@ -6,7 +6,7 @@ import fs from 'fs';
 import { randomBytes } from 'tweetnacl';
 
 import { Crust } from '@skyekiwi/crust-network';
-import { DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
+import { AsymmetricEncryption, DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
@@ -18,7 +18,8 @@ import { Driver } from '.';
 require('dotenv').config();
 
 const filePath = '/tmp/file.file';
-const downstreamPath = '/tmp/down.file';
+const downstreamPath1 = '/tmp/down1.file';
+const downstreamPath2 = '/tmp/down2.file';
 
 describe('@skyekiwi/driver', function () {
   const content = randomBytes(1200000);
@@ -34,7 +35,7 @@ describe('@skyekiwi/driver', function () {
     await registry.disconnect();
   });
 
-  it('upstream, author only', async () => {
+  it('upstream', async () => {
     const file = await setup(content);
     const sealer = new DefaultSealer();
 
@@ -62,8 +63,8 @@ describe('@skyekiwi/driver', function () {
     await cleanup();
   });
 
-  it('downstream, author only', async () => {
-    const stream = fs.createWriteStream(downstreamPath, { flags: 'a' });
+  it('downstream', async () => {
+    const stream = fs.createWriteStream(downstreamPath1, { flags: 'a' });
     const sealer = new DefaultSealer();
 
     sealer.key = mnemonicToMiniSecret(mnemonic);
@@ -72,7 +73,64 @@ describe('@skyekiwi/driver', function () {
       vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
     );
 
-    const downstreamContent = fs.readFileSync(downstreamPath);
+    const downstreamContent = fs.readFileSync(downstreamPath1);
+
+    expect(Buffer.compare(
+      downstreamContent,
+      Buffer.from(content)
+    )).toEqual(0);
+
+    await cleanup();
+  });
+
+  it('generate PoA and verify PoA', async () => {
+    const sealer = new DefaultSealer();
+
+    sealer.key = mnemonicToMiniSecret(mnemonic);
+
+    const sig = await Driver.generateProofOfAccess(
+      vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
+      new Uint8Array([0x0, 0x1, 0x2, 0x3])
+    );
+
+    expect(Driver.verifyProofOfAccess(sig)).toEqual(true);
+
+    await cleanup();
+  });
+
+  it('update encryptionSchema & downstream again', async () => {
+    await setup(content);
+    const sealer = new DefaultSealer();
+
+    const privateKey1 = randomBytes(32);
+    const privateKey2 = randomBytes(32);
+    const publicKey1 = AsymmetricEncryption.getPublicKey(privateKey1);
+    const publicKey2 = AsymmetricEncryption.getPublicKey(privateKey2);
+
+    sealer.key = mnemonicToMiniSecret(mnemonic);
+    const encryptionSchema = new EncryptionSchema({
+      author: sealer.getAuthorKey(),
+      numOfShares: 5,
+      threshold: 3,
+      unencryptedPieceCount: 1
+    });
+
+    encryptionSchema.addMember(sealer.getAuthorKey(), 2);
+    encryptionSchema.addMember(publicKey1, 1);
+    encryptionSchema.addMember(publicKey2, 1);
+
+    const result = await Driver.updateEncryptionSchema(
+      vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], storage, registry, sealer
+    );
+
+    expect(result).toHaveProperty('ok');
+
+    const stream = fs.createWriteStream(downstreamPath2, { flags: 'a' });
+
+    await Driver.downstream(
+      vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
+    );
+    const downstreamContent = fs.readFileSync(downstreamPath2);
 
     expect(Buffer.compare(
       downstreamContent,
@@ -108,7 +166,8 @@ const cleanup = async () => {
 
   try {
     await unlink(filePath);
-    await unlink(downstreamPath);
+    await unlink(downstreamPath1);
+    await unlink(downstreamPath2);
   } catch (err) {
     // pass
   }

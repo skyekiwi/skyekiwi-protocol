@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { WriteStream } from 'fs';
+import type { Signature } from '@skyekiwi/crypto/types';
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
 
 import { Crust } from '@skyekiwi/crust-network';
-import { AsymmetricEncryption, EncryptionSchema, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
+import { AsymmetricEncryption, EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
 import { Metadata, SKYEKIWI_VERSION } from '@skyekiwi/metadata';
@@ -205,5 +206,26 @@ export class Driver {
     } else {
       throw new Error('packaging works well, blockchain network err - Driver.upstream');
     }
+  }
+
+  public static async generateProofOfAccess (
+    vaultId: number,
+    keys: Uint8Array[],
+    registry: WASMContract,
+    sealer: Sealer,
+
+    message: Uint8Array
+  ): Promise<Signature> {
+    const preSealData = await Driver.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
+
+    const signer = new EthereumSign();
+
+    return await signer.generateSignature(preSealData.sealingKey, message);
+  }
+
+  public static verifyProofOfAccess (signature: Signature): boolean {
+    const signer = new EthereumSign();
+
+    return signer.verifySignature(signature);
   }
 }

@@ -23,6 +23,7 @@
     "@skyekiwi/metadata": "0.3.1",
     "@skyekiwi/secrets": "^2.0.1",
     "@skyekiwi/util": "0.3.1",
+    "ethers": "^5.4.6",
     "tweetnacl": "^1.0.3"
   }
 }
