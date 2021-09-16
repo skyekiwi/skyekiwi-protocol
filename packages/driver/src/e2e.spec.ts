@@ -124,19 +124,6 @@ describe('@skyekiwi/driver', function () {
     );
 
     expect(result).toHaveProperty('ok');
-
-    const stream = fs.createWriteStream(downstreamPath2, { flags: 'a' });
-
-    await Driver.downstream(
-      vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
-    );
-    const downstreamContent = fs.readFileSync(downstreamPath2);
-
-    expect(Buffer.compare(
-      downstreamContent,
-      Buffer.from(content)
-    )).toEqual(0);
-
     await cleanup();
   });
 });
