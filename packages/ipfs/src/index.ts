@@ -250,7 +250,6 @@ export class IPFS {
 
       if (result.status !== 200) {
         logger.debug('remote gateway returned non-200 response', result);
-        throw new Error('public gateway non-200 response - ipfs.fetchFileFromRemote');
       }
 
       controller.abort();
@@ -308,7 +307,6 @@ export class IPFS {
         } catch (err) {
           logger.warn('skyekiwi gateway failed', err);
           logger.warn('all remote gateway failed', err);
-          throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote');
         }
       }
     }
