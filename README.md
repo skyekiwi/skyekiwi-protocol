@@ -118,70 +118,78 @@ Please refer to the `package.json`
 
 ## Install
 
-```bash
-yarn add @skyekiwi/protocol
+|Package Name|Description|
+|---|---|
+|@skyekiwi/crust-network|The Crust Network Connector|
+|@skyekiwi/crypto|Cryptographic Primitives|
+|@skyekiwi/driver|Core Driver of the protocol / exposed APIs|
+|@skyekiwi/file|File stream wrapper|
+|@skyekiwi/ipfs|IPFS Client wrapper|
+|@skyekiwi/metadata|Metadata Packaer|
+|@skyekiwi/util|Useful Utility Functions|
+|@skyekiwi/wasm-contract|Secret Registry: Substrate WASM Smart Contract connector|
+
+Please refer to the `package/driver/e2e.spec.ts` folder which contains test cases for common useage.
+
+SETUP
+```javascript
+  const mnemonic = process.env.SEED_PHRASE;
+
+  const storage = new Crust(mnemonic);
+  const registry = new WASMContract(mnemonic, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
 ```
 
+UPSTERAM
 ```javascript
-import * as SkyeKiwi from '@skyekiwi/protocol';
-```
+const sealer = new DefaultSealer();
 
-Please refer to the `test/integration.test.ts` folder which contains test cases for common useage.
-
-```javascript
-const mnemonic = process.env.SEED_PHRASE
-const blockchain = new SkyeKiwi.Blockchain(
-  // seed phrase
-  mnemonic,
-  // contract address
-  '3cNizgEgkjB8TKm8FGJD3mtcxNTwBRxWrCwa77rNTq3WaZsM',
-  // contract instance endpoint
-  'wss://jupiter-poa.elara.patract.io',
-  // storage network endpoint
-  'wss://rocky-api.crust.network/',
-)
-
-const encryptionSchema = new SkyeKiwi.EncryptionSchema({
-  numOfShares: 2, 
-  threshold: 2, 
-  author: author, 
+sealer.key = mnemonicToMiniSecret(mnemonic);
+const encryptionSchema = new EncryptionSchema({
+  author: sealer.getAuthorKey(),
+  numOfShares: 2,
+  threshold: 2,
   unencryptedPieceCount: 1
-})
-encryptionSchema.addMember(author, 1)
+});
 
-const key = new SkyeKiwi.Seal({
-  encryptionSchema: encryptionSchema, 
-  seed: mnemonic
-})
+encryptionSchema.addMember(sealer.getAuthorKey(), 1);
 
-// upstream the file, it take two major actions: 
-// upload files to the Crust Network & Write to a smart contract to generate a vaultId
-await SkyeKiwi.Driver.upstream({
-  file: fileHandle[0].file,
-  seal: key,
-  blockchain: blockchain
-})
+const result = await Driver.upstream(
+  file, sealer, encryptionSchema, storage, registry
+);
 ```
 
+DOWNSTREAM
 ```javascript
-const stream = fs.createWriteStream(outputPath, {flags: 'a'})
-await SkyeKiwi.Driver.downstream({
-  vaultId: vaultId,
-  blockchain: blockchain,
-  keys: [key1, key2 ... ], // private key of recipeints
-  writeStream: stream,
-})
+const stream = fs.createWriteStream(downstreamPath, { flags: 'a' });
+const sealer = new DefaultSealer();
+
+sealer.key = mnemonicToMiniSecret(mnemonic);
+
+await Driver.downstream(
+  vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
+);
 ```
 
+
+UPDATE ENCRYPTION SCHEMA
 ```javascript
-// upon finishing, the encryptionSchema will be updated
-await SkyeKiwi.Driver.updateEncryptionSchema({
-  vaultId: vaultId,
-  newEncryptionSchema: encryptionSchema,
-  seed: mnemonic,
-  keys: [key1, key2 ... ], // private key of recipeints
-  blockchain: blockchain
-})
+const result = await Driver.updateEncryptionSchema(
+  vaultId1, newEncryptionSchema, [mnemonicToMiniSecret(mnemonic)], storage, registry, sealer
+);
+```
+
+GENERATE & VERIFY PROOF OF ACCESS
+```javascript
+const sealer = new DefaultSealer();
+sealer.key = mnemonicToMiniSecret(mnemonic);
+
+const sig = await Driver.generateProofOfAccess(
+  vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
+  new Uint8Array([0x0, 0x1, 0x2, 0x3])
+);
+
+// should equals true
+Driver.verifyProofOfAccess(sig)
 ```
 
 ### Run Test
@@ -193,18 +201,10 @@ git clone git@github.com:skyekiwi/skyekiwi-protocol.git
 yarn
 ```
 
-2. Install global dependencies
-
-```bash
-yarn global add mocha
-yarn global add ts-node
-```
-
 2. Create `.env`  files at the project home directory and write your seed phrase to it
 
 ```
 SEED_PHRASE = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
-LOG_LEVEL = 'debug'
 ```
 
 3. Get some test-net tokens to interact with the blockchain. By default, SkyeKiwi uses the [Jupiter Network](https://github.com/patractlabs/jupiter/) for smart contract runtime and [Crust Network - Rocky Testnet](https://wiki.crust.network/docs/en/buildRockyGuidance) for storage.
@@ -232,64 +232,6 @@ When pushing content to IPFS, the IPFS module of the SkyeKiwi Protocol will try 
 Similarly, for `ipfs.cat`, it will first try to fetch through a list of public IPFS gatewey, if failed, it will try to use an Infura ipfs gateway, if failed again, use SkyeKiwi IPFS Gateway, if failed again, it will fall back to a local node. 
 
 If an `ERR_LOCK_EXISTS` appears on `jsipfs`, it is because that you are trying to start another local IPFS node when there is already one running. Run `await ipfs.stopIfRunning()` to stop the local IPFS node. `stopIfRunning` will always do checks and if there is actually a local node running, if not, it will not do anything. Therefore, if a local IPFS node is not needed, always run `await ipfs.stopIfRunning()`. 
-
-
-### Project Structure 
-```
-.
-├── LICENSE
-├── README.md
-├── abi // where all smart contract information is stored
-│   ├── skyekiwi.contract
-│   └── skyekiwi.json
-├── browser.test // run index.html to run tests in browsers
-│   ├── index.html 
-│   ├── test.browser.js // generated by Webpack to include all tests
-│   └── test.browser.js.LICENSE.txt
-├── dist
-│   ├── src // compiled by TSC of src
-|   | .... 
-│   |── test // compiled by TSC of test
-│   └── .....
-├── src
-│   ├── Blockchain // blockchain adapter
-│   │   ├── Contract.ts // interact with smart contract
-│   │   ├── Crust.ts // interact with the Crust Network
-│   │   ├── Util.ts
-│   │   └── index.ts
-│   ├── Encryption // cryptographic module
-│   │   ├── AsymmetricEncryption.ts
-│   │   ├── SymmetricEncryption.ts
-│   │   ├── TSS.ts
-│   │   └── index.ts
-│   ├── File
-│   │   └── index.ts
-│   ├── IPFS
-│   │   └── index.ts
-│   ├── Metadata // core metadata packager
-│   │   ├── EncryptionSchema.ts
-│   │   ├── Seal.ts
-│   │   └── index.ts
-│   ├── Util
-│   │   └── index.ts
-│   ├── driver.ts // Driver module that export "upstream", "donwstream" and "updateEncryptionSchema"
-│   └── index.ts
-├── test // tests
-│   ├── blockchain.test.ts
-│   ├── encryption.test.ts
-│   ├── file.test.ts
-│   ├── index.ts // include all tests / used for browser
-│   ├── integration.test.ts
-│   ├── ipfs.test.ts
-│   ├── setup.ts
-│   └── tmp // temporary folder for generated files when tested on Node.js
-├── package.json
-├── tsconfig.json
-├── tslint.json
-├── webpack.config.js
-└── yarn.lock
-```
-
 
 ### LICENSE
 
