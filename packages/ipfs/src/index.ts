@@ -250,7 +250,7 @@ export class IPFS {
 
       if (result.status !== 200) {
         logger.debug('remote gateway returned non-200 response', result);
-        throw new Error('non-200 response from public gateways')
+        throw new Error('non-200 response from public gateways');
       }
 
       controller.abort();
@@ -308,6 +308,7 @@ export class IPFS {
         } catch (err) {
           logger.warn('skyekiwi gateway failed', err);
           logger.warn('all remote gateway failed', err);
+          throw new Error('remote gateway fetching failed')
         }
       }
     }
