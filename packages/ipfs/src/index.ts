@@ -196,228 +196,115 @@ export class IPFS {
     }
   }
 
-  // public async fetchFileFromRemote (cid: string): Promise<string> {
-  //   const logger = getLogger('ipfs.fetchFileFromRemote');
-  //   const controller = new AbortController();
-
-  //   try {
-  //     const requests = [
-  //       // fetch(`http://ipfs.io/ipfs/${cid}`, {
-  //       //   mode: 'no-cors',
-  //       //   signal: controller.signal
-  //       // } as RequestInit).then((res) => {
-  //       //   if (res.ok) { return res; } else {
-  //       //     throw new Error('public gateway non-200 response');
-  //       //   }
-  //       // }),
-  //       fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {
-  //         mode: 'no-cors',
-  //         signal: controller.signal
-  //       } as RequestInit).then((res) => {
-  //         if (res.ok) { return res; } else {
-  //           throw new Error('public gateway non-200 response');
-  //         }
-  //       }),
-  //       fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {
-  //         mode: 'no-cors',
-  //         signal: controller.signal
-  //       } as RequestInit).then((res) => {
-  //         if (res.ok) { return res; } else {
-  //           throw new Error('public gateway non-200 response');
-  //         }
-  //       }),
-  //       fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {
-  //         mode: 'no-cors',
-  //         signal: controller.signal
-  //       } as RequestInit).then((res) => {
-  //         if (res.ok) { return res; } else {
-  //           throw new Error('public gateway non-200 response');
-  //         }
-  //       }),
-  //       fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {
-  //         mode: 'no-cors',
-  //         signal: controller.signal
-  //       } as RequestInit).then((res) => {
-  //         if (res.ok) { return res; } else {
-  //           throw new Error('public gateway non-200 response');
-  //         }
-  //       })
-  //     ];
-
-  //     logger.debug('fetching files from public gateways', cid);
-
-  //     const result = await Promise.any(requests);
-
-  //     if (result.status !== 200) {
-  //       logger.debug('remote gateway returned non-200 response', result);
-  //       throw new Error('public gateway non-200 response - ipfs.fetchFileFromRemote');
-  //     }
-
-  //     controller.abort();
-
-  //     return await result.text();
-  //   } catch (err) {
-  //     if (err !== 'AbortError') {
-  //       logger.warn('public gateway failed');
-  //     }
-
-  //     try {
-  //       logger.debug('public gateway failed. Trying Infura');
-
-  //       const infura = createClient({
-  //         headers: {
-  //           'Access-Control-Allow-Origin': '*'
-  //         },
-  //         host: 'ipfs.infura.io',
-  //         port: 5001,
-  //         protocol: 'https'
-  //       });
-  //       let result = '';
-  //       const stream = infura.cat(cid);
-
-  //       for await (const chunk of stream) {
-  //         result += chunk.toString();
-  //       }
-
-  //       logger.debug('fetched from Infura', result);
-
-  //       return result;
-  //     } catch (err) {
-  //       logger.warn('infura gateway failed', err);
-
-  //       try {
-  //         logger.debug('public gateway & Infura failed. Trying SkyeKiwi');
-  //         const skyekiwiNode = createClient({
-  //           headers: {
-  //             'Access-Control-Allow-Origin': '*'
-  //           },
-  //           host: 'sgnode.skye.kiwi',
-  //           port: 5001,
-  //           protocol: 'http'
-  //         });
-  //         let result = '';
-  //         const stream = skyekiwiNode.cat(cid);
-
-  //         for await (const chunk of stream) {
-  //           result += chunk.toString();
-  //         }
-
-  //         logger.debug('fetched from SkyeKiwi', result);
-
-  //         return result;
-  //       } catch (err) {
-  //         logger.warn('skyekiwi gateway failed', err);
-  //         logger.warn('all remote gateway failed', err);
-  //         throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote');
-  //       }
-  //     }
-  //   }
-  // }
   public async fetchFileFromRemote (cid: string): Promise<string> {
     const logger = getLogger('ipfs.fetchFileFromRemote');
     const controller = new AbortController();
 
     try {
-      logger.debug('public gateway failed. Trying Infura');
+      const requests = [
+        fetch(`http://ipfs.io/ipfs/${cid}`, {
+          mode: 'no-cors',
+          signal: controller.signal
+        } as RequestInit).then((res) => {
+          if (res.ok) { return res; } else {
+            throw new Error('public gateway non-200 response');
+          }
+        }),
+        fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {
+          mode: 'no-cors',
+          signal: controller.signal
+        } as RequestInit).then((res) => {
+          if (res.ok) { return res; } else {
+            throw new Error('public gateway non-200 response');
+          }
+        }),
+        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {
+          mode: 'no-cors',
+          signal: controller.signal
+        } as RequestInit).then((res) => {
+          if (res.ok) { return res; } else {
+            throw new Error('public gateway non-200 response');
+          }
+        }),
+        fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {
+          mode: 'no-cors',
+          signal: controller.signal
+        } as RequestInit).then((res) => {
+          if (res.ok) { return res; } else {
+            throw new Error('public gateway non-200 response');
+          }
+        }),
+        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {
+          mode: 'no-cors',
+          signal: controller.signal
+        } as RequestInit).then((res) => {
+          if (res.ok) { return res; } else {
+            throw new Error('public gateway non-200 response');
+          }
+        })
+      ];
 
-      const infura = createClient({
-        headers: {
-          'Access-Control-Allow-Origin': '*'
-        },
-        host: 'ipfs.infura.io',
-        port: 5001,
-        protocol: 'https'
-      });
-      let result = '';
-      const stream = infura.cat(cid);
+      logger.debug('fetching files from public gateways', cid);
 
-      for await (const chunk of stream) {
-        result += chunk.toString();
+      const result = await Promise.any(requests);
+
+      if (result.status !== 200) {
+        logger.debug('remote gateway returned non-200 response', result);
+        throw new Error('public gateway non-200 response - ipfs.fetchFileFromRemote');
       }
 
-      logger.debug('fetched from Infura', result);
+      controller.abort();
 
-      return result;
+      return await result.text();
     } catch (err) {
-      logger.warn('infura gateway failed', err);
+      if (err !== 'AbortError') {
+        logger.warn('public gateway failed');
+      }
 
       try {
-        logger.debug('public gateway & Infura failed. Trying SkyeKiwi');
-        const skyekiwiNode = createClient({
+        logger.debug('public gateway failed. Trying Infura');
+
+        const infura = createClient({
           headers: {
             'Access-Control-Allow-Origin': '*'
           },
-          host: 'sgnode.skye.kiwi',
+          host: 'ipfs.infura.io',
           port: 5001,
-          protocol: 'http'
+          protocol: 'https'
         });
         let result = '';
-        const stream = skyekiwiNode.cat(cid);
+        const stream = infura.cat(cid);
 
         for await (const chunk of stream) {
           result += chunk.toString();
         }
 
-        logger.debug('fetched from SkyeKiwi', result);
+        logger.debug('fetched from Infura', result);
 
         return result;
       } catch (err) {
+        logger.warn('infura gateway failed', err);
+
         try {
-          const requests = [
-            fetch(`http://ipfs.io/ipfs/${cid}`, {
-              mode: 'no-cors',
-              signal: controller.signal
-            } as RequestInit).then((res) => {
-              if (res.ok) { return res; } else {
-                throw new Error('public gateway non-200 response');
-              }
-            }),
-            fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {
-              mode: 'no-cors',
-              signal: controller.signal
-            } as RequestInit).then((res) => {
-              if (res.ok) { return res; } else {
-                throw new Error('public gateway non-200 response');
-              }
-            }),
-            fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {
-              mode: 'no-cors',
-              signal: controller.signal
-            } as RequestInit).then((res) => {
-              if (res.ok) { return res; } else {
-                throw new Error('public gateway non-200 response');
-              }
-            }),
-            fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {
-              mode: 'no-cors',
-              signal: controller.signal
-            } as RequestInit).then((res) => {
-              if (res.ok) { return res; } else {
-                throw new Error('public gateway non-200 response');
-              }
-            }),
-            fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {
-              mode: 'no-cors',
-              signal: controller.signal
-            } as RequestInit).then((res) => {
-              if (res.ok) { return res; } else {
-                throw new Error('public gateway non-200 response');
-              }
-            })
-          ];
+          logger.debug('public gateway & Infura failed. Trying SkyeKiwi');
+          const skyekiwiNode = createClient({
+            headers: {
+              'Access-Control-Allow-Origin': '*'
+            },
+            host: 'sgnode.skye.kiwi',
+            port: 5001,
+            protocol: 'http'
+          });
+          let result = '';
+          const stream = skyekiwiNode.cat(cid);
 
-          logger.debug('fetching files from public gateways', cid);
-
-          const result = await Promise.race(requests);
-
-          if (result.status !== 200) {
-            logger.debug('remote gateway returned non-200 response', result);
-            throw new Error('public gateway non-200 response - ipfs.fetchFileFromRemote');
+          for await (const chunk of stream) {
+            result += chunk.toString();
           }
 
-          controller.abort();
+          logger.debug('fetched from SkyeKiwi', result);
 
-          return await result.text();
+          return result;
         } catch (err) {
           logger.warn('skyekiwi gateway failed', err);
           logger.warn('all remote gateway failed', err);
@@ -426,4 +313,117 @@ export class IPFS {
       }
     }
   }
+  // public async fetchFileFromRemote (cid: string): Promise<string> {
+  //   const logger = getLogger('ipfs.fetchFileFromRemote');
+  //   const controller = new AbortController();
+
+  //   try {
+  //     logger.debug('public gateway failed. Trying Infura');
+
+  //     const infura = createClient({
+  //       headers: {
+  //         'Access-Control-Allow-Origin': '*'
+  //       },
+  //       host: 'ipfs.infura.io',
+  //       port: 5001,
+  //       protocol: 'https'
+  //     });
+  //     let result = '';
+  //     const stream = infura.cat(cid);
+
+  //     for await (const chunk of stream) {
+  //       result += chunk.toString();
+  //     }
+
+  //     logger.debug('fetched from Infura', result);
+
+  //     return result;
+  //   } catch (err) {
+  //     logger.warn('infura gateway failed', err);
+
+  //     try {
+  //       logger.debug('public gateway & Infura failed. Trying SkyeKiwi');
+  //       const skyekiwiNode = createClient({
+  //         headers: {
+  //           'Access-Control-Allow-Origin': '*'
+  //         },
+  //         host: 'sgnode.skye.kiwi',
+  //         port: 5001,
+  //         protocol: 'http'
+  //       });
+  //       let result = '';
+  //       const stream = skyekiwiNode.cat(cid);
+
+  //       for await (const chunk of stream) {
+  //         result += chunk.toString();
+  //       }
+
+  //       logger.debug('fetched from SkyeKiwi', result);
+
+  //       return result;
+  //     } catch (err) {
+  //       try {
+  //         const requests = [
+  //           fetch(`http://ipfs.io/ipfs/${cid}`, {
+  //             mode: 'no-cors',
+  //             signal: controller.signal
+  //           } as RequestInit).then((res) => {
+  //             if (res.ok) { return res; } else {
+  //               throw new Error('public gateway non-200 response');
+  //             }
+  //           }),
+  //           fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {
+  //             mode: 'no-cors',
+  //             signal: controller.signal
+  //           } as RequestInit).then((res) => {
+  //             if (res.ok) { return res; } else {
+  //               throw new Error('public gateway non-200 response');
+  //             }
+  //           }),
+  //           fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {
+  //             mode: 'no-cors',
+  //             signal: controller.signal
+  //           } as RequestInit).then((res) => {
+  //             if (res.ok) { return res; } else {
+  //               throw new Error('public gateway non-200 response');
+  //             }
+  //           }),
+  //           fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {
+  //             mode: 'no-cors',
+  //             signal: controller.signal
+  //           } as RequestInit).then((res) => {
+  //             if (res.ok) { return res; } else {
+  //               throw new Error('public gateway non-200 response');
+  //             }
+  //           }),
+  //           fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {
+  //             mode: 'no-cors',
+  //             signal: controller.signal
+  //           } as RequestInit).then((res) => {
+  //             if (res.ok) { return res; } else {
+  //               throw new Error('public gateway non-200 response');
+  //             }
+  //           })
+  //         ];
+
+  //         logger.debug('fetching files from public gateways', cid);
+
+  //         const result = await Promise.race(requests);
+
+  //         if (result.status !== 200) {
+  //           logger.debug('remote gateway returned non-200 response', result);
+  //           throw new Error('public gateway non-200 response - ipfs.fetchFileFromRemote');
+  //         }
+
+  //         controller.abort();
+
+  //         return await result.text();
+  //       } catch (err) {
+  //         logger.warn('skyekiwi gateway failed', err);
+  //         logger.warn('all remote gateway failed', err);
+  //         throw new Error('remote file fetching failed - ipfs.fetchFileFromRemote');
+  //       }
+  //     }
+  //   }
+  // }
 }
