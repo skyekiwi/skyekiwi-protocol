@@ -246,10 +246,11 @@ export class IPFS {
 
       logger.debug('fetching files from public gateways', cid);
 
-      const result = await Promise.any(requests);
+      const result = await Promise.race(requests);
 
       if (result.status !== 200) {
         logger.debug('remote gateway returned non-200 response', result);
+        throw new Error('non-200 response from public gateways')
       }
 
       controller.abort();
