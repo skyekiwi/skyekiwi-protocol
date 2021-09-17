@@ -308,7 +308,7 @@ export class IPFS {
         } catch (err) {
           logger.warn('skyekiwi gateway failed', err);
           logger.warn('all remote gateway failed', err);
-          throw new Error('remote gateway fetching failed')
+          throw new Error('remote gateway fetching failed');
         }
       }
     }
