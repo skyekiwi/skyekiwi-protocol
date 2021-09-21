@@ -120,14 +120,14 @@ Please refer to the `package.json`
 
 |Package Name|Description|
 |---|---|
-|@skyekiwi/crust-network|The Crust Network Connector|
-|@skyekiwi/crypto|Cryptographic Primitives|
-|@skyekiwi/driver|Core Driver of the protocol / exposed APIs|
-|@skyekiwi/file|File stream wrapper|
-|@skyekiwi/ipfs|IPFS Client wrapper|
-|@skyekiwi/metadata|Metadata Packaer|
-|@skyekiwi/util|Useful Utility Functions|
-|@skyekiwi/wasm-contract|Secret Registry: Substrate WASM Smart Contract connector|
+|`@skyekiwi/crust-network`|The Crust Network Connector|
+|`@skyekiwi/crypto`|Cryptographic Primitives|
+|`@skyekiwi/driver`|Core Driver of the protocol / exposed APIs|
+|`@skyekiwi/file`|File stream wrapper|
+|`@skyekiwi/ipfs`|IPFS Client wrapper|
+|`@skyekiwi/metadata`|Metadata Packaer|
+|`@skyekiwi/util`|Useful Utility Functions|
+|`@skyekiwi/wasm-contract`|Secret Registry: Substrate WASM Smart Contract connector|
 
 Please refer to the `package/driver/e2e.spec.ts` folder which contains test cases for common useage.
 

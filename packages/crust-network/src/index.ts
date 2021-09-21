@@ -2,30 +2,41 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
+import type { Signer } from '@polkadot/api/types';
 
 import { typesBundleForPolkadot } from '@crustio/type-definitions';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { waitReady } from '@polkadot/wasm-crypto';
+import { mnemonicValidate } from '@polkadot/util-crypto'
 
 import { sendTx } from '@skyekiwi/util';
 
 export class Crust {
-  #signer: string | KeyringPair
+  #sender: string | KeyringPair
+  #signer: Signer | undefined
   #api: ApiPromise
-  #isReady: boolean
   #provider: WsProvider
+  #mnemonic: string
 
-  constructor (signer: string | KeyringPair, testnet = true) {
-    this.#signer = signer;
-    this.#isReady = false;
-
+  constructor (sender: string, signer?: Signer, testnet = true) {
     this.#provider = testnet ? new WsProvider('wss://rpc-rocky.crust.network/') : new WsProvider('wss://rpc.crust.network/');
     this.#api = new ApiPromise({
       provider: this.#provider,
       typesBundle: typesBundleForPolkadot
     });
+
+    if (mnemonicValidate(sender)) {
+      this.#mnemonic = sender;
+    } else {
+      if (signer === undefined) {
+        throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor')
+      } else {
+        this.#sender = sender;
+        this.#signer = signer;
+      }
+    }
   }
 
   public async disconnect (): Promise<void> {
@@ -33,44 +44,34 @@ export class Crust {
   }
 
   public async init (): Promise<boolean> {
-    try {
+    if (this.#mnemonic) {
       await waitReady();
+      const keypair = (new Keyring({
+        type: 'sr25519'
+      })).addFromUri(this.#mnemonic)
 
-      if (typeof this.#signer === 'string') {
-        this.#signer = (new Keyring({
-          type: 'sr25519'
-        })).addFromUri(this.#signer);
-      }
-
-      this.#api = await this.#api.isReadyOrError;
-      this.#isReady = true;
-
+      this.#sender = keypair;
+      this.#signer = undefined;
       return true;
-    } catch (err) {
-      console.error(err);
-
-      return false;
+    } else {
+      if (this.#sender && this.#signer) {
+        return true;
+      } else {
+        throw new Error('Init failed, this should never happen - Crust.init')
+      }
     }
   }
 
   public async placeOrder (cid: string, size: number, tip?: number): Promise<boolean> {
-    if (this.#isReady === false) {
-      throw new Error('initialization error, run .init() first - Crust.placeOrder');
-    }
-
     return await sendTx(
       this.#api.tx.market.placeStorageOrder(
         cid, size, tip || 0, 'test'
       ),
-      this.#signer as KeyringPair
+      this.#sender, this.#signer
     );
   }
 
   public async placeBatchOrderWithCIDList (cidList: IPFSResult[], tip?: number): Promise<boolean> {
-    if (this.#isReady === false) {
-      throw new Error('initialization error, run .init() first - Crust.placeBatchOrderWithCIDList');
-    }
-
     const extrinsicQueue = [];
 
     for (const cid of cidList) {
@@ -82,18 +83,14 @@ export class Crust {
     const crustResult = await sendTx(
       this.#api.tx.utility.batchAll(
         extrinsicQueue
-      ), this.#signer as KeyringPair
+      ), this.#sender, this.#signer
     );
 
     return crustResult;
   }
 
-  // size in term of bytes
+  // size in bytes
   public async getStoragePrice (size: number): Promise<number> {
-    if (this.#isReady === false) {
-      throw new Error('initialization error, run .init() first - Crust.getStoragePrice');
-    }
-
     const unitPricePerMB = await this.#api.query.market.filePrice();
     const price = parseInt(unitPricePerMB.toHex());
 

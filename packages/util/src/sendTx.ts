@@ -1,10 +1,9 @@
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-/* eslint-disable node/no-extraneous-import */
+import type { Signer } from '@polkadot/api/types';
+import type { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 import type { KeyringPair } from '@polkadot/keyring/types';
-
-import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
 
 // Ported from
 // https://github.com/crustio/crust.js/blob/main/packages/crust-pin/src/util.ts
@@ -18,15 +17,18 @@ import { SubmittableExtrinsic } from '@polkadot/api/promise/types';
  */
 const sendTx = (
   extrinsic: SubmittableExtrinsic,
-  signer: KeyringPair,
+  sender: string | KeyringPair,
+  signer?: Signer,
   logging?: boolean
 ): Promise<boolean> => {
   logging = logging === undefined ? false : logging;
 
   if (logging) { console.log('⛓  Send tx to chain...'); }
 
+  const options = signer ? {signer: signer} : undefined;
+
   return new Promise((resolve, reject) => {
-    extrinsic.signAndSend(signer, ({ events = [], status }) => {
+    extrinsic.signAndSend(sender, options, ({ events = [], status }) => {
       if (logging) {
         console.log(
           `  ↪ 💸  Transaction status: ${status.type}`
