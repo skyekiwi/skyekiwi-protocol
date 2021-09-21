@@ -30,7 +30,8 @@ export class Crust {
     if (mnemonicValidate(sender)) {
       this.#mnemonic = sender;
     } else {
-      console.log('here')
+      console.log('here');
+
       if (signer === undefined) {
         throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
       } else {
