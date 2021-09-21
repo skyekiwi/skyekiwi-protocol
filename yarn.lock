@@ -3102,7 +3102,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/crust-network@0.3.2-0, @skyekiwi/crust-network@workspace:packages/crust-network":
+"@skyekiwi/crust-network@0.3.2-1, @skyekiwi/crust-network@workspace:packages/crust-network":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crust-network@workspace:packages/crust-network"
   dependencies:
@@ -3111,19 +3111,19 @@ __metadata:
     "@polkadot/api": ^5.6.1
     "@polkadot/keyring": ^7.2.1
     "@polkadot/wasm-crypto": ^4.1.2
-    "@skyekiwi/ipfs": 0.3.2-0
-    "@skyekiwi/util": 0.3.2-0
+    "@skyekiwi/ipfs": 0.3.2-1
+    "@skyekiwi/util": 0.3.2-1
     dotenv: ^10.0.0
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/crypto@0.3.2-0, @skyekiwi/crypto@workspace:packages/crypto":
+"@skyekiwi/crypto@0.3.2-1, @skyekiwi/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
-    "@skyekiwi/metadata": 0.3.2-0
+    "@skyekiwi/metadata": 0.3.2-1
     "@skyekiwi/secrets": ^2.0.1
-    "@skyekiwi/util": 0.3.2-0
+    "@skyekiwi/util": 0.3.2-1
     ethers: ^5.4.6
     tweetnacl: ^1.0.3
   languageName: unknown
@@ -3227,18 +3227,18 @@ __metadata:
   resolution: "@skyekiwi/driver@workspace:packages/driver"
   dependencies:
     "@polkadot/util-crypto": ^7.2.1
-    "@skyekiwi/crust-network": 0.3.2-0
-    "@skyekiwi/crypto": 0.3.2-0
-    "@skyekiwi/file": 0.3.2-0
-    "@skyekiwi/ipfs": 0.3.2-0
-    "@skyekiwi/metadata": 0.3.2-0
-    "@skyekiwi/util": 0.3.2-0
-    "@skyekiwi/wasm-contract": 0.3.2-0
+    "@skyekiwi/crust-network": 0.3.2-1
+    "@skyekiwi/crypto": 0.3.2-1
+    "@skyekiwi/file": 0.3.2-1
+    "@skyekiwi/ipfs": 0.3.2-1
+    "@skyekiwi/metadata": 0.3.2-1
+    "@skyekiwi/util": 0.3.2-1
+    "@skyekiwi/wasm-contract": 0.3.2-1
     dotenv: ^10.0.0
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/file@0.3.2-0, @skyekiwi/file@workspace:packages/file":
+"@skyekiwi/file@0.3.2-1, @skyekiwi/file@workspace:packages/file":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/file@workspace:packages/file"
   dependencies:
@@ -3251,11 +3251,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/ipfs@0.3.2-0, @skyekiwi/ipfs@workspace:packages/ipfs":
+"@skyekiwi/ipfs@0.3.2-1, @skyekiwi/ipfs@workspace:packages/ipfs":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
-    "@skyekiwi/util": 0.3.2-0
+    "@skyekiwi/util": 0.3.2-1
     abort-controller: ^3.0.0
     ipfs-core: ^0.6.1
     ipfs-core-types: 0.7.0
@@ -3264,14 +3264,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/metadata@0.3.2-0, @skyekiwi/metadata@workspace:packages/metadata":
+"@skyekiwi/metadata@0.3.2-1, @skyekiwi/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/metadata@workspace:packages/metadata"
   dependencies:
     "@polkadot/util-crypto": ^7.2.1
-    "@skyekiwi/crypto": 0.3.2-0
-    "@skyekiwi/ipfs": 0.3.2-0
-    "@skyekiwi/util": 0.3.2-0
+    "@skyekiwi/crypto": 0.3.2-1
+    "@skyekiwi/ipfs": 0.3.2-1
+    "@skyekiwi/util": 0.3.2-1
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -3283,7 +3283,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/util@0.3.2-0, @skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@0.3.2-1, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:
@@ -3294,7 +3294,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/wasm-contract@0.3.2-0, @skyekiwi/wasm-contract@workspace:packages/wasm-contract":
+"@skyekiwi/wasm-contract@0.3.2-1, @skyekiwi/wasm-contract@workspace:packages/wasm-contract":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/wasm-contract@workspace:packages/wasm-contract"
   dependencies:
@@ -3303,7 +3303,7 @@ __metadata:
     "@polkadot/keyring": ^7.2.1
     "@polkadot/types": ^5.6.1
     "@polkadot/wasm-crypto": ^4.1.2
-    "@skyekiwi/util": 0.3.2-0
+    "@skyekiwi/util": 0.3.2-1
   languageName: unknown
   linkType: soft
 
