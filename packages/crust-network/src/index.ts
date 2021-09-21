@@ -1,15 +1,15 @@
 // Copyright 2021 @skyekiwi/crust-network authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { Signer } from '@polkadot/api/types';
+import type { IPFSResult } from '@skyekiwi/ipfs/types';
 
 import { typesBundleForPolkadot } from '@crustio/type-definitions';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Keyring } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
+import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
-import { mnemonicValidate } from '@polkadot/util-crypto'
 
 import { sendTx } from '@skyekiwi/util';
 
@@ -31,7 +31,7 @@ export class Crust {
       this.#mnemonic = sender;
     } else {
       if (signer === undefined) {
-        throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor')
+        throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
       } else {
         this.#sender = sender;
         this.#signer = signer;
@@ -48,16 +48,17 @@ export class Crust {
       await waitReady();
       const keypair = (new Keyring({
         type: 'sr25519'
-      })).addFromUri(this.#mnemonic)
+      })).addFromUri(this.#mnemonic);
 
       this.#sender = keypair;
       this.#signer = undefined;
+
       return true;
     } else {
       if (this.#sender && this.#signer) {
         return true;
       } else {
-        throw new Error('Init failed, this should never happen - Crust.init')
+        throw new Error('Init failed, this should never happen - Crust.init');
       }
     }
   }

@@ -1,8 +1,8 @@
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Signer } from '@polkadot/api/types';
 import type { SubmittableExtrinsic } from '@polkadot/api/promise/types';
+import type { Signer } from '@polkadot/api/types';
 import type { KeyringPair } from '@polkadot/keyring/types';
 
 // Ported from
@@ -25,7 +25,7 @@ const sendTx = (
 
   if (logging) { console.log('⛓  Send tx to chain...'); }
 
-  const options = signer ? {signer: signer} : undefined;
+  const options = signer ? { signer: signer } : undefined;
 
   return new Promise((resolve, reject) => {
     extrinsic.signAndSend(sender, options, ({ events = [], status }) => {

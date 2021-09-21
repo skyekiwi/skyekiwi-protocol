@@ -1,5 +1,6 @@
 // Copyright 2021 @skyekiwi/wasm-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
+
 import type { Signer } from '@polkadot/api/types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
@@ -7,8 +8,8 @@ import { Abi, ContractPromise } from '@polkadot/api-contract';
 import { Keyring } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { AnyJson, RegistryTypes } from '@polkadot/types/types';
+import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
-import { mnemonicValidate } from '@polkadot/util-crypto'
 
 import { sendTx } from '@skyekiwi/util';
 
@@ -44,7 +45,7 @@ export class WASMContract {
       this.#mnemonic = sender;
     } else {
       if (signer === undefined) {
-        throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor')
+        throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
       } else {
         this.#sender = sender;
         this.#signer = signer;
@@ -63,7 +64,7 @@ export class WASMContract {
     if (this.#mnemonic) {
       const keypair = (new Keyring({
         type: 'sr25519'
-      })).addFromUri(this.#mnemonic)
+      })).addFromUri(this.#mnemonic);
 
       this.#sender = keypair;
       this.#signer = undefined;
@@ -77,9 +78,10 @@ export class WASMContract {
         this.#contract = new ContractPromise(
           this.api, new Abi(this.#abi, this.api.registry.getChainProperties()), this.#address
         );
+
         return true;
       } else {
-        throw new Error('Init failed, this should never happen - Crust.init')
+        throw new Error('Init failed, this should never happen - Crust.init');
       }
     }
   }
@@ -97,13 +99,13 @@ export class WASMContract {
 
     if (txResult) {
       return execResult.output?.toJSON();
-    } else return txResult;
+    } else { return txResult; }
   }
 
   async queryContract (message: string, params: unknown[]) {
     // eslint-disable-next-line
     return (await this.#contract.query[message](
-      (typeof this.#sender === 'object') ? (this.#sender as KeyringPair).address : this.#sender,
+      (typeof this.#sender === 'object') ? (this.#sender).address : this.#sender,
       { gasLimit: -1 },
       ...params
     ));
