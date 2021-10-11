@@ -30,7 +30,7 @@ export class Crust {
     if (mnemonicValidate(sender)) {
       this.#mnemonic = sender;
     } else {
-      console.log('here');
+      console.log('loading crust network connector in browser mode');
 
       if (signer === undefined) {
         throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');

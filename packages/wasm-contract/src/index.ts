@@ -44,6 +44,8 @@ export class WASMContract {
     if (mnemonicValidate(sender)) {
       this.#mnemonic = sender;
     } else {
+      console.log('loading wasm contract connector in browser mode');
+
       if (signer === undefined) {
         throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
       } else {

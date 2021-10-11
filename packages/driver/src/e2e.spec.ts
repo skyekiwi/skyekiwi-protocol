@@ -1,7 +1,7 @@
 // Copyright 2021 @skyekiwi/driver authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
+import { mnemonicToMiniSecret, mnemonicValidate } from '@polkadot/util-crypto';
 import fs from 'fs';
 import { randomBytes } from 'tweetnacl';
 
@@ -26,6 +26,10 @@ describe('@skyekiwi/driver', function () {
 
   let vaultId1: number;
   const mnemonic = process.env.SEED_PHRASE;
+
+  if (!mnemonicValidate(mnemonic)) {
+    throw new Error('mnemonic failed to read - e2e.spec.ts');
+  }
 
   const storage = new Crust(mnemonic);
   const registry = new WASMContract(mnemonic, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
