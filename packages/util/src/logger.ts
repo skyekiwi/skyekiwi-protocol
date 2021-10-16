@@ -14,16 +14,16 @@ import type { Logger } from './types';
 import pino from 'pino';
 
 const logger = pino({
+  level: 'info',
   transport: {
-    target: 'pino-pretty',
     options: {
       colorize: true,
       ignore: 'hostname',
       singleLine: true,
       translateTime: 'yyyy-mm-dd HH:MM:ss'
-    }
-  },
-  level: 'info'
+    },
+    target: 'pino-pretty'
+  }
 });
 
 const getLogger = (module: string): Logger => {

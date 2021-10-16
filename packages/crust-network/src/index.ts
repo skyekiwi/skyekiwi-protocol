@@ -11,7 +11,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { sendTx, getLogger } from '@skyekiwi/util';
+import { getLogger, sendTx } from '@skyekiwi/util';
 
 export class Crust {
   #sender: string | KeyringPair
@@ -33,6 +33,7 @@ export class Crust {
       this.#mnemonic = sender;
     } else {
       logger.info('mnemonic validation failed, trying to init in browser mode');
+
       if (signer === undefined) {
         throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
       } else {

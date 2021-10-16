@@ -11,7 +11,7 @@ import { AnyJson, RegistryTypes } from '@polkadot/types/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { sendTx, getLogger } from '@skyekiwi/util';
+import { getLogger, sendTx } from '@skyekiwi/util';
 
 export class WASMContract {
   public api: ApiPromise
@@ -33,8 +33,7 @@ export class WASMContract {
     signer?: Signer,
     testnet = true
   ) {
-
-    const logger = getLogger('WASMContract.constructor')
+    const logger = getLogger('WASMContract.constructor');
 
     this.#abi = abi;
     this.#address = contractAddress;
