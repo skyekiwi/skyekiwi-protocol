@@ -11,7 +11,7 @@ import { AnyJson, RegistryTypes } from '@polkadot/types/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { sendTx } from '@skyekiwi/util';
+import { sendTx, getLogger } from '@skyekiwi/util';
 
 export class WASMContract {
   public api: ApiPromise
@@ -33,6 +33,9 @@ export class WASMContract {
     signer?: Signer,
     testnet = true
   ) {
+
+    const logger = getLogger('WASMContract.constructor')
+
     this.#abi = abi;
     this.#address = contractAddress;
     this.#provider = testnet ? new WsProvider('wss://ws.jupiter-poa.patract.cn') : new WsProvider('wss://ws.jupiter-poa.patract.cn');
@@ -44,7 +47,7 @@ export class WASMContract {
     if (mnemonicValidate(sender)) {
       this.#mnemonic = sender;
     } else {
-      console.log('loading wasm contract connector in browser mode');
+      logger.info('mnemonic validation failed, loading in browser mode');
 
       if (signer === undefined) {
         throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');

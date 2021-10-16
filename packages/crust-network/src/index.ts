@@ -11,7 +11,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { sendTx } from '@skyekiwi/util';
+import { sendTx, getLogger } from '@skyekiwi/util';
 
 export class Crust {
   #sender: string | KeyringPair
@@ -21,6 +21,8 @@ export class Crust {
   #mnemonic: string
 
   constructor (sender: string, signer?: Signer, testnet = true) {
+    const logger = getLogger('Crust.constructor');
+
     this.#provider = testnet ? new WsProvider('wss://rpc-rocky.crust.network/') : new WsProvider('wss://rpc.crust.network/');
     this.#api = new ApiPromise({
       provider: this.#provider,
@@ -30,8 +32,7 @@ export class Crust {
     if (mnemonicValidate(sender)) {
       this.#mnemonic = sender;
     } else {
-      console.log('loading crust network connector in browser mode');
-
+      logger.info('mnemonic validation failed, trying to init in browser mode');
       if (signer === undefined) {
         throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
       } else {
