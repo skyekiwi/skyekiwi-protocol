@@ -22,7 +22,7 @@
   "dependencies": {
     "@polkadot/api": "^6.0.5",
     "@polkadot/keyring": "^7.4.1",
-    "pino": "^7.0.2",
-    "pino-pretty": "^7.1.0"
+    "pino": "^7.0.0-rc.1",
+    "pino-pretty": "^5.1.2"
   }
 }

@@ -15,14 +15,11 @@ import pino from 'pino';
 
 const logger = pino({
   level: 'info',
-  transport: {
-    options: {
-      colorize: true,
-      ignore: 'hostname',
-      singleLine: true,
-      translateTime: 'yyyy-mm-dd HH:MM:ss'
-    },
-    target: 'pino-pretty'
+  prettyPrint: {
+    colorize: true,
+    ignore: 'hostname',
+    singleLine: true,
+    translateTime: 'yyyy-mm-dd HH:MM:ss'
   }
 });
 
