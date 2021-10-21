@@ -95,7 +95,6 @@ export class Metadata {
     * @returns {string} return the packed sealed metadata
   */
   public async generateSealedMetadata (encryptionSchema: EncryptionSchema): Promise<string> {
-    
     // 1. encrypt and upload a list of all CIDs of chunks
     await this.uploadCIDList();
 
@@ -195,7 +194,7 @@ export class Metadata {
     * @param {number} chunkId sequencing of the chunk
     * @param {number} rawChunkSize the size of the chunk before encryption and uploading
     * @param {number} ipfsChunkSize the size of the encrypted chunk size; based on IPFS result
-    * @param {string} ipfsCID the IPFS CID of the chunk 
+    * @param {string} ipfsCID the IPFS CID of the chunk
   */
   public writeChunkResult (config: {
     chunkId: number, rawChunkSize: number, ipfsChunkSize: number, ipfsCID: string

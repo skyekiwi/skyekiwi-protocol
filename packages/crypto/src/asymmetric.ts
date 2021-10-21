@@ -3,9 +3,7 @@
 
 import { box, randomBytes } from 'tweetnacl';
 
-
 export class AsymmetricEncryption {
-  
   /**
     * get a curve25519 publicKey from a secretKey
     * @param {Uint8Array} secretKey a 32 bytes secretKey on curve25519

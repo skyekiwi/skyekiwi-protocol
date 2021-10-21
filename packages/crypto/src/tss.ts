@@ -16,12 +16,11 @@ const SKYEKIWI_SECRETS_ENDING =
 // the half byte cannot be parse to U8A correctly
 
 class TSS {
-
   /**
     * generate TSS shares
     * @param {Uint8Array} message message to be shared
     * @param {number} numShares number of total shares to be generated
-    * @param {number} threshold define the recovery threshold 
+    * @param {number} threshold define the recovery threshold
     * @returns {Uint8Array[]} all generated shares, same length as numShares
   */
   public static generateShares (

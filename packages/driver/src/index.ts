@@ -15,12 +15,11 @@ import { hexToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
 export class Driver {
-  
   /**
     * the high level upstream API to upstream a content
     * @param {File} file content to be uploaded
     * @param {Sealer} sealer a collection of sealer functions to be used
-    * @param {EncryptionSchema} encryptionSchema blueprint for the secret 
+    * @param {EncryptionSchema} encryptionSchema blueprint for the secret
     * @param {Crust} storage storage blockchain network connector
     * @param {WASMContract} registry secret registry connector to be used
     * @returns {Promise<void>} None.
@@ -123,7 +122,6 @@ export class Driver {
     keys: Uint8Array[],
     sealer: Sealer
   ): Promise<PreSealData> {
-
     // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
     const contractResult = (await registry
@@ -151,7 +149,7 @@ export class Driver {
   /**
     * high level downstream API
     * @param {number} vaultId the vaultId from the secret registry
-    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares  
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
     * @param {WASMContract} registry connector to the blockchain secret registry
     * @param {WriteSteram} writeStream output writeStream
     * @param {Sealer} sealer sealer functions used to decrypt the shares
@@ -215,7 +213,7 @@ export class Driver {
     * high level API to update the encryption schema of a secret without changing the content
     * @param {number} vaultId the vaultId from the secret registry
     * @param {EncryptionSchema} newEncryptionSchema the new encryptionSchema
-    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares  
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
     * @param {Crust} storage storage network connector
     * @param {WASMContract} registry connector to the blockchain secret registry
     * @param {Sealer} sealer sealer functions used to decrypt the shares
@@ -229,7 +227,6 @@ export class Driver {
     registry: WASMContract,
     sealer: Sealer
   ) {
-
     // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
 
@@ -274,7 +271,7 @@ export class Driver {
   /**
     * generate a proof of access from the signature derived from the sealingKey
     * @param {number} vaultId the vaultId from the secret registry
-    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares  
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
     * @param {WASMContract} registry connector to the blockchain secret registry
     * @param {Sealer} sealer sealer functions used to decrypt the shares
     * @param {Uint8Array} message message to be signed; no need to be hashed

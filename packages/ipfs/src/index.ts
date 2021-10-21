@@ -19,7 +19,7 @@ export class IPFS {
   constructor () {
     this.localIpfsReady = false;
   }
-  
+
   /**
     init a local js-ipfs node
   */
@@ -281,7 +281,7 @@ export class IPFS {
       try {
         logger.debug('public gateway failed. Trying Infura');
 
-        const infura = create({
+        const infura = createClient({
           headers: {
             'Access-Control-Allow-Origin': '*'
           },
@@ -304,7 +304,7 @@ export class IPFS {
 
         try {
           logger.debug('public gateway & Infura failed. Trying SkyeKiwi');
-          const skyekiwiNode = create({
+          const skyekiwiNode = createClient({
             headers: {
               'Access-Control-Allow-Origin': '*'
             },

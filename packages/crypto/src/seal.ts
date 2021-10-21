@@ -9,7 +9,6 @@ import { hexToU8a, trimEnding, u8aToHex } from '@skyekiwi/util';
 import { Sealer, TSS } from '.';
 
 export class Seal {
-  
   /**
     * seal a message with a pre-defined encryptionSchema and Sealer
     * @param {Uint8Array} message message to be encryoted
@@ -22,7 +21,6 @@ export class Seal {
     encryptionSchema: EncryptionSchema,
     sealer: Sealer
   ): Sealed {
-
     // 1. verify the encryptionSchema
     if (!encryptionSchema.verify()) {
       throw new Error('encryptionSchema Failer - Seal.seal');
@@ -76,7 +74,6 @@ export class Seal {
     orignalAuthor: Uint8Array,
     sealer: Sealer
   ): Uint8Array {
-
     const pub = sealed.public.split('|').map(hexToU8a);
     const priv = sealed.private.split('|').map(hexToU8a);
 

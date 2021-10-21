@@ -4,7 +4,6 @@
 import { randomBytes, secretbox } from 'tweetnacl';
 
 export class SymmetricEncryption {
-
   /**
     * encrypt a message with xsalsa20-poly1305 from Tweetnacl
     * @param {Uint8Array} key a 32 bytes sealingKey
