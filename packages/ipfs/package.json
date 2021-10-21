@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/ipfs",
-  "version": "0.3.2-4",
+  "version": "0.3.2-5",
   "type": "module",
   "description": "ipfs wrapper for @skyekiwi",
   "main": "index.js",
@@ -20,7 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/util": "0.3.2-4",
+    "@skyekiwi/util": "0.3.2-5",
     "abort-controller": "^3.0.0",
     "ipfs-core": "^0.6.1",
     "ipfs-core-types": "0.7.0",
