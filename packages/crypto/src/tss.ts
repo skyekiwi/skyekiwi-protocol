@@ -5,6 +5,7 @@ import secrets from '@skyekiwi/secrets';
 import { hexToU8a, u8aToHex } from '@skyekiwi/util';
 
 // 32 bytes
+// SKYEKIWI_SECRETS_ENDING is used to make sure the integrity of the recovered message
 const SKYEKIWI_SECRETS_ENDING =
   '1122334455667788990011223344556677889900112233445566778899002619';
 
@@ -15,6 +16,14 @@ const SKYEKIWI_SECRETS_ENDING =
 // the half byte cannot be parse to U8A correctly
 
 class TSS {
+
+  /**
+    * generate TSS shares
+    * @param {Uint8Array} message message to be shared
+    * @param {number} numShares number of total shares to be generated
+    * @param {number} threshold define the recovery threshold 
+    * @returns {Uint8Array[]} all generated shares, same length as numShares
+  */
   public static generateShares (
     message: Uint8Array,
     numShares: number,
@@ -43,6 +52,11 @@ class TSS {
     return _shares;
   }
 
+  /**
+    * recover TSS shares
+    * @param {Uint8Array[]} shares all shares collected; might not satisfied the threshold
+    * @returns {Uint8Array} the orignal message
+  */
   public static recover (shares: Uint8Array[]): Uint8Array {
     const sharesInHexString: string[] = shares.map(u8aToHex);
 

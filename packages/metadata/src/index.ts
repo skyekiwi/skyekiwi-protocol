@@ -21,6 +21,12 @@ export class Metadata {
 
   public hash: Uint8Array
 
+  /**
+   * Constructor of a Metadata handler
+   * @constructor
+   * @param {Sealer} sealer define the Sealer used for encryption
+   * @param {Uint8Array} [sealingKey] optional pre-defined sealingKey. Not recommanded to be used for security.
+  */
   constructor (sealer: Sealer, sealingKey?: Uint8Array) {
     this.#chunkList = {};
 
@@ -34,10 +40,19 @@ export class Metadata {
     }
   }
 
+  /**
+    * encrypt a chunk with the #sealingKey
+    * @param {Uint8Array} chunk the chunk to be encrypted
+    * @returns {Uint8Array} the encrypted chunk with leading nonce
+  */
   public encryptChunk (chunk: Uint8Array): Uint8Array {
     return SymmetricEncryption.encrypt(this.#sealingKey, chunk);
   }
 
+  /**
+    * encrypt and upload a list of all chunk CIDs to IPFS
+    * @returns {void} None. The result will be written to this.#chunkListCID
+  */
   public async uploadCIDList (): Promise<void> {
     let chunk = '';
 
@@ -60,8 +75,12 @@ export class Metadata {
     };
   }
 
+  /**
+    * generate the preSeal metadata
+    * @returns {Uint8Array} return the packed preSeal metadata
+  */
   public generatePreSealMetadata (): Uint8Array {
-    return Metadata.packagePreSeal({
+    return Metadata.encodePreSeal({
       author: this.#sealer.getAuthorKey(),
       chunkCID: this.#chunkListCID.cid,
       hash: this.hash,
@@ -70,21 +89,33 @@ export class Metadata {
     });
   }
 
+  /**
+    * generate the sealed metadata
+    * @param {EncryptionSchema} encryptionSchema the blueprint of the secret
+    * @returns {string} return the packed sealed metadata
+  */
   public async generateSealedMetadata (encryptionSchema: EncryptionSchema): Promise<string> {
+    
+    // 1. encrypt and upload a list of all CIDs of chunks
     await this.uploadCIDList();
+
+    // 2. pack the preSeal metadata
     const preSealData = this.generatePreSealMetadata();
 
+    // sanity check
     if (preSealData.length !== 146) {
       throw new Error('pre-seal data len error - Metadata.generateSealedMetadata');
     }
 
+    // 3. seal the preSeal data with the encryptionSchema
     const sealed = Seal.seal(
       preSealData,
       encryptionSchema,
       this.#sealer
     );
 
-    return Metadata.packageSealedMetadta({
+    // 4. pack the sealed data
+    return Metadata.encodeSealedMetadta({
       author: this.#sealer.getAuthorKey(),
       publicSealingKey: AsymmetricEncryption.getPublicKey(this.#sealingKey),
       sealed: sealed,
@@ -92,6 +123,10 @@ export class Metadata {
     });
   }
 
+  /**
+    * get a list of CIDs of chunks
+    * @returns {IPFSResult[]} the list of CIDs of all chunks
+  */
   public getCIDList (): IPFSResult[] {
     const cids: IPFSResult[] = [];
 
@@ -109,7 +144,11 @@ export class Metadata {
     return cids;
   }
 
-  public static recoverPreSealData (preSealData: Uint8Array): PreSealData {
+  /**
+    * decode the preSealData
+    * @returns {PreSealData} the decoded PreSealData
+  */
+  public static decodePreSealData (preSealData: Uint8Array): PreSealData {
     if (preSealData.length !== 146) {
       throw new Error('wrong length of pre-sealed data - Metadata.recover');
     }
@@ -129,7 +168,11 @@ export class Metadata {
     };
   }
 
-  public static recoverSealedData (hex: string): SealedMetadata {
+  /**
+    * decode an encoded SealedMetadata
+    * @returns {SealedMetadata} the decoded SealedMetadata
+  */
+  public static decodeSealedData (hex: string): SealedMetadata {
     const pieces = hex.split('-');
 
     if (pieces.length !== 5) {
@@ -147,6 +190,13 @@ export class Metadata {
     };
   }
 
+  /**
+    * write the result of one chunk to the Metadata handler
+    * @param {number} chunkId sequencing of the chunk
+    * @param {number} rawChunkSize the size of the chunk before encryption and uploading
+    * @param {number} ipfsChunkSize the size of the encrypted chunk size; based on IPFS result
+    * @param {string} ipfsCID the IPFS CID of the chunk 
+  */
   public writeChunkResult (config: {
     chunkId: number, rawChunkSize: number, ipfsChunkSize: number, ipfsCID: string
   }): void {
@@ -167,7 +217,11 @@ export class Metadata {
     };
   }
 
-  public static packagePreSeal (preSeal: PreSealData): Uint8Array {
+  /**
+    * encode an raw PreSealData
+    * @returns {Uint8Array} the encoded PreSealData
+  */
+  public static encodePreSeal (preSeal: PreSealData): Uint8Array {
     const result = new Uint8Array(
       // sealingKey, hash, Author
       32 * 3 +
@@ -177,6 +231,7 @@ export class Metadata {
       46
     );
 
+    // verify all fields are valid
     if (
       !(preSeal.author.length === 32) ||
       !(stringToU8a(preSeal.chunkCID).length === 46) ||
@@ -196,7 +251,11 @@ export class Metadata {
     return result;
   }
 
-  public static packageSealedMetadta (sealedData: SealedMetadata): string {
+  /**
+    * encode an raw SealedMetadata
+    * @returns {string} the encoded SealedMetadata
+  */
+  public static encodeSealedMetadta (sealedData: SealedMetadata): string {
     return `${u8aToHex(sealedData.author)}-${u8aToHex(sealedData.publicSealingKey)}-${sealedData.sealed.public}-${sealedData.sealed.private}-${u8aToHex(sealedData.version)}`;
   }
 }

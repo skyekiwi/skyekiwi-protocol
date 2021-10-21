@@ -15,6 +15,16 @@ import { hexToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
 export class Driver {
+  
+  /**
+    * the high level upstream API to upstream a content
+    * @param {File} file content to be uploaded
+    * @param {Sealer} sealer a collection of sealer functions to be used
+    * @param {EncryptionSchema} encryptionSchema blueprint for the secret 
+    * @param {Crust} storage storage blockchain network connector
+    * @param {WASMContract} registry secret registry connector to be used
+    * @returns {Promise<void>} None.
+  */
   public static async upstream (
     file: File,
     sealer: Sealer,
@@ -31,6 +41,7 @@ export class Driver {
     let chunkCount = 0;
     const readStream = file.getReadStream();
 
+    // main loop - the main upstreaming pipeline
     for await (const chunk of readStream) {
       await Driver.upstreamChunkProcessingPipeLine(
         metadata, chunk, chunkCount++
@@ -56,6 +67,13 @@ export class Driver {
     }
   }
 
+  /**
+    * upstream helper - pipeline to process each chunk
+    * @param {Metadata} metadata an Metadata handler instance
+    * @param {Uint8Array} chunk chunk to be processed
+    * @param {number} chunkId sequencing number of the current chunk
+    * @returns {Promise<void>} None.
+  */
   private static async upstreamChunkProcessingPipeLine (
     metadata: Metadata, chunk: Uint8Array, chunkId: number
   ): Promise<void> {
@@ -91,21 +109,33 @@ export class Driver {
     });
   }
 
+  /**
+    * fetch data from the secret registry and unseal the SealedData
+    * @param {number} vaultId the vaultId from the secret registry
+    * @param {WASMContract} registry connector to the blockchain secret registry
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
+    * @param {Sealer} sealer sealer functions used to decrypt the shares
+    * @returns {Promise<PreSealData>} the decrypted & recovered PreSealData
+  */
   public static async getPreSealDataByVaultId (
     vaultId: number,
     registry: WASMContract,
     keys: Uint8Array[],
     sealer: Sealer
   ): Promise<PreSealData> {
+
+    // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
     const contractResult = (await registry
       .queryContract('getMetadata', [vaultId])
     ).output.toString();
 
+    // 2. fetch the sealedData from IPFS
     const ipfs = new IPFS();
-    const metadata = Metadata.recoverSealedData(await ipfs.cat(contractResult));
+    const metadata = Metadata.decodeSealedData(await ipfs.cat(contractResult));
 
-    const unsealed = Metadata.recoverPreSealData(
+    // 3. recover and decode the sealedData
+    const unsealed = Metadata.decodePreSealData(
       Seal.recover(
         {
           private: metadata.sealed.private,
@@ -118,6 +148,15 @@ export class Driver {
     return unsealed;
   }
 
+  /**
+    * high level downstream API
+    * @param {number} vaultId the vaultId from the secret registry
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares  
+    * @param {WASMContract} registry connector to the blockchain secret registry
+    * @param {WriteSteram} writeStream output writeStream
+    * @param {Sealer} sealer sealer functions used to decrypt the shares
+    * @returns {Promise<void>} None.
+  */
   public static async downstream (
     vaultId: number,
     keys: Uint8Array[],
@@ -135,6 +174,14 @@ export class Driver {
     );
   }
 
+  /**
+    * downstream API helper
+    * @param {string} chunks the encrypted list of all CIDs of chunks
+    * @param {Uint8Array} hash hash of all chunks; used for verification
+    * @param {Uint8Array} sealingKey sealingKey used to decrypt the files
+    * @param {WriteSteram} writeStream output writeStream
+    * @returns {Promise<void>} None.
+  */
   private static async downstreamChunkProcessingPipeLine (
     chunks: string,
     hash: Uint8Array,
@@ -164,6 +211,16 @@ export class Driver {
     }
   }
 
+  /**
+    * high level API to update the encryption schema of a secret without changing the content
+    * @param {number} vaultId the vaultId from the secret registry
+    * @param {EncryptionSchema} newEncryptionSchema the new encryptionSchema
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares  
+    * @param {Crust} storage storage network connector
+    * @param {WASMContract} registry connector to the blockchain secret registry
+    * @param {Sealer} sealer sealer functions used to decrypt the shares
+    * @returns {Promise<void>} None.
+  */
   public static async updateEncryptionSchema (
     vaultId: number,
     newEncryptionSchema: EncryptionSchema,
@@ -172,23 +229,29 @@ export class Driver {
     registry: WASMContract,
     sealer: Sealer
   ) {
+
+    // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
 
+    // 2. update the new Author Key
     unsealed.author = sealer.getAuthorKey();
 
+    // 3. re-seal the data with the new encryptionSchema
     const sealed = Seal.seal(
-      Metadata.packagePreSeal(unsealed),
+      Metadata.encodePreSeal(unsealed),
       newEncryptionSchema,
       sealer
     );
 
-    const sealedMetadata = Metadata.packageSealedMetadta({
+    // 3. encode the sealed data
+    const sealedMetadata = Metadata.encodeSealedMetadta({
       author: sealer.getAuthorKey(),
       publicSealingKey: AsymmetricEncryption.getPublicKey(unsealed.sealingKey),
       sealed: sealed,
       version: SKYEKIWI_VERSION
     });
 
+    // 4. upload the updated sealed data and write to the secret registry
     await storage.init();
     await registry.init();
 
@@ -208,6 +271,15 @@ export class Driver {
     }
   }
 
+  /**
+    * generate a proof of access from the signature derived from the sealingKey
+    * @param {number} vaultId the vaultId from the secret registry
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares  
+    * @param {WASMContract} registry connector to the blockchain secret registry
+    * @param {Sealer} sealer sealer functions used to decrypt the shares
+    * @param {Uint8Array} message message to be signed; no need to be hashed
+    * @returns {Promise<Signature>} the proof generated
+  */
   public static async generateProofOfAccess (
     vaultId: number,
     keys: Uint8Array[],
@@ -223,6 +295,11 @@ export class Driver {
     return await signer.generateSignature(preSealData.sealingKey, message);
   }
 
+  /**
+    * offline verify a proof of access
+    * @param {Signature} signature signature generated by generateProofOfAccess
+    * @returns {boolean} the validity of the signature
+  */
   public static verifyProofOfAccess (signature: Signature): boolean {
     const signer = new EthereumSign();
 

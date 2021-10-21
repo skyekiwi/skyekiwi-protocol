@@ -8,6 +8,14 @@ export class EncryptionSchema {
   public threshold: number
   public unencryptedPieceCount: number
 
+  /**
+   * Constructor for an EncryptionSchema
+   * @constructor
+   * @param {Uint8Array} author curve25519 public key of the secret author
+   * @param {number} numOfShares total number of shares
+   * @param {number} threshold threshold of shares needed for recovery
+   * @param {number} unencryptedPieceCount number of pieces left unencrypted
+  */
   constructor (config: {
     author: Uint8Array,
     numOfShares: number,
@@ -21,10 +29,20 @@ export class EncryptionSchema {
     this.unencryptedPieceCount = config.unencryptedPieceCount;
   }
 
+  /**
+    * add in a receiving number to the encryption schema
+    * @param {Uint8Array} memberPublicKey a 32 bytes curve25519 public key of the receiver
+    * @param {number} shares number of shares to be assigned to this receiver
+    * @returns {void} None
+  */
   public addMember (memberPublicKey: Uint8Array, shares: number): void {
     for (let i = 0; i < shares; i++) { this.members.push(memberPublicKey); }
   }
 
+  /**
+    * total number of unique receivers
+    * @returns {number} number of unique receivers in this encryptionSchema
+  */
   public getNumOfParticipants (): number {
     // get all unique publicKey in this.members and
     // that's the number of participants
@@ -33,6 +51,10 @@ export class EncryptionSchema {
       .length;
   }
 
+  /**
+    * verify the validity of an encryption schema
+    * @returns {boolean} whether or not this encrytion schema is valid
+  */
   public verify (): boolean {
     // pieces = public piece(s) + members' piece(s)
     if (this.numOfShares !== this.unencryptedPieceCount + this.members.length) {

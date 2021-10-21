@@ -25,6 +25,16 @@ export class WASMContract {
   #mnemonic: string
   #signer: Signer | undefined
 
+  /**
+   * Constructor for a WASM Contract registry
+   * @constructor
+   * @param {string} sender either a **seed phrase** or an **address**
+   * @param {AnyJson} types types defination of the Substrate based blockchain
+   * @param {AnyJson} abi abi of the wasm contract
+   * @param {string} contractAddress the address of the contract instace on chain
+   * @param {Signer} [signer] optional signer when sender is an **address** and load in browser mode
+   * @param {boolean} [testnet = true] whether or not to send the tx on testnet, True by default
+  */
   constructor (
     sender: string,
     types: AnyJson,
@@ -57,10 +67,16 @@ export class WASMContract {
     }
   }
 
+  /**
+   * Disconnect rpc connections
+  */
   public async disconnect (): Promise<void> {
     await this.#provider.disconnect();
   }
 
+  /**
+   * Initialize the connector. Must be run before sending tx
+  */
   public async init (): Promise<boolean> {
     await waitReady();
     this.api = await this.api.isReadyOrError;
@@ -90,6 +106,12 @@ export class WASMContract {
     }
   }
 
+  /**
+   * execute a contract call
+   * @param {string} message the name of the function of the contract to be called
+   * @param {unknown[]} params paramters of the function call
+   * @returns {Promise<AnyJson>} result from the blockchain
+  */
   async execContract (message: string, params: unknown[]): Promise<AnyJson> {
     // "the dirty method" as in https://github.com/patractlabs/redspot/issues/78
     const execResult = await this.queryContract(message, params);
@@ -106,6 +128,12 @@ export class WASMContract {
     } else { return txResult; }
   }
 
+  /**
+   * query a contract function
+   * @param {string} message the name of the function of the contract to be called
+   * @param {unknown[]} params paramters of the function call
+   * @returns {Promise<AnyJson>} result from the blockchain
+  */
   async queryContract (message: string, params: unknown[]) {
     // eslint-disable-next-line
     return (await this.#contract.query[message](

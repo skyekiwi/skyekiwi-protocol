@@ -20,6 +20,13 @@ export class Crust {
   #provider: WsProvider
   #mnemonic: string
 
+  /**
+   * Constructor for a Crust Network connector
+   * @constructor
+   * @param {string} sender either a **seed phrase** or an **address**
+   * @param {Signer} signer when sender is an **address**, pass in a Signer
+   * @param {boolean} [testnet = true] whether or not to send the tx on testnet, True by default
+  */
   constructor (sender: string, signer?: Signer, testnet = true) {
     const logger = getLogger('Crust.constructor');
 
@@ -43,10 +50,16 @@ export class Crust {
     }
   }
 
+  /**
+   * Disconnect rpc connections
+  */
   public async disconnect (): Promise<void> {
     await this.#provider.disconnect();
   }
 
+  /**
+   * Initialize the connector. Must be run before sending tx
+  */
   public async init (): Promise<boolean> {
     if (this.#mnemonic) {
       await waitReady();
@@ -67,6 +80,13 @@ export class Crust {
     }
   }
 
+  /**
+    * place one Crust Network storage order
+    * @param {string} cid the CID to the IPFS content to be stored
+    * @param {number} size size of the content - must NOT be lower than the IPFS size or the network will reject the file
+    * @param {number} tip optional tip for faster processing
+    * @returns {Promise<boolean>} whether the tx goes through fine
+  */
   public async placeOrder (cid: string, size: number, tip?: number): Promise<boolean> {
     return await sendTx(
       this.#api.tx.market.placeStorageOrder(
@@ -76,6 +96,12 @@ export class Crust {
     );
   }
 
+  /**
+    * place a batch of Crust Network storage orders
+    * @param {IPFSResult[]} cidList a list of IPFSResults to be stored
+    * @param {number} tip optional tip for faster processing
+    * @returns {Promise<boolean>} whether the tx goes through fine
+  */
   public async placeBatchOrderWithCIDList (cidList: IPFSResult[], tip?: number): Promise<boolean> {
     const extrinsicQueue = [];
 
@@ -94,7 +120,11 @@ export class Crust {
     return crustResult;
   }
 
-  // size in bytes
+  /**
+    * query the Crust Network storage price
+    * @param {number} size size of the file to be stored in BYTES
+    * @returns {Promise<number>} a promise of the price
+  */
   public async getStoragePrice (size: number): Promise<number> {
     const unitPricePerMB = await this.#api.query.market.filePrice();
     const price = parseInt(unitPricePerMB.toHex());

@@ -10,22 +10,38 @@ import pako from 'pako';
 
 export class File {
   public fileName: string
-  public readStream?: ReadStream
+  public readStream: ReadStream
 
+  /**
+   * Constructor of a File object
+   * @constructor
+   * @param {string} fileName name of the file
+   * @param {readStream} readStream a readStream to the file content
+  */
   constructor (config: {
     fileName: string,
-    readStream?: ReadStream
+    readStream: ReadStream
   }) {
     this.fileName = config.fileName;
     this.readStream = config.readStream;
   }
 
-  public getReadStream (): ReadStream | undefined {
+  /**
+    * get the file ReadStream
+    * @returns {ReadStream} the file ReadStream
+  */
+  public getReadStream (): ReadStream {
     return this.readStream;
   }
 
+  /**
+    * get the checksum hash of a signle Chunk
+    * @param {Uint8Array} chunk the chunk to be calculated
+    * @returns {Promise<Uint8Array>} the resulting hash
+  */
   public static async getChunkHash (chunk: Uint8Array): Promise<Uint8Array> {
-    if (typeof fs === undefined) {
+    if (typeof window === undefined) {
+      /* browser mode */
       return new Uint8Array(await window.crypto.subtle.digest('SHA-256', chunk));
     }
 
@@ -36,7 +52,15 @@ export class File {
     return hashSum.digest();
   }
 
+  /**
+    * get the checksum hash of the previousHash combined with the current chunk
+    * @param {Uint8Array} previousHash hash of all previous chunk(s)
+    * @param {Uint8Array} chunk the chunk to be calculated
+    * @returns {Promise<Uint8Array>} the resulting hash
+  */
   public static async getCombinedChunkHash (previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
+    // the hash of the previous chunk(s) and the current chunk is used to ensure the sequencing of all chunks are correct
+
     if (previousHash.length !== 32) {
       console.log(previousHash);
       throw new Error('previousHash not valid - File.getCombinedChunkHash');
@@ -51,10 +75,21 @@ export class File {
     return await File.getChunkHash(combined);
   }
 
+  /**
+    * deflate a chunk
+    * @param {Uint8Array} chunk the chunk to be deflated
+    * @returns {Uint8Array} the deflated chunk
+  */
   public static deflateChunk (chunk: Uint8Array): Uint8Array {
+    // pako is cross platform, it can be used on both nodejs and browsers
     return pako.deflate(chunk);
   }
 
+  /**
+    * inflate a deflated chunk
+    * @param {Uint8Array} deflatedChunk an deflated chunk
+    * @returns {Uint8Array} the inflated chunk
+  */
   public static inflatDeflatedChunk (deflatedChunk: Uint8Array): Uint8Array {
     try {
       return pako.inflate(deflatedChunk);
@@ -63,6 +98,13 @@ export class File {
     }
   }
 
+  /**
+    * write file to a path (used in Node.js)
+    * @param {ArrayBuffer} content content to be written
+    * @param {string} filePath path to the output path
+    * @param {string} flag the writeStream flag, usually 'a' so that the file can be written in chunks
+    * @returns {Promise<boolean>} whether the file writting is successful
+  */
   public static writeFile (
     content: ArrayBuffer,
     filePath: string,
@@ -78,6 +120,13 @@ export class File {
     });
   }
 
+  /**
+    * save and download a file in Browser
+    * @param {Uint8Array} content content to be written
+    * @param {string} fileName name of the file
+    * @param {string} fileType type of the file
+    * @returns {Promise<boolean>} whether the file writting is successful
+  */
   public static saveAs (
     content: Uint8Array,
     fileName?: string,

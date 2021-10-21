@@ -11,7 +11,7 @@ import type { KeyringPair } from '@polkadot/keyring/types';
 // Licensed under Apache-2.0
 
 /**
- * Send tx to Crust Network
+ * Send tx on Substrate
  * @param {SubmittableExtrinsic} tx substrate-style tx
  * @param {string} seeds tx already been sent
  */
