@@ -2,6 +2,12 @@
 
 **NOTE:** This is a very early version of the SkyeKiwi Protocol. It is in heavy development. We will not advise anyone to use in production environment yet.
 
+<br>
+<div>
+    <img src="https://s6.jpg.cm/2021/10/26/IzgUTy.jpg" width="40%" align="left"/>
+    <img src="https://s6.jpg.cm/2021/10/26/IzfSV2.png" width="40%" align="left"/>
+</div>
+<br><br><br><br><br><br><br><br>
 
 > **A fun background story behind our logo** <br/><br/>
 > Little do people know that among all Greek letters, Sigma is a special one. Not only because it’s the Greek for S and S for  SkyeKiwi(duh..), but also because it’s the only Greek letter that can be written in three ways: uppercase “Σ”, lowercase “σ” and lowercase in word-final position “ς” and English likely adopt “ς” as “S” (they do look alike, right?). We make our logo to honor the Greeks’ letter Sigma but intentionally leave out the “ς” ( at a word-final position :) ), to keep this a secret (Shhhh... ). To read more on this fun Greek fact. [Link](https://en.wikipedia.org/wiki/Sigma)
@@ -28,7 +34,7 @@ The SkyeKiwi Client Library reads in files/FormData in binary stream, divide the
 <details><summary>Full Environment Setup</summary>
 
 <p>
-  
+
 ### Install Node.js
 
 please reference to [Node.js Website](https://nodejs.org/en/download/) 
@@ -240,3 +246,5 @@ Apache 2.0. See the `LICNESE` File.
 ### Contact 
 Email: hello@skye.kiwi <br/>
 Telegram: @songzhou26
+
+
