@@ -15,6 +15,7 @@ import { getLogger, sendTx } from '@skyekiwi/util';
 
 export class WASMContract {
   public api: ApiPromise
+  public senderAddress: string
 
   #abi: AnyJson
   #address: string
@@ -86,6 +87,7 @@ export class WASMContract {
         type: 'sr25519'
       })).addFromUri(this.#mnemonic);
 
+      this.senderAddress = keypair.address;
       this.#sender = keypair;
       this.#signer = undefined;
       this.#contract = new ContractPromise(
@@ -95,13 +97,16 @@ export class WASMContract {
       return true;
     } else {
       if (this.#sender && this.#signer) {
+        // here this.#sender is always an address string
+        this.senderAddress = this.#sender as string;
+
         this.#contract = new ContractPromise(
           this.api, new Abi(this.#abi, this.api.registry.getChainProperties()), this.#address
         );
 
         return true;
       } else {
-        throw new Error('Init failed, this should never happen - Crust.init');
+        throw new Error('Init failed, this should never happen - WASMContract.init');
       }
     }
   }

@@ -1,6 +1,8 @@
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { decodeAddress, encodeAddress } from '@polkadot/keyring';
+
 const hexToU8a = (hex: string): Uint8Array => {
   if (isValidHex(hex)) {
     return new Uint8Array(hex.match(/[0-9A-Fa-f]{1,2}/g).map((byte) => parseInt(byte, 16)));
@@ -37,4 +39,18 @@ const u8aToString = (u8a: Uint8Array): string => {
   return (new TextDecoder('utf-8')).decode(u8a);
 };
 
-export { hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString };
+const isValidSubstrateAddress = (address: string) => {
+  try {
+    encodeAddress(
+      isValidHex(address)
+        ? hexToU8a(address)
+        : decodeAddress(address)
+    );
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+export { isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString };
