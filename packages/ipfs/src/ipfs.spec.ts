@@ -27,7 +27,5 @@ describe('@skyekiwi/ipfs', function () {
 
       expect(content).toEqual(u8aToHex(data[i]));
     }
-
-    await ipfs.stopIfRunning();
   });
 });

@@ -21,10 +21,8 @@
   },
   "dependencies": {
     "@skyekiwi/util": "0.3.2-5",
-    "abort-controller": "^3.0.0",
-    "ipfs-core": "^0.6.1",
-    "ipfs-core-types": "0.7.0",
-    "ipfs-http-client": "^49.0.2",
+    "got": "^11.8.2",
+    "ipfs-http-client": "52.0.5",
     "node-fetch": "2.6.1"
   }
 }

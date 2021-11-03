@@ -1,333 +1,80 @@
 // Copyright 2021 @skyekiwi/ipfs authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Logger } from '@skyekiwi/util/types';
-import type { IPFSNode, IPFSResult } from './types';
+import type { IPFSResult } from './types';
 
-import AbortController from 'abort-controller';
-import ipfs from 'ipfs-core';
-import createClient from 'ipfs-http-client';
-import fetch, { RequestInit } from 'node-fetch';
-
-import { getLogger } from '@skyekiwi/util';
+import got from 'got';
+import { create } from 'ipfs-http-client';
 
 // WIP - the IPFS connector might go through lots of changes
 export class IPFS {
-  private localIpfsReady: boolean
-  private localIpfs: IPFSNode
-
-  constructor () {
-    this.localIpfsReady = false;
-  }
-
-  /**
-    init a local js-ipfs node
-  */
-  public async init (): Promise<void> {
-    const logger = getLogger('ipfs.init');
-
-    try {
-      this.localIpfsReady = true;
-      this.localIpfs = await ipfs.create();
-
-      logger.debug('ipfs spawned');
-      logger.trace(this.localIpfs);
-    } catch (err) {
-      console.warn(err);
-      // pass
-      // this is where there is already an ipfs node running
-    }
-  }
-
-  /**
-    stop the local js-ipfs node if it is running
-  */
-  public async stopIfRunning (): Promise<void> {
-    const logger = getLogger('ipfs.stopIfRunning');
-
-    if (this.localIpfsReady) {
-      logger.debug('ipfs stopping');
-      await this.localIpfs.stop();
-    }
-  }
-
-  /**
-    * add and pin a file to IPFS
-    * @param {string} str content to be added
-    * @returns {Promise<IPFSResult>} result from IPFS
-  */
-  public async add (str: string): Promise<IPFSResult> {
-    const logger = getLogger('ipfs.add');
-
-    logger.trace('Uploading %s', str);
-    logger.debug('Uploading %d bytes to IPFS', str.length);
-
-    try {
-      logger.debug('pushing to remote IPFS nodes');
-      const remoteResult = await this.remoteGatewayAddAndPin(str);
-
-      if (remoteResult !== null) return remoteResult;
-    } catch (err) {
-      // pass
-    }
-
-    logger.warn('all remote push failed, fallback to local IPFS, you need to keep the local IPFS running');
-
-    try {
-      await this.init();
-      const cid = await this.localIpfs.add(str);
-      const fileStat = await this.localIpfs.files.stat('/ipfs/' + cid.path);
-
-      logger.debug('bytes pushed as', {
-        cid: cid.path, size: fileStat.cumulativeSize
-      });
-
-      return {
-        cid: cid.path, size: fileStat.cumulativeSize
-      };
-    } catch (err) {
-      logger.error('local ipfs pushing failed', err);
-      throw (new Error('IPFS Failure: ipfs.add'));
-    }
-  }
-
-  /**
-    * fetch a file from IPFS
-    * @param {string} cid an IPFS cid to the file to be fetched
-    * @returns {Promise<string>} the resulting content
-  */
-  public async cat (cid: string): Promise<string> {
-    const logger = getLogger('ipfs.add');
-
+  private async pin (authHeader: string, cid: string): Promise<any> {
     if (cid.length !== 46) {
-      throw new Error('cid length error: ipfs.cat');
+      throw new Error('CID len err');
     }
 
-    try {
-      logger.debug('fetching from remote ipfs gateways');
-      const remoteResult = await this.fetchFileFromRemote(cid);
-
-      logger.debug('fetched %s', cid);
-
-      return remoteResult;
-    } catch (err) {
-      logger.info('remote gateways failed, fetching from local IPFS node');
-
-      try {
-        let result = '';
-
-        await this.init();
-
-        for await (const chunk of this.localIpfs.cat(cid)) {
-          result += chunk;
+    const { body } = await got.post(
+      'https://pin.crustcode.com/psa' + '/pins',
+      {
+        headers: {
+          authorization: 'Bearer ' + authHeader
+        },
+        json: {
+          cid: cid,
+          name: 'near-live-file.txt'
         }
-
-        logger.debug('fetched from local', result);
-
-        return result;
-      } catch (err) {
-        throw (new Error('IPFS Failure: ipfs.cat'));
       }
-    }
+    );
+
+    return body;
   }
 
-  private async addAndPinInfura (content: string): Promise<IPFSResult> {
-    const logger = getLogger('ipfs.addAndPinInfura');
-
-    logger.trace('pushing to infura %s', content);
-
-    const infura = createClient({
+  private async upload (authHeader: string, content: string): Promise<IPFSResult> {
+    const ipfs = create({
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Request-Method': 'POST'
+        authorization: 'Basic ' + authHeader
       },
-      host: 'ipfs.infura.io',
-      port: 5001,
-      protocol: 'https'
+      url: 'https://crustwebsites.net'
     });
 
-    const infuraResult = await infura.add(content);
-
-    await infura.pin.add(infuraResult.cid.toString());
-
-    logger.debug('content pushed', {
-      cid: infuraResult.path,
-      size: infuraResult.size
-    });
+    const result = await ipfs.add(content);
 
     return {
-      cid: infuraResult.path,
-      size: infuraResult.size
+      cid: result.cid.toString(),
+      size: result.size
     };
   }
 
-  private async addAndPinSkyeKiwi (content: string): Promise<IPFSResult> {
-    const logger = getLogger('ipfs.addAndPinSkyeKiwi');
-
-    logger.trace('pushing to SkyeKiwi IPFS nodes %s', content);
-
-    const skyekiwiNode = createClient({
+  private async download (authHeader: string, cid: string): Promise<string> {
+    let result = '';
+    const ipfs = create({
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Request-Method': 'POST'
+        authorization: 'Basic ' + authHeader
       },
-      host: 'sgnode.skye.kiwi',
-      port: 5001,
-      protocol: 'http'
+      url: 'https://crustwebsites.net'
     });
 
-    const skyekiwiResult = await skyekiwiNode.add(content);
+    const content = ipfs.cat(cid);
 
-    await skyekiwiNode.pin.add(skyekiwiResult.cid.toString());
+    for await (const chunk of content) {
+      result += chunk.toString();
+    }
 
-    logger.debug('content pushed', {
-      cid: skyekiwiResult.path,
-      size: skyekiwiResult.size
-    });
-
-    return {
-      cid: skyekiwiResult.path,
-      size: skyekiwiResult.size
-    };
+    return result;
   }
 
-  private async remoteGatewayAddAndPin (content: string): Promise<IPFSResult> {
-    const logger: Logger = getLogger('ipfs.remoteGatewayAddAndPin');
+  async add (content: string, authHeader?: string): Promise<IPFSResult> {
+    const auth = authHeader || 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
+    const result = await this.upload(auth, content);
 
-    try {
-      logger.debug('pushing to SkyeKiwi IPFS nodes');
+    await this.pin(auth, result.cid);
 
-      return await this.addAndPinSkyeKiwi(content);
-    } catch (err) {
-      logger.warn('pushing to SkyeKiwi IPFS nodes failed', err);
-
-      try {
-        logger.debug('pushing to Infura nodes');
-
-        return await this.addAndPinInfura(content);
-      } catch (err) {
-        logger.warn('pushing to all Infura nodes failed', err);
-        logger.warn('pushing to all remote nodes failed', err);
-        throw new Error('all remote pin failed - ipfs.remoteGatewayAddAndPin');
-      }
-    }
+    return result;
   }
 
-  private async fetchFileFromRemote (cid: string): Promise<string> {
-    const logger = getLogger('ipfs.fetchFileFromRemote');
-    const controller = new AbortController();
+  async cat (cid: string, authHeader?: string): Promise<string> {
+    const auth = authHeader || 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
 
-    try {
-      const requests = [
-        fetch(`http://ipfs.io/ipfs/${cid}`, {
-          mode: 'no-cors',
-          signal: controller.signal
-        } as RequestInit).then((res) => {
-          if (res.ok) { return res; } else {
-            throw new Error('public gateway non-200 response');
-          }
-        }),
-        fetch(`http://gateway.ipfs.io/ipfs/${cid}`, {
-          mode: 'no-cors',
-          signal: controller.signal
-        } as RequestInit).then((res) => {
-          if (res.ok) { return res; } else {
-            throw new Error('public gateway non-200 response');
-          }
-        }),
-        fetch(`http://gateway.originprotocol.com/ipfs/${cid}`, {
-          mode: 'no-cors',
-          signal: controller.signal
-        } as RequestInit).then((res) => {
-          if (res.ok) { return res; } else {
-            throw new Error('public gateway non-200 response');
-          }
-        }),
-        fetch(`http://ipfs.fleek.co/ipfs/${cid}`, {
-          mode: 'no-cors',
-          signal: controller.signal
-        } as RequestInit).then((res) => {
-          if (res.ok) { return res; } else {
-            throw new Error('public gateway non-200 response');
-          }
-        }),
-        fetch(`http://cloudflare-ipfs.com/ipfs/${cid}`, {
-          mode: 'no-cors',
-          signal: controller.signal
-        } as RequestInit).then((res) => {
-          if (res.ok) { return res; } else {
-            throw new Error('public gateway non-200 response');
-          }
-        })
-      ];
-
-      logger.debug('fetching files from public gateways', cid);
-
-      const result = await Promise.race(requests);
-
-      if (result.status !== 200) {
-        logger.debug('remote gateway returned non-200 response', result);
-        throw new Error('non-200 response from public gateways');
-      }
-
-      controller.abort();
-
-      return await result.text();
-    } catch (err) {
-      if (err !== 'AbortError') {
-        logger.warn('public gateway failed');
-      }
-
-      try {
-        logger.debug('public gateway failed. Trying Infura');
-
-        const infura = createClient({
-          headers: {
-            'Access-Control-Allow-Origin': '*'
-          },
-          host: 'ipfs.infura.io',
-          port: 5001,
-          protocol: 'https'
-        });
-        let result = '';
-        const stream = infura.cat(cid);
-
-        for await (const chunk of stream) {
-          result += chunk.toString();
-        }
-
-        logger.debug('fetched from Infura', result);
-
-        return result;
-      } catch (err) {
-        logger.warn('infura gateway failed', err);
-
-        try {
-          logger.debug('public gateway & Infura failed. Trying SkyeKiwi');
-          const skyekiwiNode = createClient({
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            },
-            host: 'sgnode.skye.kiwi',
-            port: 5001,
-            protocol: 'http'
-          });
-          let result = '';
-          const stream = skyekiwiNode.cat(cid);
-
-          for await (const chunk of stream) {
-            result += chunk.toString();
-          }
-
-          logger.debug('fetched from SkyeKiwi', result);
-
-          return result;
-        } catch (err) {
-          logger.warn('skyekiwi gateway failed', err);
-          logger.warn('all remote gateway failed', err);
-          throw new Error('remote gateway fetching failed');
-        }
-      }
-    }
+    return await this.download(auth, cid);
   }
 }

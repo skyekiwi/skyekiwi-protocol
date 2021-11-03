@@ -4,26 +4,14 @@
 import { randomBytes } from 'tweetnacl';
 
 import { DefaultSealer } from '@skyekiwi/crypto';
-import { u8aToHex } from '@skyekiwi/util';
 
 import { Metadata } from '.';
-
-const print = console.log;
 
 describe('@skyekiwi/metadata', function () {
   test('encode/decode pre-seal works', () => {
     const authorSk = randomBytes(32);
-
-    print('author privvate key', u8aToHex(authorSk));
-
     const hash = randomBytes(32);
-
-    print('hash', u8aToHex(hash));
-
     const slk = randomBytes(32);
-
-    print('slk', u8aToHex(slk));
-
     const sealer = new DefaultSealer();
 
     sealer.key = authorSk;
@@ -36,9 +24,6 @@ describe('@skyekiwi/metadata', function () {
       version: Uint8Array.from([0x0, 0x0, 0x0, 0x1])
     });
 
-    console.log('preseal', u8aToHex(preSeal));
-    console.log('preseal', preSeal);
-
     const recovered = Metadata.decodePreSealData(preSeal);
 
     expect(recovered.author).toEqual(sealer.getAuthorKey());
@@ -46,8 +31,6 @@ describe('@skyekiwi/metadata', function () {
     expect(recovered.hash).toEqual(hash);
     expect(recovered.sealingKey).toEqual(slk);
     expect(recovered.version).toEqual(Uint8Array.from([0x0, 0x0, 0x0, 0x1]));
-
-    console.log(recovered);
   });
 });
 

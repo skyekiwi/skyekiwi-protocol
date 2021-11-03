@@ -32,7 +32,6 @@ describe('@skyekiwi/crust-network', () => {
 
     expect(crustResult).toEqual(true);
 
-    await ipfs.stopIfRunning();
     await crust.disconnect();
   });
 });
