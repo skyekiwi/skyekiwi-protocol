@@ -83,7 +83,7 @@ export class Seal {
     // 2. try to decrypt as many private shares as possible
     for (const share of priv) {
       for (const key of keys) {
-        sealer.key = key;
+        sealer.unlock(key);
         const decrypted = sealer.decrypt(share, orignalAuthor);
 
         if (decrypted) { shares.push(decrypted); }

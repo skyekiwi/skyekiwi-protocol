@@ -14,7 +14,7 @@ describe('@skyekiwi/metadata', function () {
     const slk = randomBytes(32);
     const sealer = new DefaultSealer();
 
-    sealer.key = authorSk;
+    sealer.unlock(authorSk);
 
     const preSeal = Metadata.encodePreSeal({
       author: sealer.getAuthorKey(),

@@ -43,7 +43,7 @@ describe('@skyekiwi/driver', function () {
     const file = await setup(content);
     const sealer = new DefaultSealer();
 
-    sealer.key = mnemonicToMiniSecret(mnemonic);
+    sealer.unlock(mnemonicToMiniSecret(mnemonic));
     const encryptionSchema = new EncryptionSchema({
       author: sealer.getAuthorKey(),
       numOfShares: 2,
@@ -71,7 +71,7 @@ describe('@skyekiwi/driver', function () {
     const stream = fs.createWriteStream(downstreamPath1, { flags: 'a' });
     const sealer = new DefaultSealer();
 
-    sealer.key = mnemonicToMiniSecret(mnemonic);
+    sealer.unlock(mnemonicToMiniSecret(mnemonic));
 
     await Driver.downstream(
       vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
@@ -90,7 +90,7 @@ describe('@skyekiwi/driver', function () {
   it('generate PoA and verify PoA', async () => {
     const sealer = new DefaultSealer();
 
-    sealer.key = mnemonicToMiniSecret(mnemonic);
+    sealer.unlock(mnemonicToMiniSecret(mnemonic));
 
     const sig = await Driver.generateProofOfAccess(
       vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
@@ -111,7 +111,7 @@ describe('@skyekiwi/driver', function () {
     const publicKey1 = AsymmetricEncryption.getPublicKey(privateKey1);
     const publicKey2 = AsymmetricEncryption.getPublicKey(privateKey2);
 
-    sealer.key = mnemonicToMiniSecret(mnemonic);
+    sealer.unlock(mnemonicToMiniSecret(mnemonic));
     const encryptionSchema = new EncryptionSchema({
       author: sealer.getAuthorKey(),
       numOfShares: 5,

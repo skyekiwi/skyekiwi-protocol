@@ -4,7 +4,7 @@
 import { AsymmetricEncryption } from '.';
 
 export interface Sealer {
-  set key(key: Uint8Array)
+  unlock(key: Uint8Array): void
   decrypt(encryptedMessage: Uint8Array, author: Uint8Array): Uint8Array
   encrypt(message: Uint8Array, recipient: Uint8Array): Uint8Array
   getAuthorKey(): Uint8Array
@@ -14,12 +14,7 @@ export interface Sealer {
 export class DefaultSealer implements Sealer {
   #key: Uint8Array;
 
-  // always return null for security
-  public get key (): null {
-    return null;
-  }
-
-  public set key (key: Uint8Array) {
+  public unlock (key: Uint8Array) {
     if (key.length !== 32) {
       throw new Error('private key length error - Encryptor.constructor');
     }
