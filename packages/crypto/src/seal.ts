@@ -74,8 +74,12 @@ export class Seal {
     orignalAuthor: Uint8Array,
     sealer: Sealer
   ): Uint8Array {
-    const pub = sealed.public.split('|').map(hexToU8a);
-    const priv = sealed.private.split('|').map(hexToU8a);
+    let pub: Uint8Array[] = [];
+    let priv: Uint8Array[] = [];
+
+    if (sealed.public) { pub = sealed.public.split('|').map(hexToU8a); }
+
+    if (sealed.private) { priv = sealed.private.split('|').map(hexToU8a); }
 
     // 1. collect all public shares
     const shares: Uint8Array[] = [...pub];
