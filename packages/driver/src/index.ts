@@ -11,7 +11,7 @@ import { AsymmetricEncryption, EncryptionSchema, EthereumSign, Seal, Sealer, Sym
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
 import { Metadata, SKYEKIWI_VERSION } from '@skyekiwi/metadata';
-import { hexToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { getLogger, hexToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
 export class Driver {
@@ -31,6 +31,8 @@ export class Driver {
     storage: Crust,
     registry: WASMContract
   ) {
+    const logger = getLogger('Driver.upstream');
+
     const ipfs = new IPFS();
     const metadata = new Metadata(sealer);
 
@@ -40,6 +42,8 @@ export class Driver {
     let chunkCount = 0;
     const readStream = file.getReadStream();
 
+    logger.info('initiating chunk processing pipeline');
+
     // main loop - the main upstreaming pipeline
     for await (const chunk of readStream) {
       await Driver.upstreamChunkProcessingPipeLine(
@@ -48,9 +52,16 @@ export class Driver {
     }
 
     const cidList: IPFSResult[] = metadata.getCIDList();
+
+    logger.info('CID List extraction success');
+
     const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
 
+    logger.info('file metadata sealed');
+
     const result = await ipfs.add(sealedData);
+
+    logger.info('sealed metadata uploaded to IPFS');
 
     cidList.push({
       cid: result.cid,
@@ -59,7 +70,11 @@ export class Driver {
 
     const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
 
+    logger.info('Crust order placed');
+
     if (storageResult) {
+      logger.info('writting to registry');
+
       return await registry.execContract('createVault', [result.cid]);
     } else {
       throw new Error('packaging works well, blockchain network err - Driver.upstream');
@@ -76,6 +91,10 @@ export class Driver {
   private static async upstreamChunkProcessingPipeLine (
     metadata: Metadata, chunk: Uint8Array, chunkId: number
   ): Promise<void> {
+    const logger = getLogger('Driver.upstreamChunkProcessingPipeLine');
+
+    logger.info(`processing chunk ${chunkId}`);
+
     // 0. get raw chunk size
     const rawChunkSize = chunk.length;
 
@@ -89,15 +108,21 @@ export class Driver {
       );
     }
 
+    logger.info(`computing hash success for ${chunkId}`);
+
     // 2. deflate the chunk
     chunk = File.deflateChunk(chunk);
+    logger.info(`deflating chunk success for ${chunkId}`);
 
     // 3. SecretBox encryption
     chunk = metadata.encryptChunk(chunk);
+    logger.info(`chunk encryption success for ${chunkId}`);
 
     // 4. upload to IPFS
     const ipfs = new IPFS();
     const IPFS_CID = await ipfs.add(u8aToHex(chunk));
+
+    logger.info(`chunk uploaded to ipfs for ${chunkId}`);
 
     // 5. write to chunkMetadata
     metadata.writeChunkResult({
@@ -106,6 +131,7 @@ export class Driver {
       ipfsChunkSize: IPFS_CID.size,
       rawChunkSize: rawChunkSize
     });
+    logger.info(`chunk metadata stored for ${chunkId}`);
   }
 
   /**
@@ -122,15 +148,21 @@ export class Driver {
     keys: Uint8Array[],
     sealer: Sealer
   ): Promise<PreSealData> {
+    const logger = getLogger('Driver.getPreSealDataByVaultId');
+
     // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
     const contractResult = (await registry
       .queryContract('getMetadata', [vaultId])
     ).output.toString();
 
+    logger.info('querying registry success');
+
     // 2. fetch the sealedData from IPFS
     const ipfs = new IPFS();
     const metadata = Metadata.decodeSealedData(await ipfs.cat(contractResult));
+
+    logger.info('unseal metadata success');
 
     // 3. recover and decode the sealedData
     const unsealed = Metadata.decodePreSealData(
@@ -142,6 +174,8 @@ export class Driver {
         keys, metadata.author, sealer
       )
     );
+
+    logger.info('pre-seal data recovered');
 
     return unsealed;
   }
@@ -162,7 +196,12 @@ export class Driver {
     writeStream: WriteStream,
     sealer: Sealer
   ): Promise<void> {
+    const logger = getLogger('Driver.downstream');
+
+    logger.info('fetching pre-seal data');
     const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
+
+    logger.info('entering downstream processing pipeline');
 
     return await this.downstreamChunkProcessingPipeLine(
       unsealed.chunkCID,
@@ -186,20 +225,29 @@ export class Driver {
     sealingKey: Uint8Array,
     writeStream: WriteStream
   ): Promise<void> {
+    const logger = getLogger('Driver.downstream');
+
     const ipfs = new IPFS();
 
     const chunksList = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunks)))).split('-');
 
+    logger.info('chunkList recovery successful');
+
     let currentHash: Uint8Array;
 
     for (const chunkCID of chunksList) {
+      logger.info(`downstreaming chunk ${chunkCID}`);
       const chunk = File.inflatDeflatedChunk(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunkCID))));
+
+      logger.info(`downstreaming chunk ${chunkCID} success`);
 
       if (currentHash === undefined) {
         currentHash = await File.getChunkHash(chunk);
       } else {
         currentHash = await File.getCombinedChunkHash(currentHash, chunk);
       }
+
+      logger.info('writting to file');
 
       writeStream.write(chunk);
     }
