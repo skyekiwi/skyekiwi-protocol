@@ -5,7 +5,6 @@ import { AsymmetricEncryption } from '.';
 
 export interface Sealer {
   set key(key: Uint8Array)
-  get key()
   decrypt(encryptedMessage: Uint8Array, author: Uint8Array): Uint8Array
   encrypt(message: Uint8Array, recipient: Uint8Array): Uint8Array
   getAuthorKey(): Uint8Array
