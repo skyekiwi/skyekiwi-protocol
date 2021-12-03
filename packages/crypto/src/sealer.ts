@@ -5,7 +5,7 @@ import { AsymmetricEncryption } from '.';
 
 export interface Sealer {
   unlock(key: Uint8Array): void
-  decrypt(encryptedMessage: Uint8Array, author: Uint8Array): Uint8Array
+  decrypt(encryptedMessage: Uint8Array): Uint8Array
   encrypt(message: Uint8Array, recipient: Uint8Array): Uint8Array
   getAuthorKey(): Uint8Array
 }
@@ -25,21 +25,21 @@ export class DefaultSealer implements Sealer {
   /**
     * decrypt a message with curve25519 from Tweetnacl
     * @param {Uint8Array} encryptedMessage encryptedMessage with leading nonce
-    * @param {Uint8Array} author public key of the author public key
     * @returns {Uint8Array} the original message
   */
-  public decrypt (encryptedMessage: Uint8Array, author: Uint8Array): Uint8Array {
+  public decrypt (encryptedMessage: Uint8Array): Uint8Array {
     if (this.#key === undefined) {
       throw new Error('sealer is locked - Sealer.decrypt');
     }
 
     try {
       const result = AsymmetricEncryption.decrypt(
-        this.#key, encryptedMessage, author
+        this.#key, encryptedMessage
       );
 
       if (result) return result;
     } catch (err) {
+      console.log(err);
       // pass
     }
 

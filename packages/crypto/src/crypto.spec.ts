@@ -12,7 +12,6 @@ describe('@skyekiwi/crypto', () => {
 
   const message = '123456780123456';
   const _message = stringToU8a(message);
-  const senderPublicKey = AsymmetricEncryption.getPublicKey(key);
 
   test('Symmetric: Encryption & Decryption Works', () => {
     const encrypted = SymmetricEncryption.encrypt(key, _message);
@@ -27,7 +26,7 @@ describe('@skyekiwi/crypto', () => {
     const receiverPublicKey = AsymmetricEncryption.getPublicKey(receiverPrivateKey);
     const encrypted = AsymmetricEncryption.encrypt(key, _message, receiverPublicKey);
 
-    const decrypted = AsymmetricEncryption.decrypt(receiverPrivateKey, encrypted, senderPublicKey);
+    const decrypted = AsymmetricEncryption.decrypt(receiverPrivateKey, encrypted);
     const decryptedString = u8aToString(decrypted);
 
     expect(decryptedString).toEqual(message);
@@ -47,16 +46,10 @@ describe('@skyekiwi/crypto', () => {
     const receiverPublicKey = AsymmetricEncryption.getPublicKey(receiverPrivateKey);
     const encrypted = AsymmetricEncryption.encrypt(key, _message, receiverPublicKey);
 
-    // wrong sender's public key
-    // the receiver's public key is sent instead of the sender's public key
-    expect(() => AsymmetricEncryption.decrypt(receiverPrivateKey, encrypted, receiverPublicKey)).toThrow(
-      'decryption failed - Box.decrypt'
-    );
-
     // wrong receiver's private key
     const wrongPrivateKey = randomBytes(32);
 
-    expect(() => AsymmetricEncryption.decrypt(wrongPrivateKey, encrypted, senderPublicKey)).toThrow(
+    expect(() => AsymmetricEncryption.decrypt(wrongPrivateKey, encrypted)).toThrow(
       'decryption failed - Box.decrypt'
     );
   });

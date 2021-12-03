@@ -19,6 +19,12 @@ const isValidHex = (str: string): boolean => {
     (/^[0-9A-Fa-f]*$/g).test(str);
 };
 
+const toBase64 = (x: string): string =>
+  Buffer.from(x, 'binary').toString('base64');
+
+const fromBase64 = (x: string): string =>
+  Buffer.from(x, 'base64').toString('binary');
+
 const numberPadding = (n: number): string => {
   return String(n).padStart(16, '0');
 };
@@ -26,7 +32,7 @@ const numberPadding = (n: number): string => {
 const trimEnding = (str: string): string => {
   const len = str.length;
 
-  if (str[len - 1] === '|' || str[len - 1] === '-' || str[len - 1] === ' ') {
+  if (str[len - 1] === '|' || str[len - 1] === '-' || str[len - 1] === ' ' || str[len - 1] === '?') {
     return str.substring(0, len - 1);
   } else return str;
 };
@@ -53,4 +59,4 @@ const isValidSubstrateAddress = (address: string) => {
   }
 };
 
-export { isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString };
+export { isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64 };

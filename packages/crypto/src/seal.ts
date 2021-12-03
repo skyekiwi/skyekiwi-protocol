@@ -71,7 +71,6 @@ export class Seal {
   public static recover (
     sealed: Sealed,
     keys: Uint8Array[],
-    orignalAuthor: Uint8Array,
     sealer: Sealer
   ): Uint8Array {
     let pub: Uint8Array[] = [];
@@ -88,7 +87,7 @@ export class Seal {
     for (const share of priv) {
       for (const key of keys) {
         sealer.unlock(key);
-        const decrypted = sealer.decrypt(share, orignalAuthor);
+        const decrypted = sealer.decrypt(share);
 
         if (decrypted) { shares.push(decrypted); }
       }

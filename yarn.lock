@@ -2941,6 +2941,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@skyekiwi/s-contract@workspace:packages/s-contract":
+  version: 0.0.0-use.local
+  resolution: "@skyekiwi/s-contract@workspace:packages/s-contract"
+  dependencies:
+    "@polkadot/util-crypto": ^7.4.1
+    "@skyekiwi/crust-network": 0.3.2-10
+    "@skyekiwi/crypto": 0.3.2-10
+    "@skyekiwi/file": "workspace:packages/file"
+    "@skyekiwi/ipfs": 0.3.2-10
+    "@skyekiwi/metadata": 0.3.2-10
+    "@skyekiwi/util": 0.3.2-10
+    "@skyekiwi/wasm-contract": 0.3.2-10
+    dotenv: ^10.0.0
+  languageName: unknown
+  linkType: soft
+
 "@skyekiwi/secrets@npm:^2.0.1":
   version: 2.0.1
   resolution: "@skyekiwi/secrets@npm:2.0.1"
@@ -3182,6 +3198,13 @@ __metadata:
   version: 16.11.6
   resolution: "@types/node@npm:16.11.6"
   checksum: 6e19634766ff589d3d2f361c2196b671f8f133cdadc5ad347a621c360d8994b6c4fbccfb2ad9c60c588c593831a96497c9c6b77d2b7e91be723384b94f6368e7
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^16.11.11":
+  version: 16.11.11
+  resolution: "@types/node@npm:16.11.11"
+  checksum: 1c472bd63f23ca0e4effc96e6e0c693b83b027f613a1f41b6d1bd7791f65ce171a351e0a5c92575cb59e84ad0a930875397bfbbb91a7c925ddbbb558f7461af8
   languageName: node
   linkType: hard
 
@@ -10551,6 +10574,7 @@ resolve@^2.0.0-next.3:
     "@babel/core": ^7.15.0
     "@skyekiwi/dev": ^0.3.1
     "@types/jest": ^27.0.1
+    "@types/node": ^16.11.11
     dotenv: ^10.0.0
   languageName: unknown
   linkType: soft

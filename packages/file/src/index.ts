@@ -8,6 +8,8 @@ import FileSaver from 'file-saver';
 import fs from 'fs';
 import pako from 'pako';
 
+import { u8aToString } from '@skyekiwi/util';
+
 export class File {
   public fileName: string
   public readStream: ReadStream
@@ -32,6 +34,22 @@ export class File {
   */
   public getReadStream (): ReadStream {
     return this.readStream;
+  }
+
+  /**
+    * read the whole file
+    * DO NOT USE THIS IF YOU ARE TRYING TO READ A LARGE FILE
+    * THE FILE MUST ALSO BE UTF8 ENCODED
+    * @returns {string} the whole file content
+   */
+  public async readAll (): Promise<string> {
+    let content = '';
+
+    for await (const chunk of this.readStream) {
+      content += u8aToString(chunk);
+    }
+
+    return content;
   }
 
   /**
