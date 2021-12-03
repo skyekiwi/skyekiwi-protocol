@@ -27,11 +27,13 @@ export class AsymmetricEncryption {
   ): Uint8Array {
     const nonce = randomBytes(box.nonceLength);
     const encrypted = box(message, nonce, receiverPublicKey, key);
+    const authorKey = AsymmetricEncryption.getPublicKey(key);
 
-    const fullMessage = new Uint8Array(nonce.length + encrypted.length);
+    const fullMessage = new Uint8Array(nonce.length + encrypted.length + authorKey.length);
 
-    fullMessage.set(nonce);
-    fullMessage.set(encrypted, nonce.length);
+    fullMessage.set(authorKey);
+    fullMessage.set(nonce, authorKey.length);
+    fullMessage.set(encrypted, nonce.length + authorKey.length);
 
     return fullMessage;
   }
@@ -45,15 +47,15 @@ export class AsymmetricEncryption {
   */
   public static decrypt (
     privateKey: Uint8Array,
-    messageWithNonce: Uint8Array,
-    senderPublicKey: Uint8Array
+    messageWithNonce: Uint8Array
   ): Uint8Array {
-    const nonce = messageWithNonce.slice(0, box.nonceLength);
+    const authorKey = messageWithNonce.slice(0, box.publicKeyLength);
+    const nonce = messageWithNonce.slice(box.publicKeyLength, box.publicKeyLength + box.nonceLength);
     const message = messageWithNonce.slice(
-      box.nonceLength, messageWithNonce.length
+      box.publicKeyLength + box.nonceLength //, messageWithNonce.length
     );
 
-    const decrypted = box.open(message, nonce, senderPublicKey, privateKey);
+    const decrypted = box.open(message, nonce, authorKey, privateKey);
 
     if (!decrypted) {
       throw new Error('decryption failed - Box.decrypt');

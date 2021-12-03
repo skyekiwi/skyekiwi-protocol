@@ -15,7 +15,6 @@ export type ChunkList = {
 }
 
 export type PreSealData = {
-  author: Uint8Array,
   chunkCID: string,
   hash: Uint8Array,
   sealingKey: Uint8Array,
@@ -23,7 +22,6 @@ export type PreSealData = {
 }
 
 export type SealedMetadata = {
-  author: Uint8Array,
   publicSealingKey: Uint8Array,
   sealed: Sealed,
   version: Uint8Array,

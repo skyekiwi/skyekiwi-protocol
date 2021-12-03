@@ -17,7 +17,6 @@ describe('@skyekiwi/metadata', function () {
     sealer.unlock(authorSk);
 
     const preSeal = Metadata.encodePreSeal({
-      author: sealer.getAuthorKey(),
       chunkCID: 'QmZMpQ8K7Tp1Uwae8SXi3ZJqJDES8JGBiMmNWV2iRatwbW',
       hash: hash,
       sealingKey: slk,
@@ -26,7 +25,6 @@ describe('@skyekiwi/metadata', function () {
 
     const recovered = Metadata.decodePreSealData(preSeal);
 
-    expect(recovered.author).toEqual(sealer.getAuthorKey());
     expect(recovered.chunkCID).toEqual('QmZMpQ8K7Tp1Uwae8SXi3ZJqJDES8JGBiMmNWV2iRatwbW');
     expect(recovered.hash).toEqual(hash);
     expect(recovered.sealingKey).toEqual(slk);

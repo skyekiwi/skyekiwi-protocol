@@ -171,7 +171,7 @@ export class Driver {
           private: metadata.sealed.private,
           public: metadata.sealed.public
         },
-        keys, metadata.author, sealer
+        keys, sealer
       )
     );
 
@@ -278,10 +278,7 @@ export class Driver {
     // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
 
-    // 2. update the new Author Key
-    unsealed.author = sealer.getAuthorKey();
-
-    // 3. re-seal the data with the new encryptionSchema
+    // 2. re-seal the data with the new encryptionSchema
     const sealed = Seal.seal(
       Metadata.encodePreSeal(unsealed),
       newEncryptionSchema,
@@ -290,7 +287,6 @@ export class Driver {
 
     // 3. encode the sealed data
     const sealedMetadata = Metadata.encodeSealedMetadta({
-      author: sealer.getAuthorKey(),
       publicSealingKey: AsymmetricEncryption.getPublicKey(unsealed.sealingKey),
       sealed: sealed,
       version: SKYEKIWI_VERSION

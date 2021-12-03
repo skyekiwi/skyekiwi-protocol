@@ -11,7 +11,7 @@ import { IPFS } from '@skyekiwi/ipfs';
 import { hexToU8a, stringToU8a, trimEnding, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 // version code in Uint8Array
-export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 0, 1]);
+export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 1, 0]);
 
 export class Metadata {
   #sealingKey: Uint8Array;
@@ -81,7 +81,6 @@ export class Metadata {
   */
   public generatePreSealMetadata (): Uint8Array {
     return Metadata.encodePreSeal({
-      author: this.#sealer.getAuthorKey(),
       chunkCID: this.#chunkListCID.cid,
       hash: this.hash,
       sealingKey: this.#sealingKey,
@@ -102,7 +101,7 @@ export class Metadata {
     const preSealData = this.generatePreSealMetadata();
 
     // sanity check
-    if (preSealData.length !== 146) {
+    if (preSealData.length !== 114) {
       throw new Error('pre-seal data len error - Metadata.generateSealedMetadata');
     }
 
@@ -115,7 +114,6 @@ export class Metadata {
 
     // 4. pack the sealed data
     return Metadata.encodeSealedMetadta({
-      author: this.#sealer.getAuthorKey(),
       publicSealingKey: AsymmetricEncryption.getPublicKey(this.#sealingKey),
       sealed: sealed,
       version: SKYEKIWI_VERSION
@@ -148,18 +146,16 @@ export class Metadata {
     * @returns {PreSealData} the decoded PreSealData
   */
   public static decodePreSealData (preSealData: Uint8Array): PreSealData {
-    if (preSealData.length !== 146) {
+    if (preSealData.length !== 114) {
       throw new Error('wrong length of pre-sealed data - Metadata.recover');
     }
 
-    const author = preSealData.slice(0, 32);
-    const chunkCID = u8aToString(preSealData.slice(32, 78));
-    const hash = preSealData.slice(78, 110);
-    const slk = preSealData.slice(110, 142);
-    const version = preSealData.slice(142);
+    const chunkCID = u8aToString(preSealData.slice(0, 46));
+    const hash = preSealData.slice(46, 78);
+    const slk = preSealData.slice(78, 110);
+    const version = preSealData.slice(110);
 
     return {
-      author: author,
       chunkCID: chunkCID,
       hash: hash,
       sealingKey: slk,
@@ -174,18 +170,17 @@ export class Metadata {
   public static decodeSealedData (hex: string): SealedMetadata {
     const pieces = hex.split('-');
 
-    if (pieces.length !== 5) {
+    if (pieces.length !== 4) {
       throw new Error('invalid sealed data - Metadata.recoverSealedData');
     }
 
     return {
-      author: hexToU8a(pieces[0]),
-      publicSealingKey: hexToU8a(pieces[1]),
+      publicSealingKey: hexToU8a(pieces[0]),
       sealed: {
-        private: pieces[3],
+        private: pieces[1],
         public: pieces[2]
       },
-      version: hexToU8a(pieces[4])
+      version: hexToU8a(pieces[3])
     };
   }
 
@@ -222,8 +217,8 @@ export class Metadata {
   */
   public static encodePreSeal (preSeal: PreSealData): Uint8Array {
     const result = new Uint8Array(
-      // sealingKey, hash, Author
-      32 * 3 +
+      // sealingKey, hash
+      32 * 2 +
       // skyekiwi version
       4 +
       // an IPFS CID in binary
@@ -232,7 +227,6 @@ export class Metadata {
 
     // verify all fields are valid
     if (
-      !(preSeal.author.length === 32) ||
       !(stringToU8a(preSeal.chunkCID).length === 46) ||
       !(preSeal.hash.length === 32) ||
       !(preSeal.sealingKey.length === 32) ||
@@ -241,11 +235,10 @@ export class Metadata {
       throw new Error('pre-sealing error - Metadata.getPreSealData');
     }
 
-    result.set(preSeal.author, 0);
-    result.set(stringToU8a(preSeal.chunkCID), 32);
-    result.set(preSeal.hash, 78);
-    result.set(preSeal.sealingKey, 110);
-    result.set(SKYEKIWI_VERSION, 142);
+    result.set(stringToU8a(preSeal.chunkCID), 0);
+    result.set(preSeal.hash, 46);
+    result.set(preSeal.sealingKey, 78);
+    result.set(SKYEKIWI_VERSION, 110);
 
     return result;
   }
@@ -255,6 +248,6 @@ export class Metadata {
     * @returns {string} the encoded SealedMetadata
   */
   public static encodeSealedMetadta (sealedData: SealedMetadata): string {
-    return `${u8aToHex(sealedData.author)}-${u8aToHex(sealedData.publicSealingKey)}-${sealedData.sealed.public}-${sealedData.sealed.private}-${u8aToHex(sealedData.version)}`;
+    return `${u8aToHex(sealedData.publicSealingKey)}-${sealedData.sealed.private}-${sealedData.sealed.public}-${u8aToHex(sealedData.version)}`;
   }
 }
