@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.5.0 Dec 03, 2021
+## 0.5.1 Dec 03, 2021
 🎉 First Public Pre-release
 
 Reduce Pre-Seal Metadata Size
