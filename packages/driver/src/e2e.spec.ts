@@ -3,6 +3,7 @@
 
 import { mnemonicToMiniSecret, mnemonicValidate } from '@polkadot/util-crypto';
 import fs from 'fs';
+import path from 'path';
 import { randomBytes } from 'tweetnacl';
 
 import { Crust } from '@skyekiwi/crust-network';
@@ -17,8 +18,8 @@ import { Driver } from '.';
 // eslint-disable-next-line
 require('dotenv').config();
 
-const filePath = '/tmp/file.file';
-const downstreamPath1 = '/tmp/down1.file';
+const filePath = path.join(__dirname, '../mock/file.file');
+const downstreamPath = path.join(__dirname, '../mock/down.file');
 
 describe('@skyekiwi/driver', function () {
   const content = randomBytes(1200000);
@@ -67,7 +68,7 @@ describe('@skyekiwi/driver', function () {
   });
 
   it('downstream', async () => {
-    const stream = fs.createWriteStream(downstreamPath1, { flags: 'a' });
+    const stream = fs.createWriteStream(downstreamPath, { flags: 'a' });
     const sealer = new DefaultSealer();
 
     sealer.unlock(mnemonicToMiniSecret(mnemonic));
@@ -76,7 +77,7 @@ describe('@skyekiwi/driver', function () {
       vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
     );
 
-    const downstreamContent = fs.readFileSync(downstreamPath1);
+    const downstreamContent = fs.readFileSync(downstreamPath);
 
     console.log(downstreamContent.length);
     console.log(Buffer.from(content).length);
@@ -159,7 +160,7 @@ const cleanup = async () => {
 
   try {
     await unlink(filePath);
-    await unlink(downstreamPath1);
+    await unlink(downstreamPath);
   } catch (err) {
     // pass
   }
