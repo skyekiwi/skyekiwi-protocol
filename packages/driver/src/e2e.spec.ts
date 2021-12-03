@@ -19,7 +19,6 @@ require('dotenv').config();
 
 const filePath = '/tmp/file.file';
 const downstreamPath1 = '/tmp/down1.file';
-const downstreamPath2 = '/tmp/down2.file';
 
 describe('@skyekiwi/driver', function () {
   const content = randomBytes(1200000);
@@ -78,6 +77,9 @@ describe('@skyekiwi/driver', function () {
     );
 
     const downstreamContent = fs.readFileSync(downstreamPath1);
+
+    console.log(downstreamContent.length);
+    console.log(Buffer.from(content).length);
 
     expect(Buffer.compare(
       downstreamContent,
@@ -158,7 +160,6 @@ const cleanup = async () => {
   try {
     await unlink(filePath);
     await unlink(downstreamPath1);
-    await unlink(downstreamPath2);
   } catch (err) {
     // pass
   }
