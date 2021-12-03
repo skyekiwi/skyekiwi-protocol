@@ -11,9 +11,9 @@ module.exports = Object.assign({}, config, {
     '@skyekiwi/file(.*)$': '<rootDir>/packages/file/src/$1',
     '@skyekiwi/ipfs(.*)$': '<rootDir>/packages/ipfs/src/$1',
     '@skyekiwi/metadata(.*)$': '<rootDir>/packages/metadata/src/$1',
+    '@skyekiwi/s-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1',
     '@skyekiwi/util(.*)$': '<rootDir>/packages/util/src/$1',
-    '@skyekiwi/wasm-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1',
-    '@skyekiwi/s-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1'
+    '@skyekiwi/wasm-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1'
   },
   modulePathIgnorePatterns: [
     '<rootDir>/packages/crust-network/build',

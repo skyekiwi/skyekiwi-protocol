@@ -28,7 +28,7 @@ describe('@skyekiwi/metadata', function () {
     expect(recovered.chunkCID).toEqual('QmZMpQ8K7Tp1Uwae8SXi3ZJqJDES8JGBiMmNWV2iRatwbW');
     expect(recovered.hash).toEqual(hash);
     expect(recovered.sealingKey).toEqual(slk);
-    expect(recovered.version).toEqual(Uint8Array.from([0x0, 0x0, 0x0, 0x1]));
+    expect(recovered.version).toEqual(Uint8Array.from([0x0, 0x0, 0x1, 0x0]));
   });
 });
 
