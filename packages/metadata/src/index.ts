@@ -11,7 +11,7 @@ import { IPFS } from '@skyekiwi/ipfs';
 import { hexToU8a, stringToU8a, trimEnding, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 // version code in Uint8Array
-export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 0, 1]);
+export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 1, 0]);
 
 export class Metadata {
   #sealingKey: Uint8Array;
