@@ -2948,7 +2948,7 @@ __metadata:
     "@polkadot/util-crypto": ^7.4.1
     "@skyekiwi/crust-network": 0.3.2-10
     "@skyekiwi/crypto": 0.3.2-10
-    "@skyekiwi/file": "workspace:packages/file"
+    "@skyekiwi/file": 0.3.2-10
     "@skyekiwi/ipfs": 0.3.2-10
     "@skyekiwi/metadata": 0.3.2-10
     "@skyekiwi/util": 0.3.2-10

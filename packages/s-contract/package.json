@@ -1,0 +1,35 @@
+{
+  "name": "@skyekiwi/s-contract",
+  "version": "0.3.2-10",
+  "type": "module",
+  "description": "core driver of the SkyeKiwi Protocol client lib for @skyekiwi",
+  "main": "index.js",
+  "sideEffects": [
+    "./detectPackage.js",
+    "./detectPackage.cjs"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "maintainers": [],
+  "contributors": [],
+  "author": "SkyeKiwi <hello@skye.kiwi>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
+  },
+  "dependencies": {
+    "@skyekiwi/crust-network": "0.3.2-10",
+    "@skyekiwi/crypto": "0.3.2-10",
+    "@skyekiwi/file": "0.3.2-10",
+    "@skyekiwi/ipfs": "0.3.2-10",
+    "@skyekiwi/metadata": "0.3.2-10",
+    "@skyekiwi/util": "0.3.2-10",
+    "@skyekiwi/wasm-contract": "0.3.2-10"
+  },
+  "devDependencies": {
+    "@polkadot/util-crypto": "^7.4.1",
+    "dotenv": "^10.0.0"
+  }
+}
