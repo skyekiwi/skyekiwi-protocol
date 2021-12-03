@@ -45,7 +45,7 @@ const u8aToString = (u8a: Uint8Array): string => {
   return (new TextDecoder('utf-8')).decode(u8a);
 };
 
-const isValidSubstrateAddress = (address: string) => {
+const isValidSubstrateAddress = (address: string): boolean => {
   try {
     encodeAddress(
       isValidHex(address)
