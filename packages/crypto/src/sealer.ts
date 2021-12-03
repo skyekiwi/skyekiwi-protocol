@@ -39,7 +39,7 @@ export class DefaultSealer implements Sealer {
 
       if (result) return result;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       // pass
     }
 
