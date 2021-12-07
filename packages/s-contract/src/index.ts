@@ -1,11 +1,107 @@
 // Copyright 2021 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Queue } from './queue';
-import { State } from './state';
+import type { SContractConfiguration } from './types';
 
-export { Queue, State };
+import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
+import fs from 'fs';
 
-export class SContract {
+import { Crust } from '@skyekiwi/crust-network';
+import { DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
+import { Driver } from '@skyekiwi/driver';
+import { File } from '@skyekiwi/file';
+import { IPFS } from '@skyekiwi/ipfs';
+import { indexToString } from '@skyekiwi/util';
+import { WASMContract } from '@skyekiwi/wasm-contract';
 
+import abi from '../fixtures/skyekiwi';
+import types from '../fixtures/types';
+import { SContract } from './scontract';
+
+export { SContract };
+
+/* eslint-disable */
+require('dotenv').config();
+/* eslint-enable */
+
+export class SContractExecutor {
+  public static async initialize (config: SContractConfiguration, secretId: number, wasmBlobCID: string): Promise<SContract> {
+    if (!process.env.SEED_PHRASE) {
+      throw new Error('seed phrase not found, aborting - s-contract/initialize');
+    }
+
+    const contractId = indexToString(secretId);
+
+    const outputPath = `${config.localStoragePath}`;
+    const sealer = new DefaultSealer();
+    const registry = new WASMContract(process.env.SEED_PHRASE, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
+
+    sealer.unlock(mnemonicToMiniSecret(process.env.SEED_PHRASE));
+
+    await Driver.downstream(
+      secretId, [mnemonicToMiniSecret(process.env.SEED_PHRASE)], registry,
+      fs.createWriteStream(outputPath + `${contractId}.contract`), sealer
+    );
+
+    const ipfs = new IPFS();
+    const wasmBlob = await ipfs.cat(wasmBlobCID);
+    const wasmPath = outputPath + `${contractId}.wasm`;
+
+    await File.writeFile(Buffer.from(wasmBlob), wasmPath, 'w');
+
+    const sContract = new SContract(new File({
+      fileName: contractId,
+      readStream: fs.createReadStream(outputPath + `${contractId}.contract`)
+    }), sealer);
+
+    await sContract.init();
+
+    return sContract;
+  }
+
+  // public static async execute (): Promise<void> {
+
+  // }
+
+  public static async rollup (config: SContractConfiguration, instance: SContract): Promise<number> {
+    if (!process.env.SEED_PHRASE) {
+      throw new Error('seed phrase not found, aborting - s-contract/initialize');
+    }
+
+    const outputPath = `${config.localStoragePath}`;
+    const contractId = instance.getContractId();
+
+    const sealer = new DefaultSealer();
+    const registry = new WASMContract(process.env.SEED_PHRASE, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
+
+    sealer.unlock(mnemonicToMiniSecret(process.env.SEED_PHRASE));
+
+    await instance.writeToFile(outputPath + `${contractId}.contract`);
+
+    const contractFile = new File({
+      fileName: instance.getContractId(),
+      readStream: fs.createReadStream(outputPath + `${contractId}.contract`)
+    });
+
+    const encryptionSchema = new EncryptionSchema({
+      author: sealer.getAuthorKey(),
+      numOfShares: 2,
+      threshold: 2,
+      unencryptedPieceCount: 0
+    });
+
+    encryptionSchema.addMember(sealer.getAuthorKey(), 2);
+    const storage = new Crust(process.env.SEED_PHRASE);
+
+    const result = await Driver.upstream(contractFile, sealer, encryptionSchema, storage, registry);
+
+    /* eslint-disable */
+    // @ts-ignore
+    return result['ok']
+    /* eslint-enable */
+  }
+
+  // public static async rolldown (): Promise<void> {
+
+  // }
 }

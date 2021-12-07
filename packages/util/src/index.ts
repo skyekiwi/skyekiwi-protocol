@@ -3,4 +3,4 @@
 
 export { getLogger } from './logger';
 export { sendTx } from './sendTx';
-export { hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64, isValidSubstrateAddress } from './util';
+export { stringToIndex, indexToString, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64, isValidSubstrateAddress } from './util';
