@@ -2934,6 +2934,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@skyekiwi/s-contract-host@workspace:packages/s-contract-host":
+  version: 0.0.0-use.local
+  resolution: "@skyekiwi/s-contract-host@workspace:packages/s-contract-host"
+  dependencies:
+    "@polkadot/util-crypto": ^7.4.1
+    "@skyekiwi/crust-network": 0.4.1
+    "@skyekiwi/crypto": 0.4.1
+    "@skyekiwi/file": 0.4.1
+    "@skyekiwi/ipfs": 0.4.1
+    "@skyekiwi/metadata": 0.4.1
+    "@skyekiwi/s-contract": "workspace:packages/s-contract"
+    "@skyekiwi/util": 0.4.1
+    "@skyekiwi/wasm-contract": 0.4.1
+    dotenv: ^10.0.0
+    tweetnacl: ^1.0.3
+  languageName: unknown
+  linkType: soft
+
 "@skyekiwi/s-contract@workspace:packages/s-contract":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/s-contract@workspace:packages/s-contract"

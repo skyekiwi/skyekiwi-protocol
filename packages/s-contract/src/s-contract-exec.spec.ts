@@ -8,6 +8,7 @@ import path from 'path';
 
 import { DefaultSealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
+import { indexToString } from '@skyekiwi/util';
 
 import { SContract, SContractExecutor } from '.';
 // import { mnemonicGenerate } from '@polkadot/util-crypto';
@@ -26,13 +27,10 @@ describe('@skyekiwi/s-contract', function () {
     });
 
     const sContract = new SContract(contractFile, new DefaultSealer());
-
     await sContract.init();
 
     const id = await SContractExecutor.rollup(config, sContract);
-
-    const instance = await SContractExecutor.initialize(config, id, 'QmfRE8M9X3iiJzvVrsHUyDrYywsspgRCqVj9CNS3sqspqx');
-
+    const instance = await SContractExecutor.initialize(config, indexToString(id), 'QmfRE8M9X3iiJzvVrsHUyDrYywsspgRCqVj9CNS3sqspqx');
     await instance.init();
 
     console.log(instance.readContract());

@@ -23,9 +23,9 @@ module.exports = Object.assign({}, config, {
     '<rootDir>/packages/file/build',
     '<rootDir>/packages/ipfs/build',
     '<rootDir>/packages/metadata/build',
+    '<rootDir>/packages/s-contract/build',
     '<rootDir>/packages/util/build',
     '<rootDir>/packages/wasm/build',
-    '<rootDir>/packages/s-contract/build'
   ],
   testTimeout: 3_000_000,
   transformIgnorePatterns: [

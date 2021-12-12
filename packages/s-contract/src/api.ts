@@ -18,14 +18,12 @@ import abi from '../fixtures/skyekiwi';
 import types from '../fixtures/types';
 import { SContract } from './scontract';
 
-export { SContract };
-
 /* eslint-disable */
 require('dotenv').config();
 /* eslint-enable */
 
 export class SContractAPIs {
-  public static async initialize (config: SContractConfiguration, contractId: string, wasmBlobCID: string): Promise<SContract> {
+  public static async initialize(config: SContractConfiguration, contractId: string, wasmBlobCID: string): Promise<SContract> {
     if (!process.env.SEED_PHRASE) {
       throw new Error('seed phrase not found, aborting - s-contract/initialize');
     }
@@ -39,7 +37,7 @@ export class SContractAPIs {
     await Driver.downstream(
       stringToIndex(contractId), [mnemonicToMiniSecret(process.env.SEED_PHRASE)], registry,
       fs.createWriteStream(outputPath + `${contractId}.contract`), sealer
-  );
+    );
 
     const ipfs = new IPFS();
     const wasmBlob = await ipfs.cat(wasmBlobCID);
@@ -57,7 +55,7 @@ export class SContractAPIs {
     return sContract;
   }
 
-  public static async rollup (config: SContractConfiguration, instance: SContract): Promise<number> {
+  public static async rollup(config: SContractConfiguration, instance: SContract): Promise<number> {
     if (!process.env.SEED_PHRASE) {
       throw new Error('seed phrase not found, aborting - s-contract/initialize');
     }

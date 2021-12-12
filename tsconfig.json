@@ -20,6 +20,8 @@
       "@skyekiwi/ipfs/*": [ "packages/ipfs/src/*" ],
       "@skyekiwi/metadata": [ "packages/metadata/src" ],
       "@skyekiwi/metadata/*": [ "packages/metadata/src/*" ],
+      "@skyekiwi/s-contract": [ "packages/s-contract/src" ],
+      "@skyekiwi/s-contract/*": [ "packages/s-contract/src/*" ],
       "@skyekiwi/util": [ "packages/util/src" ],
       "@skyekiwi/util/*": [ "packages/util/src/*" ],
       "@skyekiwi/wasm-contract": [ "packages/wasm-contract/src" ],

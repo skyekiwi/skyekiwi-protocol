@@ -3,6 +3,7 @@
 
 export type Call = {
   callIndex: number,
+  contractId: string,
   encrypted: boolean,
   methodName: string,
   origin: string,
@@ -24,4 +25,9 @@ export type Contract = {
   lastSyncedCallIndex: number,
   state: string,
   wasmPath: string
+}
+
+export type InitializeContractCall = {
+  contractId: string,
+  latestCallIndex: string
 }
