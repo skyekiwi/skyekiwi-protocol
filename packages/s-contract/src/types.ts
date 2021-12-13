@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export type Call = {
-  callIndex: number,
+  callIndex: string,
   contractId: string,
   encrypted: boolean,
   methodName: string,
@@ -22,12 +22,34 @@ export type SContractConfiguration = {
 export type Contract = {
   auth: Authentication[],
   contractId: string,
-  lastSyncedCallIndex: number,
+  highLocalCallIndex: string,
   state: string,
   wasmPath: string
 }
 
-export type InitializeContractCall = {
+ //// REQUESTS
+export type RequestInitializeContract = {
   contractId: string,
-  latestCallIndex: string
+  highRemoteCallIndex: string
+}
+
+export type RequestWriteNewAuthentication = {
+  contractId: string,
+  authentication: Authentication
+}
+
+export type RequestRollup = {
+  contractId: string,
+  highLocalCallIndex: string,
+  highRemoteCallIndex: string
+}
+
+export type RequestRolldown = {
+  contractId: string,
+  highLocalCallIndex: string,
+  highRemoteCallIndex: string
+}
+
+export type RequestDispatch = {
+  calls: Call[]
 }

@@ -171,6 +171,10 @@ export class SContract {
     this.#sealer.unlock(mnemonicToMiniSecret(seed));
   }
 
+  public getHighLocalCallIndex(): string {
+    return this.#contract.highLocalCallIndex;
+  }
+  
   public readContract (): Contract {
     console.log(this.#contract);
 

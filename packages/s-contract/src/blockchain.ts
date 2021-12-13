@@ -1,7 +1,7 @@
 // Copyright 2021 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Call, InitializeContractCall } from './types';
+import type { Call, RequestDispatch, RequestInitializeContract,  } from './types';
 
 import { randomBytes } from 'tweetnacl';
 import { indexToString, u8aToHex } from '@skyekiwi/util';
@@ -21,9 +21,13 @@ export const accounts = [
 
 export class MockBlockchainEnv {
 
+  // Map contractId -> nextCallIndex(as number)
   #nextCallIndex: { [key: string]: number }
+  
+  // num of blocks to mock
+  #blockNum: number
 
-  constructor() {
+  constructor(blockNum: number) {
     this.#nextCallIndex = {}
   }
 
@@ -40,7 +44,7 @@ export class MockBlockchainEnv {
       const methodName = (parseInt(Math.random() * 10 + '') % 4 === 0) ? 'get_greeting' : 'set_greeting'
 
       calls.push({
-        callIndex: callIndex++,
+        callIndex: indexToString(callIndex++),
         contractId: contractId,
         encrypted: encrypted,
         methodName: methodName,
@@ -56,16 +60,25 @@ export class MockBlockchainEnv {
   public spawnNewContractReq(callback: Function, contractId: string): void {
     callback({
       contractId: contractId,
-      latestCallIndex: indexToString(0)
-    } as InitializeContractCall)
+      highRemoteCallIndex: indexToString(0)
+    } as RequestInitializeContract)
   }
 
   public spawnBlocks(callback: Function): void {
     // const contractIds = ['0x0001b4'];
     const contractId = '0x0001b4';
 
+    let num = 0;
     setInterval(() => {
-      callback(this.spanwCalls(contractId), 'execution')
+      if (num > this.#blockNum) {
+        return;
+      }
+      num ++;
+      callback(
+        {
+          calls: this.spanwCalls(contractId)
+        } as RequestDispatch
+      )
     }, 600)
   }
 }

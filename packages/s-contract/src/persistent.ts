@@ -22,7 +22,7 @@ import { SContract } from './scontract';
 require('dotenv').config();
 /* eslint-enable */
 
-export class SContractAPIs {
+export class SContractPersistent {
   public static async initialize(config: SContractConfiguration, contractId: string, wasmBlobCID: string): Promise<SContract> {
     if (!process.env.SEED_PHRASE) {
       throw new Error('seed phrase not found, aborting - s-contract/initialize');
