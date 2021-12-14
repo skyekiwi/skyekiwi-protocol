@@ -1,7 +1,7 @@
 // Copyright 2021 @skyekiwi/driver authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SContractConfiguration } from './types';
+import type { SContractConfiguration } from '../types';
 
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +10,7 @@ import { DefaultSealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 import { indexToString } from '@skyekiwi/util';
 
-import { SContract, SContractExecutor } from '.';
+import { SContractReader, SContractPersistent } from '..';
 // import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const contractPath = path.join(__dirname, '../mock/contract');
@@ -26,11 +26,13 @@ describe('@skyekiwi/s-contract', function () {
       readStream: fs.createReadStream(contractPath)
     });
 
-    const sContract = new SContract(contractFile, new DefaultSealer());
+    const sContract = new SContractReader(contractFile, new DefaultSealer());
+
     await sContract.init();
 
-    const id = await SContractExecutor.rollup(config, sContract);
-    const instance = await SContractExecutor.initialize(config, indexToString(id), 'QmfRE8M9X3iiJzvVrsHUyDrYywsspgRCqVj9CNS3sqspqx');
+    const id = await SContractPersistent.rollup(config, sContract);
+    const instance = await SContractPersistent.initialize(config, indexToString(id), 'QmfRE8M9X3iiJzvVrsHUyDrYywsspgRCqVj9CNS3sqspqx');
+
     await instance.init();
 
     console.log(instance.readContract());

@@ -26,10 +26,12 @@
     "@skyekiwi/ipfs": "0.4.1",
     "@skyekiwi/metadata": "0.4.1",
     "@skyekiwi/util": "0.4.1",
-    "@skyekiwi/wasm-contract": "0.4.1"
+    "@skyekiwi/wasm-contract": "0.4.1",
+    "threads": "^1.7.0"
   },
   "devDependencies": {
     "@polkadot/util-crypto": "^7.4.1",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "ts-node": "^10.4.0"
   }
 }

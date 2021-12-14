@@ -3,94 +3,84 @@
 
 import type { RequestDispatch, RequestInitializeContract, RequestRolldown } from './types';
 
-import { getLogger, stringToIndex } from '@skyekiwi/util';
+import { getLogger } from '@skyekiwi/util';
+import { spawn, Worker, Pool } from 'threads'
 
-import {SContract} from './scontract';
 import { MockBlockchainEnv } from './blockchain';
-import { SContractQueue } from './queue';
-import { SContractPersistent } from './persistent'
-import { SContractExecutor } from './executor';
-import configuration from './config';
-
 const contractId = '0x0001b4';
 
 // Host filter incoming calls and route accordingly
 export class SContractHost {
+  #instances: { [key: string]: any }
+  #tasks: { [key: string]: any}
 
-  #instances: { [key: string]: SContract };
-  #queue: { [key: string]: SContractQueue };
-  #executor: {[key: string]: SContractExecutor };
-
-  constructor() {
-    this.#instances = {}
-    this.#queue = {}
-    this.#executor = {}
+  constructor () {
+    this.#instances = {};
+    this.#tasks = {}
   }
 
-  public mockMainLoop(blockNum: number): void {
-    const logger = getLogger(`SContractHost.mockMainLoop`);
+  public mockMainLoop (blockNum: number): void {
+    const logger = getLogger('SContractHost.mockMainLoop');
 
     const mock = new MockBlockchainEnv(blockNum);
-
-    logger.info(`one new contract request`)
     try {
-      mock.spawnNewContractReq(this.subscribeInitializeContracts, contractId);
-      // mock.spawnBlocks(this.subscribeDispatch);
-    } catch(err) {
-      logger.error(err)
+      mock.spawnNewContractReq(this.subscribeInitializeContracts.bind(this), contractId);
+      mock.spawnBlocks(this.subscribeDispatch.bind(this));
+    } catch (err) {
+      logger.error(err);
     }
+
+    setInterval(async () => {
+      for (const contractId in this.#tasks) {
+        await Promise.all(this.#tasks[contractId]);
+      }
+    }, 6000)
   }
 
-  public async subscribeInitializeContracts(request: RequestInitializeContract): Promise<void> {
-    const logger = getLogger("SContractHost.subscribeInitializeContracts");
-
-    const {contractId, highRemoteCallIndex} = request;
+  public subscribeInitializeContracts (request: RequestInitializeContract): void {
+    const logger = getLogger('SContractHost.subscribeInitializeContracts');
+    const { contractId } = request;
 
     // 1. filter
-    if (this.#instances[contractId]) {
-      logger.info(`Request for initialize new contract ${contractId} receiverd, but the contract is already initialized. Passing`)
-      // pass 
-      return
+    if (this.#instances.hasOwnProperty(contractId) && this.#tasks.hasOwnProperty(contractId)) {
+      logger.info(`Request for initialize new contract ${contractId} receiverd, but the contract is already initialized. Passing`);
+      // pass
+    } else {
+      const pool = Pool(() => spawn(new Worker('./worker')), 1);
+      this.#tasks[contractId] = [];
+      this.#instances[contractId] = pool;
+      logger.info(`pushing the task to the tasks queue ${request} `)
+      this.#tasks[contractId].push(pool.queue(async enclaveMock => {
+        await enclaveMock.initialzeContract(request);
+      }));
     }
-
-    const instance = await SContractPersistent.initialize(
-      configuration, contractId, 'QmfRE8M9X3iiJzvVrsHUyDrYywsspgRCqVj9CNS3sqspqx')
-
-    this.#instances[contractId] = instance;
-    
-    const highLocalCallIndex = instance.getHighLocalCallIndex();
-    if (stringToIndex(highLocalCallIndex) < stringToIndex(highRemoteCallIndex)) {
-      logger.info(`local callIndex ${highLocalCallIndex} is lower than the remote callIndex ${highRemoteCallIndex}, initialize rolldown request`);
-      this.subscribeRolldown({
-        contractId: contractId,
-        highLocalCallIndex: highLocalCallIndex,
-        highRemoteCallIndex: highRemoteCallIndex
-      } as RequestRolldown)
-    }
-
-    this.#queue[contractId] = new SContractQueue(instance, highRemoteCallIndex);
-    this.#executor[contractId] = new SContractExecutor(this.#queue[contractId]);
   }
 
-  public async subscribeDispatch(request: RequestDispatch): Promise<void> {
-    const {calls} = request;
-    const logger = getLogger("SContractHost.subscribeDispatch");
+  public subscribeDispatch (request: RequestDispatch): void {
+    const { calls } = request;
+    const logger = getLogger('SContractHost.subscribeDispatch');
 
     for (const call of calls) {
       const currentContractId = call.contractId;
-      if (!this.#instances[currentContractId]) {
+
+      if (!(this.#instances.hasOwnProperty(contractId) && this.#tasks.hasOwnProperty(contractId))) {
         logger.warn(`local contract ${currentContractId} not initialized!`);
         // pass
+      } else {
+        this.#tasks[currentContractId].push(
+          // @ts-ignore
+          this.#instances[currentContractId].queue(async enclaveMock => {
+            await enclaveMock.dispatchCall(call);
+          })
+        )
       }
-      this.#queue[currentContractId].newCall(call);
-      await this.#executor[currentContractId].dispatch();
     }
   }
 
-  public async subscribeRolldown(request: RequestRolldown): Promise<void> {
-    const {contractId, highRemoteCallIndex, highLocalCallIndex} = request;
-    const logger = getLogger("SContractHost.subscribeRolldown");
+  public async subscribeRolldown (request: RequestRolldown): Promise<void> {
+    const { contractId, highLocalCallIndex, highRemoteCallIndex } = request;
+    const logger = getLogger('SContractHost.subscribeRolldown');
 
-    logger.info(`should rolldown ${contractId}, from ${highLocalCallIndex} to ${highRemoteCallIndex}`)
+    logger.info(`should rolldown ${contractId}, from ${highLocalCallIndex} to ${highRemoteCallIndex}`);
   }
 }

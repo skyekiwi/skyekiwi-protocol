@@ -7,7 +7,7 @@ import path from 'path';
 import { DefaultSealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 
-import { SContract } from '.';
+import { SContractReader } from '..';
 // import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const contractPath = path.join(__dirname, '../mock/contract');
@@ -35,7 +35,7 @@ describe('@skyekiwi/s-contract', function () {
 
     // sContract.forceInject(seed, contract)
 
-    const sContract = new SContract(new File({
+    const sContract = new SContractReader(new File({
       fileName: 'contract',
       readStream: fs.createReadStream(contractPath)
     }), sealer);

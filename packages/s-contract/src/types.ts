@@ -27,15 +27,16 @@ export type Contract = {
   wasmPath: string
 }
 
- //// REQUESTS
+/// REQUESTS
 export type RequestInitializeContract = {
   contractId: string,
-  highRemoteCallIndex: string
+  highRemoteCallIndex: string,
+  wasmBlob: string
 }
 
 export type RequestWriteNewAuthentication = {
-  contractId: string,
-  authentication: Authentication
+  authentication: Authentication,
+  contractId: string
 }
 
 export type RequestRollup = {

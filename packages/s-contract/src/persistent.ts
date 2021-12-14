@@ -16,14 +16,14 @@ import { WASMContract } from '@skyekiwi/wasm-contract';
 
 import abi from '../fixtures/skyekiwi';
 import types from '../fixtures/types';
-import { SContract } from './scontract';
+import { SContractReader } from './reader';
 
 /* eslint-disable */
 require('dotenv').config();
 /* eslint-enable */
 
 export class SContractPersistent {
-  public static async initialize(config: SContractConfiguration, contractId: string, wasmBlobCID: string): Promise<SContract> {
+  public static async initialize (config: SContractConfiguration, contractId: string, wasmBlobCID: string): Promise<SContractReader> {
     if (!process.env.SEED_PHRASE) {
       throw new Error('seed phrase not found, aborting - s-contract/initialize');
     }
@@ -45,7 +45,7 @@ export class SContractPersistent {
 
     await File.writeFile(Buffer.from(wasmBlob), wasmPath, 'w');
 
-    const sContract = new SContract(new File({
+    const sContract = new SContractReader(new File({
       fileName: contractId,
       readStream: fs.createReadStream(outputPath + `${contractId}.contract`)
     }), sealer);
@@ -55,7 +55,7 @@ export class SContractPersistent {
     return sContract;
   }
 
-  public static async rollup(config: SContractConfiguration, instance: SContract): Promise<number> {
+  public static async rollup (config: SContractConfiguration, instance: SContractReader): Promise<number> {
     if (!process.env.SEED_PHRASE) {
       throw new Error('seed phrase not found, aborting - s-contract/initialize');
     }

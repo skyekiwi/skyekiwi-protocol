@@ -7,9 +7,9 @@ import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
 
 import { Sealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
-import { fromBase64, hexToU8a, indexToString, isValidHex, isValidSubstrateAddress, stringToIndex, stringToU8a, toBase64, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { fromBase64, hexToU8a, indexToString, isValidHex, isValidSubstrateAddress, stringToU8a, toBase64, u8aToHex, u8aToString } from '@skyekiwi/util';
 
-export class SContract {
+export class SContractReader {
   #file: File
   #sealer: Sealer
   #contract: Contract
@@ -55,11 +55,12 @@ export class SContract {
     const oneCall = callContent.split('?');
 
     return {
-      callIndex: Number(callIndex),
+      callIndex: callIndex,
+      contractId: oneCall[0],
       encrypted: encrypted,
-      methodName: fromBase64(oneCall[0]),
-      origin: fromBase64(oneCall[1]),
-      parameters: fromBase64(oneCall[2])
+      methodName: fromBase64(oneCall[1]),
+      origin: fromBase64(oneCall[2]),
+      parameters: fromBase64(oneCall[3])
     } as Call;
   }
 
@@ -76,13 +77,13 @@ export class SContract {
       throw new Error('origin must be a valid Substrate address - calls/encodeCall');
     }
 
-    let callString = `${toBase64(call.methodName)}?${toBase64(call.origin)}?${toBase64(call.parameters)}`;
+    let callString = `${call.contractId}?${toBase64(call.methodName)}?${toBase64(call.origin)}?${toBase64(call.parameters)}`;
 
     if (call.encrypted) {
       callString = u8aToHex(this.#sealer.encrypt(stringToU8a(callString), this.#sealer.getAuthorKey()));
     }
 
-    return '0x' + call.callIndex.toString(16).padStart(6, '0') + '?' + callString;
+    return call.callIndex + '?' + callString;
   }
 
   public encodeAuth (auth: Authentication): string {
@@ -117,7 +118,7 @@ export class SContract {
     const seed = contract[1];
 
     const auths = contract[2].split('|').map(this.decodeAuth);
-    const lastSyncedCallIndex = stringToIndex(contract[3]);
+    const highLocalCallIndex = contract[3];
 
     const state = contract[4];
     const wasmPath = contract[5];
@@ -128,7 +129,7 @@ export class SContract {
     return {
       auth: auths,
       contractId: contractId,
-      lastSyncedCallIndex: lastSyncedCallIndex,
+      highLocalCallIndex: highLocalCallIndex,
       state: state,
       wasmPath: wasmPath
     };
@@ -171,10 +172,10 @@ export class SContract {
     this.#sealer.unlock(mnemonicToMiniSecret(seed));
   }
 
-  public getHighLocalCallIndex(): string {
+  public getHighLocalCallIndex (): string {
     return this.#contract.highLocalCallIndex;
   }
-  
+
   public readContract (): Contract {
     console.log(this.#contract);
 

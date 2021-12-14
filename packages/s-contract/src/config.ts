@@ -5,4 +5,4 @@ import type { SContractConfiguration } from './types';
 
 export default {
   localStoragePath: '../mock/'
-} as SContractConfiguration
+} as SContractConfiguration;
