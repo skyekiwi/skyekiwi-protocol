@@ -1,11 +1,9 @@
 // Copyright 2021 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Queue } from './queue';
-import { State } from './state';
+import { mockAccounts, MockBlockchainEnv } from './blockchain';
+import { SContractPersistent } from './persistent';
+import { SContractReader } from './reader';
 
-export { Queue, State };
-
-export class SContract {
-
-}
+export { SContractPersistent, SContractReader };
+export { MockBlockchainEnv, mockAccounts };

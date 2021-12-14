@@ -34,10 +34,10 @@ describe('@skyekiwi/driver', function () {
   const storage = new Crust(mnemonic);
   const registry = new WASMContract(mnemonic, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
 
-  afterAll(async () => {
-    await storage.disconnect();
-    await registry.disconnect();
-  });
+  // afterAll(async () => {
+  //   await storage.disconnect();
+  //   await registry.disconnect();
+  // });
 
   it('upstream', async () => {
     const file = await setup(content);

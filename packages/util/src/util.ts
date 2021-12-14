@@ -45,6 +45,14 @@ const u8aToString = (u8a: Uint8Array): string => {
   return (new TextDecoder('utf-8')).decode(u8a);
 };
 
+const indexToString = (index: number): string => {
+  return '0x' + index.toString(16).padStart(6, '0');
+};
+
+const stringToIndex = (index: string): number => {
+  return Number(index);
+};
+
 const isValidSubstrateAddress = (address: string): boolean => {
   try {
     encodeAddress(
@@ -59,4 +67,4 @@ const isValidSubstrateAddress = (address: string): boolean => {
   }
 };
 
-export { isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64 };
+export { stringToIndex, indexToString, isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64 };
