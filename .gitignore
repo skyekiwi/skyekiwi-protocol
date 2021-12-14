@@ -27,4 +27,5 @@ store.db
 store.db.compacted
 .idea
 .vscode
-downstreamed/
+**.contract
+**.wasm
