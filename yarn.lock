@@ -2793,6 +2793,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@skyekiwi/crust-network@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/crust-network@npm:0.4.1"
+  dependencies:
+    "@babel/runtime": ^7.15.3
+    "@crustio/type-definitions": ^1.2.0
+    "@polkadot/api": ^6.0.5
+    "@polkadot/keyring": ^7.4.1
+    "@polkadot/wasm-crypto": ^4.2.1
+    "@skyekiwi/ipfs": 0.4.1
+    "@skyekiwi/util": 0.4.1
+  checksum: b1eeca89fe8c436b8c650b382f78c019301d894b5f85d2fdfe769179363f5acd077b9e8ec6034b84cf976f066a8998c2f16bf270f2690b3833a6e1c11455f21e
+  languageName: node
+  linkType: hard
+
 "@skyekiwi/crypto@0.5.1, @skyekiwi/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
@@ -2804,6 +2819,19 @@ __metadata:
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
+
+"@skyekiwi/crypto@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/crypto@npm:0.4.1"
+  dependencies:
+    "@skyekiwi/metadata": 0.4.1
+    "@skyekiwi/secrets": ^2.0.1
+    "@skyekiwi/util": 0.4.1
+    ethers: ^5.4.6
+    tweetnacl: ^1.0.3
+  checksum: 849de208f24c3e634cc7b86caa657e4983239b676d791e7264faa135524fd16aa4ec4b0f0d8ddae6bdfadb163348f4f7229eff492c77a974e762b05a1bbb09b3
+  languageName: node
+  linkType: hard
 
 "@skyekiwi/dev@npm:^0.3.1":
   version: 0.3.1
@@ -2927,6 +2955,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@skyekiwi/file@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/file@npm:0.4.1"
+  dependencies:
+    file-saver: ^2.0.5
+    pako: ^2.0.4
+  checksum: a08c8aee1d19492f3f2dc0fbc891624f57df05dbc3e9e23b16fd432070cfb6b8228763628daa75893b9db614e433ee01e8a014a704a19552e7ee009e46f8fa43
+  languageName: node
+  linkType: hard
+
 "@skyekiwi/ipfs@0.5.1, @skyekiwi/ipfs@workspace:packages/ipfs":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
@@ -2937,6 +2975,18 @@ __metadata:
     node-fetch: 2.6.1
   languageName: unknown
   linkType: soft
+
+"@skyekiwi/ipfs@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/ipfs@npm:0.4.1"
+  dependencies:
+    "@skyekiwi/util": 0.4.1
+    got: ^11.8.2
+    ipfs-http-client: 52.0.5
+    node-fetch: 2.6.1
+  checksum: 4747c453db495fea6d2356b278fbd2d12cfa1dbb34f92644bc6a97af8623b0e5e89aa6c65d12bf4fa767ea3f97e5cc24da2eefa512953e5adefd9edc46fb72ad
+  languageName: node
+  linkType: hard
 
 "@skyekiwi/metadata@0.5.1, @skyekiwi/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
@@ -2950,27 +3000,30 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@skyekiwi/metadata@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/metadata@npm:0.4.1"
+  dependencies:
+    "@polkadot/util-crypto": ^7.4.1
+    "@skyekiwi/crypto": 0.4.1
+    "@skyekiwi/ipfs": 0.4.1
+    "@skyekiwi/util": 0.4.1
+    tweetnacl: ^1.0.3
+  checksum: 02becf2c5d6d013ae723f264dd98d6158e1b69d3b9714c408de69785043c102b07be8a9acd3c29214fa902380e5f3ceb2bc4dd22158ac618fa67dfd563b5d7e7
+  languageName: node
+  linkType: hard
+
 "@skyekiwi/s-contract@workspace:packages/s-contract":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/s-contract@workspace:packages/s-contract"
   dependencies:
     "@polkadot/util-crypto": ^7.4.1
-<<<<<<< HEAD
     "@skyekiwi/crust-network": 0.4.1
     "@skyekiwi/crypto": 0.4.1
     "@skyekiwi/file": 0.4.1
     "@skyekiwi/ipfs": 0.4.1
     "@skyekiwi/util": 0.4.1
     "@skyekiwi/wasm-contract": 0.4.1
-=======
-    "@skyekiwi/crust-network": 0.5.1
-    "@skyekiwi/crypto": 0.5.1
-    "@skyekiwi/file": 0.5.1
-    "@skyekiwi/ipfs": 0.5.1
-    "@skyekiwi/metadata": 0.5.1
-    "@skyekiwi/util": 0.5.1
-    "@skyekiwi/wasm-contract": 0.5.1
->>>>>>> 24903a4d175dd5aaa52c451fd2fa09971f4f6e2e
     dotenv: ^10.0.0
   languageName: unknown
   linkType: soft
@@ -2993,6 +3046,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@skyekiwi/util@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/util@npm:0.4.1"
+  dependencies:
+    "@polkadot/api": ^6.0.5
+    "@polkadot/keyring": ^7.4.1
+    pino: ^7.5.1
+    pino-pretty: ^7.2.0
+  checksum: 5926923f62fc87ee5a755d01d77c71f6dcf41648f41564e663d4cd9b12e5ac2956e720f9ab0bcb4b8602b9f765aceb270b4fc6af841d52987c789104bc1c72fe
+  languageName: node
+  linkType: hard
+
 "@skyekiwi/wasm-contract@0.5.1, @skyekiwi/wasm-contract@workspace:packages/wasm-contract":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/wasm-contract@workspace:packages/wasm-contract"
@@ -3005,6 +3070,20 @@ __metadata:
     "@skyekiwi/util": 0.5.1
   languageName: unknown
   linkType: soft
+
+"@skyekiwi/wasm-contract@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@skyekiwi/wasm-contract@npm:0.4.1"
+  dependencies:
+    "@polkadot/api": ^6.0.5
+    "@polkadot/api-contract": ^6.0.5
+    "@polkadot/keyring": ^7.4.1
+    "@polkadot/types": ^6.0.5
+    "@polkadot/wasm-crypto": ^4.2.1
+    "@skyekiwi/util": 0.4.1
+  checksum: 42e0cd8a4980ad044ed5a9117ce32398781e9e4fa3ac8facf2c7e045c840a2fa0cacb66e83e34d0ecf4b4e45262cfaeb63415e369d5d71d72154382d5e221b04
+  languageName: node
+  linkType: hard
 
 "@szmarczak/http-timer@npm:^1.1.2":
   version: 1.1.2
