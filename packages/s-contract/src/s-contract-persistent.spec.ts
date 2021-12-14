@@ -1,7 +1,7 @@
 // Copyright 2021 @skyekiwi/driver authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SContractConfiguration } from '../types';
+import type { SContractConfiguration } from './types';
 
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +10,7 @@ import { DefaultSealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 import { indexToString } from '@skyekiwi/util';
 
-import { SContractReader, SContractPersistent } from '..';
+import { SContractPersistent, SContractReader } from '.';
 // import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const contractPath = path.join(__dirname, '../mock/contract');

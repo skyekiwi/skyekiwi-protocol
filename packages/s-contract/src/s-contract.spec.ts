@@ -7,7 +7,7 @@ import path from 'path';
 import { DefaultSealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 
-import { SContractReader } from '..';
+import { SContractReader } from '.';
 // import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const contractPath = path.join(__dirname, '../mock/contract');

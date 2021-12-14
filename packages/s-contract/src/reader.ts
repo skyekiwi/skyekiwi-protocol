@@ -7,7 +7,7 @@ import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
 
 import { Sealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
-import { fromBase64, hexToU8a, indexToString, isValidHex, isValidSubstrateAddress, stringToU8a, toBase64, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { fromBase64, hexToU8a, isValidHex, isValidSubstrateAddress, stringToU8a, toBase64, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 export class SContractReader {
   #file: File
@@ -107,7 +107,7 @@ export class SContractReader {
 
   public encodeContract (seed: string, contract: Contract): string {
     const authString = contract.auth.map(this.encodeAuth).join('|');
-    const result = `${contract.contractId}*${seed}*${authString}*${indexToString(contract.lastSyncedCallIndex)}*${contract.state}*${contract.wasmPath}`;
+    const result = `${contract.contractId}*${seed}*${authString}*${contract.highLocalCallIndex}*${contract.state}*${contract.wasmPath}`;
 
     return result;
   }
