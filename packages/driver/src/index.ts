@@ -75,6 +75,7 @@ export class Driver {
     if (storageResult) {
       logger.info('writting to registry');
       const res = await registry.execContract('createVault', [result.cid]);
+
       return res;
     } else {
       throw new Error('packaging works well, blockchain network err - Driver.upstream');
