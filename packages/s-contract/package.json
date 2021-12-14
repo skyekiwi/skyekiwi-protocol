@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/s-contract",
-  "version": "0.4.1",
+  "version": "0.5.1",
   "type": "module",
   "description": "secret contract host env based on SkyeKiwi Protocol",
   "main": "src/index.ts",
