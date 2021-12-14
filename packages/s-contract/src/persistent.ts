@@ -52,6 +52,8 @@ export class SContractPersistent {
 
     await sContract.init();
 
+    await registry.disconnect();
+
     return sContract;
   }
 
@@ -87,6 +89,8 @@ export class SContractPersistent {
 
     const result = await Driver.upstream(contractFile, sealer, encryptionSchema, storage, registry);
 
+    await storage.disconnect();
+    await registry.disconnect();
     /* eslint-disable */
     // @ts-ignore
     return result['ok']

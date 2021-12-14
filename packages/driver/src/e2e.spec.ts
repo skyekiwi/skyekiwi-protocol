@@ -11,8 +11,8 @@ import { AsymmetricEncryption, DefaultSealer, EncryptionSchema } from '@skyekiwi
 import { File } from '@skyekiwi/file';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
-import abi from '../mock/skyekiwi.json';
-import types from '../mock/types';
+import abi from '../fixtures/skyekiwi.json';
+import types from '../fixtures/types';
 import { Driver } from '.';
 
 // eslint-disable-next-line
@@ -34,10 +34,10 @@ describe('@skyekiwi/driver', function () {
   const storage = new Crust(mnemonic);
   const registry = new WASMContract(mnemonic, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
 
-  // afterAll(async () => {
-  //   await storage.disconnect();
-  //   await registry.disconnect();
-  // });
+  afterAll(async () => {
+    await storage.disconnect();
+    await registry.disconnect();
+  });
 
   it('upstream', async () => {
     const file = await setup(content);

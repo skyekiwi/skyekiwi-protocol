@@ -75,15 +75,8 @@ export class Driver {
     if (storageResult) {
       logger.info('writting to registry');
       const res = await registry.execContract('createVault', [result.cid]);
-
-      await registry.disconnect();
-      await storage.disconnect();
-
       return res;
     } else {
-      await registry.disconnect();
-      await storage.disconnect();
-
       throw new Error('packaging works well, blockchain network err - Driver.upstream');
     }
   }
@@ -184,8 +177,6 @@ export class Driver {
 
     logger.info('pre-seal data recovered');
 
-    await registry.disconnect();
-
     return unsealed;
   }
 
@@ -218,8 +209,6 @@ export class Driver {
       unsealed.sealingKey,
       writeStream
     );
-
-    await registry.disconnect();
   }
 
   /**
@@ -319,8 +308,6 @@ export class Driver {
     if (storageResult) {
       const res = await registry.execContract('updateMetadata', [vaultId, result.cid]);
 
-      await registry.disconnect();
-
       return res;
     } else {
       throw new Error('packaging works well, blockchain network err - Driver.upstream');
@@ -349,8 +336,6 @@ export class Driver {
     const signer = new EthereumSign();
 
     const res = await signer.generateSignature(preSealData.sealingKey, message);
-
-    await registry.disconnect();
 
     return res;
   }
