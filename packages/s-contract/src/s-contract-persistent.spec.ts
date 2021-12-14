@@ -37,6 +37,7 @@ describe('@skyekiwi/s-contract', function () {
       a: 'hello',
       b: 'hahahah'
     });
+
     instance.writeState(state);
 
     await instance.init();
@@ -44,4 +45,3 @@ describe('@skyekiwi/s-contract', function () {
     expect(instance.readState()).toEqual(state);
   });
 });
-
