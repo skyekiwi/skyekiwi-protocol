@@ -31,7 +31,7 @@ describe('@skyekiwi/s-contract', function () {
     await sContract.init();
 
     const id = await SContractPersistent.rollup(config, sContract);
-    const instance = await SContractPersistent.initialize(config, indexToString(id), 'QmfRE8M9X3iiJzvVrsHUyDrYywsspgRCqVj9CNS3sqspqx');
+    const instance = await SContractPersistent.initialize(config, indexToString(id), 'Qmc8aHYGquRWeheiQ51xP3Z6EsyQWD89XSVTrQRfQWdFcA');
 
     const state = JSON.stringify({
       a: 'hello',
