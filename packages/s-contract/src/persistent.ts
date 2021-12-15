@@ -11,7 +11,7 @@ import { DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
 import { Driver } from '@skyekiwi/driver';
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
-import { stringToIndex } from '@skyekiwi/util';
+import { hexToU8a, stringToIndex } from '@skyekiwi/util';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
 import abi from './fixtures/skyekiwi';
@@ -43,7 +43,7 @@ export class SContractPersistent {
     const wasmBlob = await ipfs.cat(wasmBlobCID);
     const wasmPath = outputPath + `${contractId}.wasm`;
 
-    await File.writeFile(Buffer.from(wasmBlob), wasmPath, 'w');
+    await File.writeFile(Buffer.from(hexToU8a(wasmBlob)), wasmPath, 'w');
 
     const sContract = new SContractReader(new File({
       fileName: contractId,

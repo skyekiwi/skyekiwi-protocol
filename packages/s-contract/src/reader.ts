@@ -26,8 +26,7 @@ export class SContractReader {
 
       this.#contract = this.decodeContract(fromBase64(fullContract));
     } catch (err) {
-      // pass
-      // the log is empty
+      throw new Error('initialization error, file might not be found s-contract/SContractReader/init');
     }
   }
 

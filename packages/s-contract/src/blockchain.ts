@@ -58,30 +58,22 @@ export class MockBlockchainEnv {
     return calls;
   }
 
-  public spawnNewContractReq (callback: (request: RequestInitializeContract) => void, contractId: string): void {
+  public spawnNewContractReq (callback: (request: RequestInitializeContract) => void, contractId: string, wasmBlob: string): void {
     callback({
       contractId: contractId,
-      highRemoteCallIndex: indexToString(0)
+      highRemoteCallIndex: indexToString(0),
+      wasmBlob: wasmBlob
     } as RequestInitializeContract);
   }
 
-  public spawnBlocks (callback: (request: RequestDispatch) => void): void {
-    // const contractIds = ['0x0001b4'];
-    const contractId = '0x0001b4';
-
+  public spawnBlocks (callback: (request: RequestDispatch) => void, contractId: string): void {
     let num = 0;
 
     setInterval(() => {
-      if (num > this.#blockNum) {
-        return;
-      }
+      if (num > this.#blockNum) { return; }
 
+      callback({ calls: this.spanwCalls(contractId) } as RequestDispatch);
       num++;
-      callback(
-        {
-          calls: this.spanwCalls(contractId)
-        } as RequestDispatch
-      );
-    }, 600);
+    }, 6000);
   }
 }
