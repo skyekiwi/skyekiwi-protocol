@@ -14,8 +14,8 @@ import { IPFS } from '@skyekiwi/ipfs';
 import { stringToIndex } from '@skyekiwi/util';
 import { WASMContract } from '@skyekiwi/wasm-contract';
 
-import abi from '../fixtures/skyekiwi';
-import types from '../fixtures/types';
+import abi from './fixtures/skyekiwi';
+import types from './fixtures/types';
 import { SContractReader } from './reader';
 
 /* eslint-disable */
