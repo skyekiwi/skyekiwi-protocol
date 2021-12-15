@@ -19,6 +19,9 @@ export class WASMContract {
 
   #abi: AnyJson
   #address: string
+
+  // eslint-disable-next-line
+  //@ts-ignore
   #contract: ContractPromise
   #provider: WsProvider
 
@@ -91,7 +94,7 @@ export class WASMContract {
       this.#sender = keypair;
       this.#signer = undefined;
       this.#contract = new ContractPromise(
-        this.api, new Abi(this.#abi, this.api.registry.getChainProperties()), this.#address
+        this.api, new Abi(JSON.stringify(this.#abi), this.api.registry.getChainProperties()), this.#address
       );
 
       return true;
@@ -101,7 +104,7 @@ export class WASMContract {
         this.senderAddress = this.#sender as string;
 
         this.#contract = new ContractPromise(
-          this.api, new Abi(this.#abi, this.api.registry.getChainProperties()), this.#address
+          this.api, new Abi(JSON.stringify(this.#abi), this.api.registry.getChainProperties()), this.#address
         );
 
         return true;
@@ -119,8 +122,10 @@ export class WASMContract {
   */
   async execContract (message: string, params: unknown[]): Promise<AnyJson> {
     // "the dirty method" as in https://github.com/patractlabs/redspot/issues/78
+
     const execResult = await this.queryContract(message, params);
 
+    // eslint-disable-next-line
     const extrinsic = this.#contract.tx[message](
       { gasLimit: -1 },
       ...params
@@ -129,7 +134,10 @@ export class WASMContract {
     const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
 
     if (txResult) {
+      /* eslint-disable */
+      //@ts-ignore
       return execResult.output?.toJSON();
+      /* eslint-enable */
     } else { return txResult; }
   }
 
@@ -139,7 +147,7 @@ export class WASMContract {
    * @param {unknown[]} params paramters of the function call
    * @returns {Promise<AnyJson>} result from the blockchain
   */
-  async queryContract (message: string, params: unknown[]) {
+  async queryContract (message: string, params: unknown[]): Promise<AnyJson> {
     // eslint-disable-next-line
     return (await this.#contract.query[message](
       (typeof this.#sender === 'object') ? (this.#sender).address : this.#sender,

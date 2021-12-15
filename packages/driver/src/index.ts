@@ -153,9 +153,11 @@ export class Driver {
 
     // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
-    const contractResult = (await registry
-      .queryContract('getMetadata', [vaultId])
-    ).output.toString();
+
+    /* eslint-disable */
+    //@ts-ignore
+    const contractResult = (await registry.queryContract('getMetadata', [vaultId])).output.toString();
+    /* eslint-enable */
 
     logger.info('querying registry success');
 
