@@ -20,11 +20,11 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/api": "^6.0.5",
-    "@polkadot/api-contract": "^6.0.5",
-    "@polkadot/keyring": "^7.4.1",
-    "@polkadot/types": "^6.0.5",
-    "@polkadot/wasm-crypto": "^4.2.1",
+    "@polkadot/api": "^6.12.1",
+    "@polkadot/api-contract": "^6.12.1",
+    "@polkadot/keyring": "^8.1.2",
+    "@polkadot/types": "^6.12.1",
+    "@polkadot/wasm-crypto": "^4.5.1",
     "@skyekiwi/util": "0.5.1"
   }
 }

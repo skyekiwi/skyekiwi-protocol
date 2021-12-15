@@ -20,15 +20,16 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/crust-network": "0.4.1",
-    "@skyekiwi/crypto": "0.4.1",
-    "@skyekiwi/file": "0.4.1",
-    "@skyekiwi/ipfs": "0.4.1",
-    "@skyekiwi/util": "0.4.1",
-    "@skyekiwi/wasm-contract": "0.4.1",
+    "@skyekiwi/crust-network": "0.5.1",
+    "@skyekiwi/crypto": "0.5.1",
+    "@skyekiwi/driver": "0.5.1",
+    "@skyekiwi/file": "0.5.1",
+    "@skyekiwi/ipfs": "0.5.1",
+    "@skyekiwi/util": "0.5.1",
+    "@skyekiwi/wasm-contract": "0.5.1",
     "dotenv": "^10.0.0"
   },
   "devDependencies": {
-    "@polkadot/util-crypto": "^7.4.1"
+    "@polkadot/util-crypto": "^8.1.2"
   }
 }
