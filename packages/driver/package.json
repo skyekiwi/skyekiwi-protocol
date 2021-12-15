@@ -20,6 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
+    "@polkadot/types": "^6.12.1",
     "@skyekiwi/crust-network": "0.5.2-2",
     "@skyekiwi/crypto": "0.5.2-2",
     "@skyekiwi/file": "0.5.2-2",

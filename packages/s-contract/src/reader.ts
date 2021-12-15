@@ -7,7 +7,7 @@ import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
 
 import { Sealer } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
-import { fromBase64, hexToU8a, isValidHex, isValidSubstrateAddress, stringToU8a, toBase64, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { fromBase64, getLogger, hexToU8a, isValidHex, isValidSubstrateAddress, stringToU8a, toBase64, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 export class SContractReader {
   #file: File
@@ -21,11 +21,14 @@ export class SContractReader {
   }
 
   public async init (): Promise<void> {
+    const logger = getLogger('SContractReader.init');
+
     try {
       const fullContract = await this.#file.readAll();
 
       this.#contract = this.decodeContract(fromBase64(fullContract));
     } catch (err) {
+      logger.error(err);
       throw new Error('initialization error, file might not be found s-contract/SContractReader/init');
     }
   }

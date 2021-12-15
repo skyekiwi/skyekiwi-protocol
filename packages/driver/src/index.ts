@@ -1,6 +1,7 @@
 // Copyright 2021 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AnyJson } from '@polkadot/types/types';
 import type { WriteStream } from 'fs';
 import type { Signature } from '@skyekiwi/crypto/types';
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
@@ -30,7 +31,7 @@ export class Driver {
     encryptionSchema: EncryptionSchema,
     storage: Crust,
     registry: WASMContract
-  ) {
+  ): Promise<AnyJson> {
     const logger = getLogger('Driver.upstream');
 
     const ipfs = new IPFS();
@@ -277,7 +278,7 @@ export class Driver {
     storage: Crust,
     registry: WASMContract,
     sealer: Sealer
-  ) {
+  ): Promise<AnyJson> {
     // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
 

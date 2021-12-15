@@ -14,7 +14,7 @@ export interface Sealer {
 export class DefaultSealer implements Sealer {
   #key: Uint8Array;
 
-  public unlock (key: Uint8Array) {
+  public unlock (key: Uint8Array): void {
     if (key.length !== 32) {
       throw new Error('private key length error - Encryptor.constructor');
     }

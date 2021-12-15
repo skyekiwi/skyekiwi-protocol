@@ -2951,6 +2951,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/driver@workspace:packages/driver"
   dependencies:
+    "@polkadot/types": ^6.12.1
     "@polkadot/util-crypto": ^8.1.2
     "@skyekiwi/crust-network": 0.5.2-2
     "@skyekiwi/crypto": 0.5.2-2

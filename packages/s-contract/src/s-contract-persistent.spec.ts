@@ -11,7 +11,6 @@ import { File } from '@skyekiwi/file';
 import { indexToString } from '@skyekiwi/util';
 
 import { SContractPersistent, SContractReader } from '.';
-// import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const contractPath = path.join(__dirname, '../mock/contract');
 
@@ -26,12 +25,16 @@ describe('@skyekiwi/s-contract', function () {
       readStream: fs.createReadStream(contractPath)
     });
 
+    console.log(contractPath);
+
     const sContract = new SContractReader(contractFile, new DefaultSealer());
 
     await sContract.init();
 
     const id = await SContractPersistent.rollup(config, sContract);
     const instance = await SContractPersistent.initialize(config, indexToString(id), 'Qmc8aHYGquRWeheiQ51xP3Z6EsyQWD89XSVTrQRfQWdFcA');
+
+    console.log(indexToString(id));
 
     const state = JSON.stringify({
       a: 'hello',

@@ -8,7 +8,7 @@ import { create } from 'ipfs-http-client';
 
 // WIP - the IPFS connector might go through lots of changes
 export class IPFS {
-  private async pin (authHeader: string, cid: string): Promise<any> {
+  private async pin (authHeader: string, cid: string): Promise<string> {
     if (cid.length !== 46) {
       throw new Error('CID len err');
     }

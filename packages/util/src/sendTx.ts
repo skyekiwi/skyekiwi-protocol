@@ -61,9 +61,7 @@ const sendTx = (
       } else {
         // Pass it
       }
-    }).catch((e: any) => {
-      reject(e);
-    });
+    }).catch(reject);
   });
 };
 
