@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/wasm-contract",
-  "version": "0.5.2-0",
+  "version": "0.5.2-1",
   "type": "module",
   "description": "wrapper for interacting with Substrate WASM contracts for @skyekiwi",
   "main": "index.js",
@@ -25,6 +25,6 @@
     "@polkadot/keyring": "^8.1.2",
     "@polkadot/types": "^6.12.1",
     "@polkadot/wasm-crypto": "^4.5.1",
-    "@skyekiwi/util": "0.5.2-0"
+    "@skyekiwi/util": "0.5.2-1"
   }
 }
