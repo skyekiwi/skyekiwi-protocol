@@ -25,8 +25,6 @@ describe('@skyekiwi/s-contract', function () {
       readStream: fs.createReadStream(contractPath)
     });
 
-    console.log(contractPath);
-
     const sContract = new SContractReader(contractFile, new DefaultSealer());
 
     await sContract.init();
@@ -42,9 +40,6 @@ describe('@skyekiwi/s-contract', function () {
     });
 
     instance.writeState(state);
-
-    await instance.init();
-
     expect(instance.readState()).toEqual(state);
   });
 });
