@@ -36,8 +36,12 @@ export class SContractReader {
     this.#sealer.unlock(key);
   }
 
+  public getContractPublicKey(): Uint8Array {
+    return this.#sealer.getAuthorKey()
+  }
+
   public decodeCall (call: string): Call {
-    const _call = call.split('?');
+    const _call = call.split(':');
 
     let callContent = '';
     const callIndex = _call[0];
@@ -46,7 +50,7 @@ export class SContractReader {
 
     if (isValidHex(_call[1])) {
       encrypted = true;
-      callContent = u8aToString(this.#sealer.decrypt(hexToU8a(call)));
+      callContent = u8aToString(this.#sealer.decrypt(hexToU8a(_call[1])));
     } else {
       callContent = _call[1];
     }
@@ -64,6 +68,11 @@ export class SContractReader {
   }
 
   public encodeCall (call: Call): string {
+    return SContractReader.rawEncodeCall(call, this.#sealer, this.#sealer.getAuthorKey())
+  }
+
+  public static rawEncodeCall(call: Call, sealer?: Sealer, dest? : Uint8Array): string {
+
     if (call.methodName.length < 0 || call.methodName.length > 32) {
       throw new Error('methodName must be between 0 - 32 bytes - calls/encodeCall');
     }
@@ -79,10 +88,16 @@ export class SContractReader {
     let callString = `${call.contractId}?${toBase64(call.methodName)}?${toBase64(call.origin)}?${toBase64(call.parameters)}`;
 
     if (call.encrypted) {
-      callString = u8aToHex(this.#sealer.encrypt(stringToU8a(callString), this.#sealer.getAuthorKey()));
+      if (!dest || dest.length !== 32) {
+        throw new Error("destination key missing or length error");
+      }
+      if (!sealer) {
+        throw new Error("sealer is required for encrypted calls")
+      }
+      callString = u8aToHex(sealer.encrypt(stringToU8a(callString), dest));
     }
 
-    return call.callIndex + '?' + callString;
+    return call.callIndex + ':' + callString;
   }
 
   public encodeAuth (auth: Authentication): string {
@@ -176,8 +191,6 @@ export class SContractReader {
   }
 
   public readContract (): Contract {
-    console.log(this.#contract);
-
     return this.#contract;
   }
 }
