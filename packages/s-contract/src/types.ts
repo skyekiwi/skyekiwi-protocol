@@ -10,6 +10,11 @@ export type Call = {
   parameters: string
 };
 
+export type EncodedCall = {
+  call: string,
+  contractId: string
+}
+
 export type Authentication = {
   storageKey: string,
   authOrigin: string
@@ -52,5 +57,5 @@ export type RequestRolldown = {
 }
 
 export type RequestDispatch = {
-  calls: Call[]
+  calls: EncodedCall[]
 }

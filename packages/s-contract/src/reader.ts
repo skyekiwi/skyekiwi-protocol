@@ -36,76 +36,8 @@ export class SContractReader {
     this.#sealer.unlock(key);
   }
 
-  public decodeCall (call: string): Call {
-    const _call = call.split('?');
-
-    let callContent = '';
-    const callIndex = _call[0];
-
-    let encrypted = false;
-
-    if (isValidHex(_call[1])) {
-      encrypted = true;
-      callContent = u8aToString(this.#sealer.decrypt(hexToU8a(call)));
-    } else {
-      callContent = _call[1];
-    }
-
-    const oneCall = callContent.split('?');
-
-    return {
-      callIndex: callIndex,
-      contractId: oneCall[0],
-      encrypted: encrypted,
-      methodName: fromBase64(oneCall[1]),
-      origin: fromBase64(oneCall[2]),
-      parameters: fromBase64(oneCall[3])
-    } as Call;
-  }
-
-  public encodeCall (call: Call): string {
-    if (call.methodName.length < 0 || call.methodName.length > 32) {
-      throw new Error('methodName must be between 0 - 32 bytes - calls/encodeCall');
-    }
-
-    if (call.parameters.length < 0 || call.parameters.length > 128) {
-      throw new Error('parameters must be between 0 - 128 bytes - calls/encodeCall');
-    }
-
-    if (!isValidSubstrateAddress(call.origin)) {
-      throw new Error('origin must be a valid Substrate address - calls/encodeCall');
-    }
-
-    let callString = `${call.contractId}?${toBase64(call.methodName)}?${toBase64(call.origin)}?${toBase64(call.parameters)}`;
-
-    if (call.encrypted) {
-      callString = u8aToHex(this.#sealer.encrypt(stringToU8a(callString), this.#sealer.getAuthorKey()));
-    }
-
-    return call.callIndex + '?' + callString;
-  }
-
-  public encodeAuth (auth: Authentication): string {
-    return toBase64(`${auth.storageKey}?${auth.authOrigin}`);
-  }
-
-  public decodeAuth (authStringRaw: string): Authentication {
-    const authString = fromBase64(authStringRaw);
-
-    const a = authString.split('?');
-    const storageKey = a[0];
-    const auth = a[1];
-
-    if (storageKey === undefined) return null;
-
-    return {
-      authOrigin: auth,
-      storageKey: storageKey
-    } as Authentication;
-  }
-
   public encodeContract (seed: string, contract: Contract): string {
-    const authString = contract.auth.map(this.encodeAuth).join('|');
+    const authString = contract.auth.map(SContractSerde.encodeAuth).join('|');
     const result = `${contract.contractId}*${seed}*${authString}*${contract.highLocalCallIndex}*${contract.state}*${contract.wasmPath}`;
 
     return result;
@@ -116,7 +48,7 @@ export class SContractReader {
     const contractId = contract[0];
     const seed = contract[1];
 
-    const auths = contract[2].split('|').map(this.decodeAuth);
+    const auths = contract[2].split('|').map(SContractSerde.decodeAuth);
     const highLocalCallIndex = contract[3];
 
     const state = contract[4];
@@ -179,5 +111,75 @@ export class SContractReader {
     console.log(this.#contract);
 
     return this.#contract;
+  }
+}
+
+export class SContractSerde {
+  public static decodeCall (call: string, sealer: Sealer): Call {
+    const _call = call.split('?');
+
+    let callContent = '';
+    const callIndex = _call[0];
+
+    let encrypted = false;
+
+    if (isValidHex(_call[1])) {
+      encrypted = true;
+      callContent = u8aToString(sealer.decrypt(hexToU8a(call)));
+    } else {
+      callContent = _call[1];
+    }
+
+    const oneCall = callContent.split('?');
+
+    return {
+      callIndex: callIndex,
+      contractId: oneCall[0],
+      encrypted: encrypted,
+      methodName: fromBase64(oneCall[1]),
+      origin: fromBase64(oneCall[2]),
+      parameters: fromBase64(oneCall[3])
+    } as Call;
+  }
+
+  public static encodeCall (call: Call, sealer: Sealer): string {
+    if (call.methodName.length < 0 || call.methodName.length > 32) {
+      throw new Error('methodName must be between 0 - 32 bytes - calls/encodeCall');
+    }
+
+    if (call.parameters.length < 0 || call.parameters.length > 128) {
+      throw new Error('parameters must be between 0 - 128 bytes - calls/encodeCall');
+    }
+
+    if (!isValidSubstrateAddress(call.origin)) {
+      throw new Error('origin must be a valid Substrate address - calls/encodeCall');
+    }
+
+    let callString = `${call.contractId}?${toBase64(call.methodName)}?${toBase64(call.origin)}?${toBase64(call.parameters)}`;
+
+    if (call.encrypted) {
+      callString = u8aToHex(sealer.encrypt(stringToU8a(callString), sealer.getAuthorKey()));
+    }
+
+    return call.callIndex + '?' + callString;
+  }
+
+  public static encodeAuth (auth: Authentication): string {
+    return toBase64(`${auth.storageKey}?${auth.authOrigin}`);
+  }
+
+  public static decodeAuth (authStringRaw: string): Authentication {
+    const authString = fromBase64(authStringRaw);
+
+    const a = authString.split('?');
+    const storageKey = a[0];
+    const auth = a[1];
+
+    if (storageKey === undefined) return null;
+
+    return {
+      authOrigin: auth,
+      storageKey: storageKey
+    } as Authentication;
   }
 }
