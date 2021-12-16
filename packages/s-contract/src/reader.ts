@@ -36,8 +36,8 @@ export class SContractReader {
     this.#sealer.unlock(key);
   }
 
-  public getContractPublicKey(): Uint8Array {
-    return this.#sealer.getAuthorKey()
+  public getContractPublicKey (): Uint8Array {
+    return this.#sealer.getAuthorKey();
   }
 
   public decodeCall (call: string): Call {
@@ -68,11 +68,10 @@ export class SContractReader {
   }
 
   public encodeCall (call: Call): string {
-    return SContractReader.rawEncodeCall(call, this.#sealer, this.#sealer.getAuthorKey())
+    return SContractReader.rawEncodeCall(call, this.#sealer, this.#sealer.getAuthorKey());
   }
 
-  public static rawEncodeCall(call: Call, sealer?: Sealer, dest? : Uint8Array): string {
-
+  public static rawEncodeCall (call: Call, sealer?: Sealer, dest?: Uint8Array): string {
     if (call.methodName.length < 0 || call.methodName.length > 32) {
       throw new Error('methodName must be between 0 - 32 bytes - calls/encodeCall');
     }
@@ -89,11 +88,13 @@ export class SContractReader {
 
     if (call.encrypted) {
       if (!dest || dest.length !== 32) {
-        throw new Error("destination key missing or length error");
+        throw new Error('destination key missing or length error');
       }
+
       if (!sealer) {
-        throw new Error("sealer is required for encrypted calls")
+        throw new Error('sealer is required for encrypted calls');
       }
+
       callString = u8aToHex(sealer.encrypt(stringToU8a(callString), dest));
     }
 
