@@ -2,6 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SContractPersistent } from './persistent';
-import { SContractReader, SContractSerde } from './reader';
+import { SContractReader } from './reader';
 
-export { SContractPersistent, SContractReader, SContractSerde };
+export { SContractPersistent, SContractReader };
