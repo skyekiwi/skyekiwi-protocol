@@ -165,25 +165,25 @@ export class Metadata {
   */
   public static decodeSealedData (hex: string): SealedMetadata {
     const sealedMetadata = hexToU8a(hex);
-    const isPublic = sealedMetadata.slice(0, 1);
+    const isPublic = sealedMetadata.slice(0, 2);
 
     if (isPublic[0]) {
       return {
         sealed: {
-          cipher: sealedMetadata.slice(1, 1 + 114),
+          cipher: sealedMetadata.slice(2, 2 + 114),
           isPublic: true,
           membersCount: 0
         } as Sealed,
-        version: sealedMetadata.slice(1 + 114, 1 + 114 + 4)
+        version: sealedMetadata.slice(2 + 114, 2 + 114 + 4)
       };
     } else {
       return {
         sealed: {
-          cipher: sealedMetadata.slice(1, sealedMetadata.length - 4),
+          cipher: sealedMetadata.slice(2, sealedMetadata.length - 4),
           isPublic: false,
-          membersCount: (sealedMetadata.length - 1 - 4) / 114
+          membersCount: (sealedMetadata.length - 2 - 4) / Seal.getEncryptedMessageSize(114)
         },
-        version: sealedMetadata.slice(sealedMetadata.length - 4)
+        version: sealedMetadata.slice(sealedMetadata.length - 4, sealedMetadata.length)
       };
     }
   }
@@ -253,32 +253,32 @@ export class Metadata {
   */
   public static encodeSealedMetadta (sealedData: SealedMetadata): string {
     if (sealedData.sealed.isPublic) {
-      const size = 1 + 114 + 4;
+      const size = 2 + 114 + 4;
       const result = new Uint8Array(size);
 
-      // isPublic = true
-      result.set([0x1], 0);
-      result.set(sealedData.sealed.cipher, 1);
-      result.set(SKYEKIWI_VERSION, 1 + 114);
+      // [one trash byte, isPublic = true]
+      result.set([0x1, 0x1], 0);
+      result.set(sealedData.sealed.cipher, 2);
+      result.set(SKYEKIWI_VERSION, 2 + 114);
 
       return u8aToHex(result);
     }
 
     const encryptedMessageSize = Seal.getEncryptedMessageSize(114);
     // publicSealingKey 64 bytes + 4 bytes version code + 1 bytes (public or private) + member * pre-sealedData encrypted length
-    const size = 4 + 1 + sealedData.sealed.membersCount * encryptedMessageSize;
+    const size = 2 + sealedData.sealed.membersCount * encryptedMessageSize + 4;
     const result = new Uint8Array(size);
 
-    result.set([0x0], 0);
+    result.set([0x0, 0x0], 0);
 
     let offset = 0;
 
     while (offset < sealedData.sealed.cipher.length) {
-      result.set(sealedData.sealed.cipher.slice(offset, offset + encryptedMessageSize), offset + 1);
+      result.set(sealedData.sealed.cipher.slice(offset, offset + encryptedMessageSize), offset + 2);
       offset = offset + encryptedMessageSize;
     }
 
-    result.set(SKYEKIWI_VERSION, offset);
+    result.set(SKYEKIWI_VERSION, offset + 2);
 
     return u8aToHex(result);
   }
