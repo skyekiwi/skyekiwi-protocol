@@ -13,6 +13,7 @@ jobs:
     - name: ${{ matrix.step }}
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        SEED_PHRASE: ${{ secrets.SEED_PHRASE }}
       run: |
         yarn install --immutable | grep -v 'YN0013'
         yarn ${{ matrix.step }}
