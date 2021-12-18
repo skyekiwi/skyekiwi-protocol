@@ -3,9 +3,9 @@
 
 import { randomBytes } from 'tweetnacl';
 
-import { stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { stringToU8a, u8aToString } from '@skyekiwi/util';
 
-import { AsymmetricEncryption, SymmetricEncryption, TSS } from '.';
+import { AsymmetricEncryption, SymmetricEncryption } from '.';
 
 describe('@skyekiwi/crypto', () => {
   const key: Uint8Array = randomBytes(32);
@@ -51,37 +51,6 @@ describe('@skyekiwi/crypto', () => {
 
     expect(() => AsymmetricEncryption.decrypt(wrongPrivateKey, encrypted)).toThrow(
       'decryption failed - Box.decrypt'
-    );
-  });
-
-  test('TSS: Sharing Works', () => {
-    const shares = TSS.generateShares(
-      _message, 5, 3
-    );
-
-    expect(shares.length).toEqual(5);
-    expect(u8aToHex(TSS.recover(shares)))
-      .toEqual(u8aToHex(_message));
-
-    // delete the last peice of share, it should still be able to recover
-    shares.pop();
-    expect(u8aToHex(TSS.recover(shares)))
-      .toEqual(u8aToHex(_message));
-
-    // 3 shares should also be able to decrypt
-    shares.pop();
-    expect(u8aToHex(TSS.recover(shares)))
-      .toEqual(u8aToHex(_message));
-
-    // less than 3 shares will fail
-    shares.pop();
-    expect(() => TSS.recover(shares)).toThrow(
-      'decryption failed, most likely because threshold is not met - TSS.recover'
-    );
-
-    shares.pop();
-    expect(() => TSS.recover(shares)).toThrow(
-      'decryption failed, most likely because threshold is not met - TSS.recover'
     );
   });
 });

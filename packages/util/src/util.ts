@@ -45,11 +45,15 @@ const u8aToString = (u8a: Uint8Array): string => {
   return (new TextDecoder('utf-8')).decode(u8a);
 };
 
-const indexToString = (index: number): string => {
-  return '0x' + index.toString(16).padStart(6, '0');
+const indexToString = (index: number, hexStarting = true): string => {
+  return (hexStarting ? '0x' : '') + index.toString(16).padStart(8, '0');
 };
 
 const stringToIndex = (index: string): number => {
+  if (index.indexOf('0x') === -1) {
+    index = '0x' + index;
+  }
+
   return Number(index);
 };
 

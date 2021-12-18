@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export type Sealed = {
-  'private': string,
-  'public': string,
+  cipher: Uint8Array,
+  isPublic: boolean,
+  membersCount: number,
 };
 
 export type ChunkList = {
@@ -22,7 +23,6 @@ export type PreSealData = {
 }
 
 export type SealedMetadata = {
-  publicSealingKey: Uint8Array,
   sealed: Sealed,
   version: Uint8Array,
 }

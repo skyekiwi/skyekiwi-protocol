@@ -44,14 +44,10 @@ describe('@skyekiwi/driver', function () {
     const sealer = new DefaultSealer();
 
     sealer.unlock(mnemonicToMiniSecret(mnemonic));
-    const encryptionSchema = new EncryptionSchema({
-      author: sealer.getAuthorKey(),
-      numOfShares: 2,
-      threshold: 2,
-      unencryptedPieceCount: 1
-    });
 
-    encryptionSchema.addMember(sealer.getAuthorKey(), 1);
+    const encryptionSchema = new EncryptionSchema();
+
+    encryptionSchema.addMember(sealer.getAuthorKey());
 
     const result = await Driver.upstream(
       file, sealer, encryptionSchema, storage, registry
@@ -115,16 +111,11 @@ describe('@skyekiwi/driver', function () {
     const publicKey2 = AsymmetricEncryption.getPublicKey(privateKey2);
 
     sealer.unlock(mnemonicToMiniSecret(mnemonic));
-    const encryptionSchema = new EncryptionSchema({
-      author: sealer.getAuthorKey(),
-      numOfShares: 5,
-      threshold: 3,
-      unencryptedPieceCount: 1
-    });
+    const encryptionSchema = new EncryptionSchema();
 
-    encryptionSchema.addMember(sealer.getAuthorKey(), 2);
-    encryptionSchema.addMember(publicKey1, 1);
-    encryptionSchema.addMember(publicKey2, 1);
+    encryptionSchema.addMember(sealer.getAuthorKey());
+    encryptionSchema.addMember(publicKey1);
+    encryptionSchema.addMember(publicKey2);
 
     const result = await Driver.updateEncryptionSchema(
       vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], storage, registry, sealer

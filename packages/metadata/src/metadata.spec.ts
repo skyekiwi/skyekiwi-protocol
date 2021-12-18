@@ -20,7 +20,7 @@ describe('@skyekiwi/metadata', function () {
       chunkCID: 'QmZMpQ8K7Tp1Uwae8SXi3ZJqJDES8JGBiMmNWV2iRatwbW',
       hash: hash,
       sealingKey: slk,
-      version: Uint8Array.from([0x0, 0x0, 0x0, 0x1])
+      version: Uint8Array.from([0x0, 0x0, 0x1, 0x1])
     });
 
     const recovered = Metadata.decodePreSealData(preSeal);
@@ -28,8 +28,8 @@ describe('@skyekiwi/metadata', function () {
     expect(recovered.chunkCID).toEqual('QmZMpQ8K7Tp1Uwae8SXi3ZJqJDES8JGBiMmNWV2iRatwbW');
     expect(recovered.hash).toEqual(hash);
     expect(recovered.sealingKey).toEqual(slk);
-    expect(recovered.version).toEqual(Uint8Array.from([0x0, 0x0, 0x1, 0x0]));
+    expect(recovered.version).toEqual(Uint8Array.from([0x0, 0x0, 0x1, 0x1]));
   });
 });
 
-// 8f73cf603eea07ace6b5cd1041e60ed1209b0cc3aebdfca1638a2fd643cc105d516d5a4d7051384b375470315577616538535869335a4a714a444553384a4742694d6d4e575632695261747762573724d3b93e2e5a44a53e2d981b91dc6cb12ebdd0dcdee6ff818517f8f08a5a70fba9a61e730235488bba7adfffddc6bcc348a98d9f2e56fe4247f3590c280a4b00000001
+// 516d5a4d7051384b375470315577616538535869335a4a714a444553384a4742694d6d4e57563269526174776257f15b34022ef3fc9bcfee38d140b908cf90a9b598952f4086b4e9a91dfe4019dfb3a0a8770fafb04b099f168b156e3d2bad541c4fa5c76d33a993e1e7d4248cd100000101

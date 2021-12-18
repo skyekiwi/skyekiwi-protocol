@@ -5,12 +5,24 @@ import type { Signature } from './types';
 
 import { ethers } from 'ethers';
 
+import { hexToU8a } from '@skyekiwi/util';
+
 export interface Sign {
+  getPublicKey(key: Uint8Array): Uint8Array
   generateSignature(key: Uint8Array, message: Uint8Array): Promise<Signature>,
   verifySignature(signature: Signature): boolean
 }
 
 export class EthereumSign implements Sign {
+  /**
+    * get the secp251k1 public key from secret key
+    * @param {Uint8Array} key a secp256k1 secretKey
+    * @returns {string} the computed publicKey
+  */
+  public getPublicKey (key: Uint8Array): Uint8Array {
+    return hexToU8a(ethers.utils.computePublicKey(key));
+  }
+
   /**
     * generate an Ehtereum style signature
     * @param {Uint8Array} key a secp256k1 secretKey
