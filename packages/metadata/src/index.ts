@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
-import type { ChunkList, PreSealData, SealedMetadata } from './types';
+import type { ChunkList, PreSealData, Sealed, SealedMetadata } from './types';
 
 import { randomBytes } from 'tweetnacl';
 
-import { AsymmetricEncryption, EncryptionSchema, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
+import { EncryptionSchema, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { IPFS } from '@skyekiwi/ipfs';
-import { hexToU8a, stringToU8a, trimEnding, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { hexToU8a, stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 // version code in Uint8Array
-export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 1, 0]);
+export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 1, 1]);
 
 export class Metadata {
   #sealingKey: Uint8Array;
@@ -59,12 +59,9 @@ export class Metadata {
     for (const chunksId in this.#chunkList) {
       // 46 char
       chunk += this.#chunkList[chunksId].ipfsCID;
-
-      // 1 char divider
-      chunk += '-';
     }
 
-    const encryptedChunk = u8aToHex(SymmetricEncryption.encrypt(this.#sealingKey, stringToU8a(trimEnding(chunk))));
+    const encryptedChunk = u8aToHex(SymmetricEncryption.encrypt(this.#sealingKey, stringToU8a(chunk)));
 
     const ipfs = new IPFS();
     const cid = await ipfs.add(encryptedChunk);
@@ -114,7 +111,6 @@ export class Metadata {
 
     // 4. pack the sealed data
     return Metadata.encodeSealedMetadta({
-      publicSealingKey: AsymmetricEncryption.getPublicKey(this.#sealingKey),
       sealed: sealed,
       version: SKYEKIWI_VERSION
     });
@@ -168,20 +164,28 @@ export class Metadata {
     * @returns {SealedMetadata} the decoded SealedMetadata
   */
   public static decodeSealedData (hex: string): SealedMetadata {
-    const pieces = hex.split('-');
+    const sealedMetadata = hexToU8a(hex);
+    const isPublic = sealedMetadata.slice(0, 2);
 
-    if (pieces.length !== 4) {
-      throw new Error('invalid sealed data - Metadata.recoverSealedData');
+    if (isPublic[0]) {
+      return {
+        sealed: {
+          cipher: sealedMetadata.slice(2, 2 + 114),
+          isPublic: true,
+          membersCount: 0
+        } as Sealed,
+        version: sealedMetadata.slice(2 + 114, 2 + 114 + 4)
+      };
+    } else {
+      return {
+        sealed: {
+          cipher: sealedMetadata.slice(2, sealedMetadata.length - 4),
+          isPublic: false,
+          membersCount: (sealedMetadata.length - 2 - 4) / Seal.getEncryptedMessageSize(114)
+        },
+        version: sealedMetadata.slice(sealedMetadata.length - 4, sealedMetadata.length)
+      };
     }
-
-    return {
-      publicSealingKey: hexToU8a(pieces[0]),
-      sealed: {
-        private: pieces[1],
-        public: pieces[2]
-      },
-      version: hexToU8a(pieces[3])
-    };
   }
 
   /**
@@ -248,6 +252,34 @@ export class Metadata {
     * @returns {string} the encoded SealedMetadata
   */
   public static encodeSealedMetadta (sealedData: SealedMetadata): string {
-    return `${u8aToHex(sealedData.publicSealingKey)}-${sealedData.sealed.private}-${sealedData.sealed.public}-${u8aToHex(sealedData.version)}`;
+    if (sealedData.sealed.isPublic) {
+      const size = 2 + 114 + 4;
+      const result = new Uint8Array(size);
+
+      // [one trash byte, isPublic = true]
+      result.set([0x1, 0x1], 0);
+      result.set(sealedData.sealed.cipher, 2);
+      result.set(SKYEKIWI_VERSION, 2 + 114);
+
+      return u8aToHex(result);
+    }
+
+    const encryptedMessageSize = Seal.getEncryptedMessageSize(114);
+    // publicSealingKey 64 bytes + 4 bytes version code + 1 bytes (public or private) + member * pre-sealedData encrypted length
+    const size = 2 + sealedData.sealed.membersCount * encryptedMessageSize + 4;
+    const result = new Uint8Array(size);
+
+    result.set([0x0, 0x0], 0);
+
+    let offset = 0;
+
+    while (offset < sealedData.sealed.cipher.length) {
+      result.set(sealedData.sealed.cipher.slice(offset, offset + encryptedMessageSize), offset + 2);
+      offset = offset + encryptedMessageSize;
+    }
+
+    result.set(SKYEKIWI_VERSION, offset + 2);
+
+    return u8aToHex(result);
   }
 }

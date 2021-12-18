@@ -77,14 +77,9 @@ export class SContractPersistent {
       readStream: fs.createReadStream(outputPath + `${contractId}.contract`)
     });
 
-    const encryptionSchema = new EncryptionSchema({
-      author: sealer.getAuthorKey(),
-      numOfShares: 2,
-      threshold: 2,
-      unencryptedPieceCount: 0
-    });
+    const encryptionSchema = new EncryptionSchema();
 
-    encryptionSchema.addMember(sealer.getAuthorKey(), 2);
+    encryptionSchema.addMember(sealer.getAuthorKey());
     const storage = new Crust(process.env.SEED_PHRASE);
 
     const result = await Driver.upstream(contractFile, sealer, encryptionSchema, storage, registry);

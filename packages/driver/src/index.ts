@@ -8,7 +8,7 @@ import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
 
 import { Crust } from '@skyekiwi/crust-network';
-import { AsymmetricEncryption, EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
+import { EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
 import { Metadata, SKYEKIWI_VERSION } from '@skyekiwi/metadata';
@@ -69,9 +69,13 @@ export class Driver {
       size: result.size
     });
 
-    const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+    // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
+    // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+    // logger.info('Crust order placed');
 
-    logger.info('Crust order placed');
+    logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
+
+    const storageResult = true;
 
     if (storageResult) {
       logger.info('writting to registry');
@@ -166,18 +170,10 @@ export class Driver {
     const ipfs = new IPFS();
     const metadata = Metadata.decodeSealedData(await ipfs.cat(contractResult));
 
-    logger.info('unseal metadata success');
+    logger.info('prase sealed metadata success');
 
     // 3. recover and decode the sealedData
-    const unsealed = Metadata.decodePreSealData(
-      Seal.recover(
-        {
-          private: metadata.sealed.private,
-          public: metadata.sealed.public
-        },
-        keys, sealer
-      )
-    );
+    const unsealed = Metadata.decodePreSealData(Seal.recover(metadata.sealed, keys, sealer));
 
     logger.info('pre-seal data recovered');
 
@@ -233,7 +229,12 @@ export class Driver {
 
     const ipfs = new IPFS();
 
-    const chunksList = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunks)))).split('-');
+    const chunksListRaw = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunks))));
+    const chunksList = [];
+
+    for (let offset = 0; offset < chunksListRaw.length; offset += 46) {
+      chunksList.push(chunksListRaw.slice(offset, offset + 46));
+    }
 
     logger.info('chunkList recovery successful');
 
@@ -291,7 +292,6 @@ export class Driver {
 
     // 3. encode the sealed data
     const sealedMetadata = Metadata.encodeSealedMetadta({
-      publicSealingKey: AsymmetricEncryption.getPublicKey(unsealed.sealingKey),
       sealed: sealed,
       version: SKYEKIWI_VERSION
     });
@@ -302,12 +302,10 @@ export class Driver {
 
     const ipfs = new IPFS();
     const result = await ipfs.add(sealedMetadata);
-    const cidList = [{
-      cid: result.cid.toString(),
-      size: result.size
-    }];
 
-    const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+    // Skipping submitting Crust network orders by using the Crust Web3 Auth Gateway
+    // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+    const storageResult = true;
 
     if (storageResult) {
       const res = await registry.execContract('updateMetadata', [vaultId, result.cid]);

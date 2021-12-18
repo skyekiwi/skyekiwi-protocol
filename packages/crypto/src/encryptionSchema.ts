@@ -1,12 +1,11 @@
 // Copyright 2021 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { getLogger, u8aToHex } from '@skyekiwi/util';
+
 export class EncryptionSchema {
-  public author: Uint8Array
   public members: Uint8Array[]
-  public numOfShares: number
-  public threshold: number
-  public unencryptedPieceCount: number
+  public isPublic: boolean
 
   /**
    * Constructor for an EncryptionSchema
@@ -16,56 +15,27 @@ export class EncryptionSchema {
    * @param {number} threshold threshold of shares needed for recovery
    * @param {number} unencryptedPieceCount number of pieces left unencrypted
   */
-  constructor (config: {
-    author: Uint8Array,
-    numOfShares: number,
-    threshold: number,
-    unencryptedPieceCount: number
-  }) {
-    this.author = config.author;
+  constructor (
+    isPublic = false
+  ) {
+    this.isPublic = isPublic;
     this.members = [];
-    this.numOfShares = config.numOfShares;
-    this.threshold = config.threshold;
-    this.unencryptedPieceCount = config.unencryptedPieceCount;
   }
 
   /**
     * add in a receiving number to the encryption schema
     * @param {Uint8Array} memberPublicKey a 32 bytes curve25519 public key of the receiver
-    * @param {number} shares number of shares to be assigned to this receiver
     * @returns {void} None
   */
-  public addMember (memberPublicKey: Uint8Array, shares: number): void {
-    for (let i = 0; i < shares; i++) { this.members.push(memberPublicKey); }
-  }
+  public addMember (memberPublicKey: Uint8Array): void {
+    const logger = getLogger('EncryptionSchema.addMmber');
 
-  /**
-    * total number of unique receivers
-    * @returns {number} number of unique receivers in this encryptionSchema
-  */
-  public getNumOfParticipants (): number {
-    // get all unique publicKey in this.members and
-    // that's the number of participants
-    return (this.members)
-      .filter((item, index, array) => array.indexOf(item) === index)
-      .length;
-  }
-
-  /**
-    * verify the validity of an encryption schema
-    * @returns {boolean} whether or not this encrytion schema is valid
-  */
-  public verify (): boolean {
-    // pieces = public piece(s) + members' piece(s)
-    if (this.numOfShares !== this.unencryptedPieceCount + this.members.length) {
-      return false;
+    if (memberPublicKey.length !== 32) {
+      logger.error(`memberPublic key not valid, received ${u8aToHex(memberPublicKey)}`);
+      throw new Error('member public key error - crypto/encryptionSchema/addMember');
     }
 
-    // quorum > pieces : a vault that can never be decrypt
-    if (this.threshold > this.numOfShares) {
-      return false;
-    }
-
-    return true;
+    logger.info(`adding member ${u8aToHex(memberPublicKey)} to the encryption schema`);
+    this.members.push(memberPublicKey);
   }
 }

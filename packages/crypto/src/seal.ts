@@ -4,11 +4,21 @@
 import type { Sealed } from '@skyekiwi/metadata/types';
 import type { EncryptionSchema } from './encryptionSchema';
 
-import { hexToU8a, trimEnding, u8aToHex } from '@skyekiwi/util';
+import { getLogger, u8aToHex } from '@skyekiwi/util';
 
-import { Sealer, TSS } from '.';
+import { Sealer } from '.';
 
 export class Seal {
+  /**
+    * get the len of a single encryption by the schema used by SkyeKiwi Protocol
+    * @param {number} rawMessageSize size of the raw message
+    * @returns {number} size of the encrypted message
+  */
+  public static getEncryptedMessageSize (rawMessageSize: number): number {
+    // original size + nonce len + xsalsa20poly1305 overhead + 32bytes public key
+    return rawMessageSize + 32 + 24 + 16;
+  }
+
   /**
     * seal a message with a pre-defined encryptionSchema and Sealer
     * @param {Uint8Array} message message to be encryoted
@@ -21,42 +31,51 @@ export class Seal {
     encryptionSchema: EncryptionSchema,
     sealer: Sealer
   ): Sealed {
-    // 1. verify the encryptionSchema
-    if (!encryptionSchema.verify()) {
-      throw new Error('encryptionSchema Failer - Seal.seal');
+    const logger = getLogger('Seal.seal');
+
+    if (encryptionSchema.isPublic) {
+      logger.info('encryptionSchema marks the sealing as public, skipping ...');
+
+      return {
+        cipher: message,
+        isPublic: true,
+        membersCount: 0
+      };
     }
 
-    let publicSharesHex = '';
-    let privateSharesHex = '';
+    const encryptedMessageSize = Seal.getEncryptedMessageSize(message.length);
 
-    // 2. generate all TSS shares before encryption
-    const shares = TSS.generateShares(
-      message,
-      encryptionSchema.numOfShares,
-      encryptionSchema.threshold
-    );
-
-    // 3. collect all unencrypted shares
-    for (let i = 0; i < encryptionSchema.unencryptedPieceCount; i++) {
-      publicSharesHex += u8aToHex(shares.pop()) + '|';
-    }
-
-    // _3. trim the ending '|'
-    publicSharesHex = trimEnding(publicSharesHex);
+    const encryptedMessages = [];
 
     // 4. encrypt the private shares with the receivers' publicKeys
     for (const member of encryptionSchema.members) {
-      privateSharesHex += u8aToHex(
-        sealer.encrypt(shares.pop(), member)
-      ) + '|';
+      logger.info(`sealing for ${u8aToHex(member)}`);
+      const encryptedMessage = sealer.encrypt(message, member);
+
+      encryptedMessages.push(encryptedMessage);
     }
 
-    // _4. trim the ending '|'
-    privateSharesHex = trimEnding(privateSharesHex);
+    const membersCount = encryptionSchema.members.length;
+
+    // result len: encrypted message len * members
+    const result = new Uint8Array(membersCount * encryptedMessageSize);
+    let offset = 0;
+
+    for (const encryptedMesage of encryptedMessages) {
+      result.set(encryptedMesage, offset);
+
+      if (encryptedMesage.length !== encryptedMessageSize) {
+        logger.error('encrypted message length unexpected!');
+        throw new Error('encrypted message length unexpected - crypto/seal/seal');
+      }
+
+      offset += encryptedMessageSize;
+    }
 
     return {
-      private: privateSharesHex,
-      public: publicSharesHex
+      cipher: result,
+      isPublic: false,
+      membersCount: membersCount
     };
   }
 
@@ -70,31 +89,49 @@ export class Seal {
   */
   public static recover (
     sealed: Sealed,
-    keys: Uint8Array[],
-    sealer: Sealer
+    keys?: Uint8Array[],
+    sealer?: Sealer
   ): Uint8Array {
-    let pub: Uint8Array[] = [];
-    let priv: Uint8Array[] = [];
+    const logger = getLogger('Seal.recover');
 
-    if (sealed.public) { pub = sealed.public.split('|').map(hexToU8a); }
+    if (sealed.isPublic) {
+      logger.info('the sealed data is public, skipping ...');
 
-    if (sealed.private) { priv = sealed.private.split('|').map(hexToU8a); }
+      return sealed.cipher;
+    }
 
-    // 1. collect all public shares
-    const shares: Uint8Array[] = [...pub];
+    if (!keys || !sealer) {
+      logger.error('sealed data is private but no keys/sealer is provided');
+      throw new Error('sealed data is private but no keys/sealer is provided');
+    }
 
-    // 2. try to decrypt as many private shares as possible
-    for (const share of priv) {
-      for (const key of keys) {
-        sealer.unlock(key);
-        const decrypted = sealer.decrypt(share);
+    let offset = 0;
+    const encryptedMessageLength = sealed.cipher.length / sealed.membersCount;
 
-        if (decrypted) { shares.push(decrypted); }
+    logger.info(`parsing a message with size ${sealed.cipher.length} & ${sealed.membersCount} member`);
+
+    const encryptedMessages = [];
+
+    while (offset < sealed.cipher.length) {
+      encryptedMessages.push(sealed.cipher.slice(offset, offset + encryptedMessageLength));
+      offset += encryptedMessageLength;
+    }
+
+    for (const key of keys) {
+      sealer.unlock(key);
+
+      for (const encryptedMessage of encryptedMessages) {
+        const message = sealer.decrypt(encryptedMessage);
+
+        if (message) {
+          logger.info('message recover success!');
+
+          return message;
+        }
       }
     }
 
-    // 3. try to recover the orignal message with avaliable shares
-    //    might fail when the threshold is not met
-    return TSS.recover(shares);
+    // if we got here - that means the keys are not included in the original encryption schema
+    throw new Error('decryption failed, incorrect keys');
   }
 }
