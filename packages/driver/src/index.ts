@@ -229,7 +229,12 @@ export class Driver {
 
     const ipfs = new IPFS();
 
-    const chunksList = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunks)))).split('-');
+    const chunksListRaw = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunks))));
+    const chunksList = [];
+
+    for (let offset = 0; offset < chunksListRaw.length; offset += 46) {
+      chunksList.push(chunksListRaw.slice(offset, offset + 46));
+    }
 
     logger.info('chunkList recovery successful');
 
