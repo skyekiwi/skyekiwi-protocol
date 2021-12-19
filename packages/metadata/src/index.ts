@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
-import type { ChunkList, PreSealData, Sealed, SealedMetadata } from './types';
+import type { ChunkList, PreSealData, SealedMetadata } from './types';
 
 import { randomBytes } from 'tweetnacl';
 
@@ -165,27 +165,16 @@ export class Metadata {
   */
   public static decodeSealedData (hex: string): SealedMetadata {
     const sealedMetadata = hexToU8a(hex);
-    const isPublic = sealedMetadata.slice(0, 2);
+    const isPublic = sealedMetadata.slice(0, 2)[0] === 0x1;
 
-    if (isPublic[0]) {
-      return {
-        sealed: {
-          cipher: sealedMetadata.slice(2, 2 + 114),
-          isPublic: true,
-          membersCount: 0
-        } as Sealed,
-        version: sealedMetadata.slice(2 + 114, 2 + 114 + 4)
-      };
-    } else {
-      return {
-        sealed: {
-          cipher: sealedMetadata.slice(2, sealedMetadata.length - 4),
-          isPublic: false,
-          membersCount: (sealedMetadata.length - 2 - 4) / Seal.getEncryptedMessageSize(114)
-        },
-        version: sealedMetadata.slice(sealedMetadata.length - 4, sealedMetadata.length)
-      };
-    }
+    return {
+      sealed: {
+        cipher: sealedMetadata.slice(2, sealedMetadata.length - 4),
+        isPublic: isPublic,
+        membersCount: isPublic ? 0 : (sealedMetadata.length - 2 - 4) / Seal.getEncryptedMessageSize(114)
+      },
+      version: sealedMetadata.slice(sealedMetadata.length - 4, sealedMetadata.length)
+    };
   }
 
   /**
@@ -252,33 +241,16 @@ export class Metadata {
     * @returns {string} the encoded SealedMetadata
   */
   public static encodeSealedMetadta (sealedData: SealedMetadata): string {
+    const result = new Uint8Array(2 + sealedData.sealed.cipher.length + 4);
+
     if (sealedData.sealed.isPublic) {
-      const size = 2 + 114 + 4;
-      const result = new Uint8Array(size);
-
-      // [one trash byte, isPublic = true]
       result.set([0x1, 0x1], 0);
-      result.set(sealedData.sealed.cipher, 2);
-      result.set(SKYEKIWI_VERSION, 2 + 114);
-
-      return u8aToHex(result);
+    } else {
+      result.set([0x0, 0x0], 0);
     }
 
-    const encryptedMessageSize = Seal.getEncryptedMessageSize(114);
-    // publicSealingKey 64 bytes + 4 bytes version code + 1 bytes (public or private) + member * pre-sealedData encrypted length
-    const size = 2 + sealedData.sealed.membersCount * encryptedMessageSize + 4;
-    const result = new Uint8Array(size);
-
-    result.set([0x0, 0x0], 0);
-
-    let offset = 0;
-
-    while (offset < sealedData.sealed.cipher.length) {
-      result.set(sealedData.sealed.cipher.slice(offset, offset + encryptedMessageSize), offset + 2);
-      offset = offset + encryptedMessageSize;
-    }
-
-    result.set(SKYEKIWI_VERSION, offset + 2);
+    result.set(sealedData.sealed.cipher, 2);
+    result.set(sealedData.version, 2 + sealedData.sealed.cipher.length);
 
     return u8aToHex(result);
   }
