@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/s-contract",
-  "version": "0.5.2-8",
+  "version": "0.5.2-9",
   "type": "module",
   "description": "secret contract host env based on SkyeKiwi Protocol",
   "main": "src/index.ts",
@@ -20,13 +20,13 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/crust-network": "0.5.2-8",
-    "@skyekiwi/crypto": "0.5.2-8",
-    "@skyekiwi/driver": "0.5.2-8",
-    "@skyekiwi/file": "0.5.2-8",
-    "@skyekiwi/ipfs": "0.5.2-8",
-    "@skyekiwi/util": "0.5.2-8",
-    "@skyekiwi/wasm-contract": "0.5.2-8",
+    "@skyekiwi/crust-network": "0.5.2-9",
+    "@skyekiwi/crypto": "0.5.2-9",
+    "@skyekiwi/driver": "0.5.2-9",
+    "@skyekiwi/file": "0.5.2-9",
+    "@skyekiwi/ipfs": "0.5.2-9",
+    "@skyekiwi/util": "0.5.2-9",
+    "@skyekiwi/wasm-contract": "0.5.2-9",
     "dotenv": "^10.0.0"
   },
   "devDependencies": {
