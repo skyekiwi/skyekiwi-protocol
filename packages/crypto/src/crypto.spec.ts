@@ -24,7 +24,7 @@ describe('@skyekiwi/crypto', () => {
   test('Asymmetric: Encryption & Decryption Works', () => {
     const receiverPrivateKey = randomBytes(32);
     const receiverPublicKey = AsymmetricEncryption.getPublicKey(receiverPrivateKey);
-    const encrypted = AsymmetricEncryption.encrypt(key, _message, receiverPublicKey);
+    const encrypted = AsymmetricEncryption.encrypt(_message, receiverPublicKey);
 
     const decrypted = AsymmetricEncryption.decrypt(receiverPrivateKey, encrypted);
     const decryptedString = u8aToString(decrypted);
@@ -44,7 +44,7 @@ describe('@skyekiwi/crypto', () => {
   test('Asymmetric: Decryption Fails w/Wrong Key', () => {
     const receiverPrivateKey = randomBytes(32);
     const receiverPublicKey = AsymmetricEncryption.getPublicKey(receiverPrivateKey);
-    const encrypted = AsymmetricEncryption.encrypt(key, _message, receiverPublicKey);
+    const encrypted = AsymmetricEncryption.encrypt(_message, receiverPublicKey);
 
     // wrong receiver's private key
     const wrongPrivateKey = randomBytes(32);

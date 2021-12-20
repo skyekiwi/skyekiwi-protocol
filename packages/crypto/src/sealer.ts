@@ -53,12 +53,8 @@ export class DefaultSealer implements Sealer {
     * @returns {Uint8Array} encrypted message with leading nonce
   */
   public encrypt (message: Uint8Array, recipient: Uint8Array): Uint8Array {
-    if (this.#key === undefined) {
-      throw new Error('sealer is locked - Sealer.encrypt');
-    }
-
     return AsymmetricEncryption.encrypt(
-      this.#key, message, recipient
+      message, recipient
     );
   }
 

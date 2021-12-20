@@ -21,13 +21,14 @@ export class AsymmetricEncryption {
     * @returns {Uint8Array} full encrypted message: nonce + encrypted message
   */
   public static encrypt (
-    key: Uint8Array,
     message: Uint8Array,
     receiverPublicKey: Uint8Array
   ): Uint8Array {
+    const ephmeralKey = randomBytes(32);
+    const authorKey = AsymmetricEncryption.getPublicKey(ephmeralKey);
+
     const nonce = randomBytes(box.nonceLength);
-    const encrypted = box(message, nonce, receiverPublicKey, key);
-    const authorKey = AsymmetricEncryption.getPublicKey(key);
+    const encrypted = box(message, nonce, receiverPublicKey, ephmeralKey);
 
     const fullMessage = new Uint8Array(nonce.length + encrypted.length + authorKey.length);
 
