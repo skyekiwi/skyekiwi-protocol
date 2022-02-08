@@ -26,6 +26,8 @@
       "@skyekiwi/util/*": [ "packages/util/src/*" ],
       "@skyekiwi/wasm-contract": [ "packages/wasm-contract/src" ],
       "@skyekiwi/wasm-contract/*": [ "packages/wasm-contract/src/*" ],
+      "@skyekiwi/secret-registry": [ "packages/secret-registry/src" ],
+      "@skyekiwi/secret-registry/*": [ "packages/secret-registry/src/*" ],
     },
     "skipLibCheck": true,
     "typeRoots": [

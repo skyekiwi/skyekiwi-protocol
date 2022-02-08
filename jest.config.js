@@ -1,4 +1,4 @@
-// Copyright 2021 @skyekiwi authors & contributors
+// Copyright 2021 - 2022 @skyekiwi authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 const config = require('@skyekiwi/dev/config/jest.cjs');
@@ -13,7 +13,8 @@ module.exports = Object.assign({}, config, {
     '@skyekiwi/metadata(.*)$': '<rootDir>/packages/metadata/src/$1',
     '@skyekiwi/s-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1',
     '@skyekiwi/util(.*)$': '<rootDir>/packages/util/src/$1',
-    '@skyekiwi/wasm-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1'
+    '@skyekiwi/wasm-contract(.*)$': '<rootDir>/packages/wasm-contract/src/$1',
+    '@skyekiwi/secret-registry(.*)$': '<rootDir>/packages/secret-registry/src/$1'
   },
   modulePathIgnorePatterns: [
     '<rootDir>/packages/crust-network/build',
@@ -25,7 +26,8 @@ module.exports = Object.assign({}, config, {
     '<rootDir>/packages/metadata/build',
     '<rootDir>/packages/s-contract/build',
     '<rootDir>/packages/util/build',
-    '<rootDir>/packages/wasm-contract/build'
+    '<rootDir>/packages/wasm-contract/build',
+    '<rootDir>/packages/secret-registry/build'
   ],
   testTimeout: 3_000_000,
   transformIgnorePatterns: [

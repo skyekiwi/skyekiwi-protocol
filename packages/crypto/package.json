@@ -21,9 +21,8 @@
   },
   "dependencies": {
     "@skyekiwi/metadata": "0.5.2-10",
-    "@skyekiwi/secrets": "^2.0.1",
     "@skyekiwi/util": "0.5.2-10",
-    "ethers": "^5.4.6",
+    "ethers": "^5.5.4",
     "tweetnacl": "^1.0.3"
   }
 }

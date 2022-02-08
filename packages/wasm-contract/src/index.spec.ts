@@ -1,4 +1,4 @@
-// Copyright 2021 @skyekiwi/wasm-contract authors & contributors
+// Copyright 2021 - 2022 @skyekiwi/wasm-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import abi from '../mock/skyekiwi.json';

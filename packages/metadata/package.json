@@ -20,7 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/util-crypto": "^8.1.2",
+    "@polkadot/util-crypto": "^8.3.3",
     "@skyekiwi/crypto": "0.5.2-10",
     "@skyekiwi/ipfs": "0.5.2-10",
     "@skyekiwi/util": "0.5.2-10",

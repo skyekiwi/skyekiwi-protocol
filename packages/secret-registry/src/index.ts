@@ -13,18 +13,11 @@ import { waitReady } from '@polkadot/wasm-crypto';
 
 import { getLogger, sendTx } from '@skyekiwi/util';
 
-export class WASMContract {
+export class SecretRegistry {
   public api: ApiPromise
   public senderAddress: string
 
-  #abi: AnyJson
-  #address: string
-
-  // eslint-disable-next-line
-  //@ts-ignore
-  #contract: ContractPromise
   #provider: WsProvider
-
   #sender: string | KeyringPair
   #mnemonic: string
   #signer: Signer | undefined
@@ -42,16 +35,13 @@ export class WASMContract {
   constructor (
     sender: string,
     types: AnyJson,
-    abi: AnyJson,
-    contractAddress: string,
     signer?: Signer,
     testnet = true
   ) {
-    const logger = getLogger('WASMContract.constructor');
+    const logger = getLogger('SecretRegistry.constructor');
 
-    this.#abi = abi;
-    this.#address = contractAddress;
-    this.#provider = testnet ? new WsProvider('wss://ws.jupiter-poa.patract.cn') : new WsProvider('wss://ws.jupiter-poa.patract.cn');
+    this.#provider = testnet ? new WsProvider('wss://staging.rpc.skye.kiwi') : new WsProvider('wss://staging.rpc.skye.kiwi');
+    // this.#provider = new WsProvider('ws://localhost:9944');
     this.api = new ApiPromise({
       provider: this.#provider,
       types: types as RegistryTypes
@@ -63,7 +53,7 @@ export class WASMContract {
       logger.info('mnemonic validation failed, loading in browser mode');
 
       if (signer === undefined) {
-        throw new Error('initialization failed, a Signer is needed - Crust.Contrusctor');
+        throw new Error('initialization failed, a Signer is needed - SecretRegistry.Contrusctor');
       } else {
         this.#sender = sender;
         this.#signer = signer;
@@ -93,9 +83,6 @@ export class WASMContract {
       this.senderAddress = keypair.address;
       this.#sender = keypair;
       this.#signer = undefined;
-      this.#contract = new ContractPromise(
-        this.api, new Abi(JSON.stringify(this.#abi), this.api.registry.getChainProperties()), this.#address
-      );
 
       return true;
     } else {
@@ -103,56 +90,30 @@ export class WASMContract {
         // here this.#sender is always an address string
         this.senderAddress = this.#sender as string;
 
-        this.#contract = new ContractPromise(
-          this.api, new Abi(JSON.stringify(this.#abi), this.api.registry.getChainProperties()), this.#address
-        );
-
         return true;
       } else {
-        throw new Error('Init failed, this should never happen - WASMContract.init');
+        throw new Error('Init failed, this should never happen - SecretRegistry.init');
       }
     }
   }
 
   /**
-   * execute a contract call
+   * register a secret
    * @param {string} message the name of the function of the contract to be called
    * @param {unknown[]} params paramters of the function call
    * @returns {Promise<AnyJson>} result from the blockchain
   */
-  async execContract (message: string, params: unknown[]): Promise<AnyJson> {
-    // "the dirty method" as in https://github.com/patractlabs/redspot/issues/78
+  async registerSecret (metadata: String): Promise<number | null> {
 
-    const execResult = await this.queryContract(message, params);
-
-    // eslint-disable-next-line
-    const extrinsic = this.#contract.tx[message](
-      { gasLimit: -1 },
-      ...params
-    );
-
+    const extrinsic = this.api.tx.secrets.registerSecret(metadata);
     const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
 
-    if (txResult) {
-      /* eslint-disable */
-      //@ts-ignore
-      return execResult.output?.toJSON();
-      /* eslint-enable */
-    } else { return txResult; }
-  }
+    if (txResult) {      
+      // time to get the secretId of the newly registered secret
 
-  /**
-   * query a contract function
-   * @param {string} message the name of the function of the contract to be called
-   * @param {unknown[]} params paramters of the function call
-   * @returns {Promise<AnyJson>} result from the blockchain
-  */
-  async queryContract (message: string, params: unknown[]): Promise<AnyJson> {
-    // eslint-disable-next-line
-    return (await this.#contract.query[message](
-      (typeof this.#sender === 'object') ? (this.#sender).address : this.#sender,
-      { gasLimit: -1 },
-      ...params
-    ));
+      const secretId = txResult.find(({ event: { method } }) => method === 'Registered').event.data[0];
+      return Number(secretId);
+
+    } else { return null; }
   }
 }

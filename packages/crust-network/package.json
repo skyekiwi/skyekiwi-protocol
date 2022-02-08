@@ -22,8 +22,8 @@
   "dependencies": {
     "@babel/runtime": "^7.15.3",
     "@crustio/type-definitions": "^1.2.0",
-    "@polkadot/api": "^6.12.1",
-    "@polkadot/keyring": "^8.1.2",
+    "@polkadot/api": "^7.7.1",
+    "@polkadot/keyring": "^8.3.3",
     "@polkadot/wasm-crypto": "^4.5.1",
     "@skyekiwi/ipfs": "0.5.2-10",
     "@skyekiwi/util": "0.5.2-10"

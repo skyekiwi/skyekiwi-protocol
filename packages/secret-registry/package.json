@@ -1,8 +1,8 @@
 {
-  "name": "@skyekiwi/wasm-contract",
+  "name": "@skyekiwi/secret-registry",
   "version": "0.5.2-10",
   "type": "module",
-  "description": "wrapper for interacting with Substrate WASM contracts for @skyekiwi",
+  "description": "wrapper for interacting with SkyeKiwi Network secret registry",
   "main": "index.js",
   "sideEffects": [
     "./detectPackage.js",
@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@polkadot/api": "^7.7.1",
-    "@polkadot/api-contract": "^7.7.1",
     "@polkadot/keyring": "^8.3.3",
     "@polkadot/types": "^7.7.1",
     "@polkadot/wasm-crypto": "^4.5.1",
