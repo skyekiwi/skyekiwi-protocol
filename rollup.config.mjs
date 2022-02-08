@@ -1,4 +1,4 @@
-// Copyright 2021 - 2022 @skyekiwi authors & contributors
+// Copyright 2021-2022 @skyekiwi authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import path from 'path';

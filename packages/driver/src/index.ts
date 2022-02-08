@@ -1,4 +1,4 @@
-// Copyright 2021 - 2022 @skyekiwi/util authors & contributors
+// Copyright 2021-2022 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AnyJson } from '@polkadot/types/types';
@@ -7,13 +7,12 @@ import type { Signature } from '@skyekiwi/crypto/types';
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
 
-import { Crust } from '@skyekiwi/crust-network';
 import { EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
 import { Metadata, SKYEKIWI_VERSION } from '@skyekiwi/metadata';
+import { SecretRegistry } from '@skyekiwi/secret-registry';
 import { getLogger, hexToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
-import { WASMContract } from '@skyekiwi/wasm-contract';
 
 export class Driver {
   /**
@@ -29,15 +28,13 @@ export class Driver {
     file: File,
     sealer: Sealer,
     encryptionSchema: EncryptionSchema,
-    storage: Crust,
-    registry: WASMContract
+    registry: SecretRegistry
   ): Promise<AnyJson> {
     const logger = getLogger('Driver.upstream');
 
     const ipfs = new IPFS();
     const metadata = new Metadata(sealer);
 
-    await storage.init();
     await registry.init();
 
     let chunkCount = 0;
@@ -79,7 +76,7 @@ export class Driver {
 
     if (storageResult) {
       logger.info('writting to registry');
-      const res = await registry.execContract('createVault', [result.cid]);
+      const res = await registry.registerSecret(result.cid);
 
       return res;
     } else {
@@ -149,8 +146,8 @@ export class Driver {
     * @returns {Promise<PreSealData>} the decrypted & recovered PreSealData
   */
   public static async getPreSealDataByVaultId (
-    vaultId: number,
-    registry: WASMContract,
+    secretId: number,
+    registry: SecretRegistry,
     keys: Uint8Array[],
     sealer: Sealer
   ): Promise<PreSealData> {
@@ -159,16 +156,13 @@ export class Driver {
     // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
 
-    /* eslint-disable */
-    //@ts-ignore
-    const contractResult = (await registry.queryContract('getMetadata', [vaultId])).output.toString();
-    /* eslint-enable */
+    const metadataCID = registry.getMetadata(secretId);
 
     logger.info('querying registry success');
 
     // 2. fetch the sealedData from IPFS
     const ipfs = new IPFS();
-    const metadata = Metadata.decodeSealedData(await ipfs.cat(contractResult));
+    const metadata = Metadata.decodeSealedData(await ipfs.cat(metadataCID));
 
     logger.info('prase sealed metadata success');
 
@@ -190,16 +184,16 @@ export class Driver {
     * @returns {Promise<void>} None.
   */
   public static async downstream (
-    vaultId: number,
+    secretId: number,
     keys: Uint8Array[],
-    registry: WASMContract,
+    registry: SecretRegistry,
     writeStream: WriteStream,
     sealer: Sealer
   ): Promise<void> {
     const logger = getLogger('Driver.downstream');
 
     logger.info('fetching pre-seal data');
-    const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
+    const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
 
     logger.info('entering downstream processing pipeline');
 
@@ -273,15 +267,14 @@ export class Driver {
     * @returns {Promise<void>} None.
   */
   public static async updateEncryptionSchema (
-    vaultId: number,
+    secretId: number,
     newEncryptionSchema: EncryptionSchema,
     keys: Uint8Array[],
-    storage: Crust,
-    registry: WASMContract,
+    registry: SecretRegistry,
     sealer: Sealer
   ): Promise<AnyJson> {
     // 1. get the preSealData from VaultId
-    const unsealed = await this.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
+    const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
 
     // 2. re-seal the data with the new encryptionSchema
     const sealed = Seal.seal(
@@ -297,7 +290,6 @@ export class Driver {
     });
 
     // 4. upload the updated sealed data and write to the secret registry
-    await storage.init();
     await registry.init();
 
     const ipfs = new IPFS();
@@ -308,7 +300,7 @@ export class Driver {
     const storageResult = true;
 
     if (storageResult) {
-      const res = await registry.execContract('updateMetadata', [vaultId, result.cid]);
+      const res = await registry.updateMetadata(secretId, result.cid);
 
       return res;
     } else {
@@ -326,14 +318,14 @@ export class Driver {
     * @returns {Promise<Signature>} the proof generated
   */
   public static async generateProofOfAccess (
-    vaultId: number,
+    secretId: number,
     keys: Uint8Array[],
-    registry: WASMContract,
+    registry: SecretRegistry,
     sealer: Sealer,
 
     message: Uint8Array
   ): Promise<Signature> {
-    const preSealData = await Driver.getPreSealDataByVaultId(vaultId, registry, keys, sealer);
+    const preSealData = await Driver.getPreSealDataByVaultId(secretId, registry, keys, sealer);
 
     const signer = new EthereumSign();
 

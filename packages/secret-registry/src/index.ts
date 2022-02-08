@@ -1,17 +1,16 @@
-// Copyright 2021 - 2022 @skyekiwi/wasm-contract authors & contributors
+// Copyright 2021-2022 @skyekiwi/wasm-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Signer } from '@polkadot/api/types';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { Abi, ContractPromise } from '@polkadot/api-contract';
 import { Keyring } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { AnyJson, RegistryTypes } from '@polkadot/types/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { getLogger, sendTx } from '@skyekiwi/util';
+import { getLogger, hexToU8a, sendTx, u8aToString } from '@skyekiwi/util';
 
 export class SecretRegistry {
   public api: ApiPromise
@@ -99,21 +98,59 @@ export class SecretRegistry {
 
   /**
    * register a secret
-   * @param {string} message the name of the function of the contract to be called
-   * @param {unknown[]} params paramters of the function call
-   * @returns {Promise<AnyJson>} result from the blockchain
+   * @param {string} metadata metadata to be stored by the blockchain module
+   * @returns {Promise<number | null>} the secret id assigned, or null if failed
   */
-  async registerSecret (metadata: String): Promise<number | null> {
-
+  async registerSecret (metadata: string): Promise<number | null> {
     const extrinsic = this.api.tx.secrets.registerSecret(metadata);
     const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
 
-    if (txResult) {      
+    if (txResult) {
       // time to get the secretId of the newly registered secret
 
-      const secretId = txResult.find(({ event: { method } }) => method === 'Registered').event.data[0];
-      return Number(secretId);
+      const secretId = txResult.find(({ event: { method } }) => method === 'SecretRegistered').event.data[0].toString();
 
+      return Number(secretId);
     } else { return null; }
+  }
+
+  /**
+   * register a secret
+   * @param {string} metadata metadata to be stored by the blockchain module
+   * @returns {Promise<number | null>} the secret id assigned, or null if failed
+  */
+  async updateMetadata (secretId: number, metadata: string): Promise<boolean> {
+    const extrinsic = this.api.tx.secrets.updateMetadata(secretId, metadata);
+    const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
+
+    if (txResult) {
+      // time to get the secretId of the newly registered secret
+
+      const _secretId = txResult.find(({ event: { method } }) => method === 'SecretUpdated').event.data[0].toString();
+
+      return Number(_secretId) === secretId;
+    } else { return false; }
+  }
+
+  /**
+   * get the next avaliable secret id
+   * @returns {Promise<number>} the secret id
+  */
+  async nextSecretId (): Promise<number> {
+    const result = await this.api.query.secrets.currentSecertId();
+
+    return Number(result.toString());
+  }
+
+  /**
+   * get metadata by secretId
+   * @param {number} secretId secretId of the secret to be queryed
+   * @returns {Promise<String>} secret metadata in form of IPFS CID
+  */
+  async getMetadata (secretId: number): Promise<string> {
+    const result = await this.api.query.secrets.metadata(secretId);
+
+    // result is the CID in hex form
+    return u8aToString(hexToU8a(result.toString().substring(2)));
   }
 }

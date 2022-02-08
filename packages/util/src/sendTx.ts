@@ -1,11 +1,10 @@
-// Copyright 2021 - 2022 @skyekiwi/util authors & contributors
+// Copyright 2021-2022 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SubmittableExtrinsic } from '@polkadot/api/promise/types';
-import type { EventRecord } from '@polkadot/types/interfaces';
-
 import type { Signer } from '@polkadot/api/types';
 import type { KeyringPair } from '@polkadot/keyring/types';
+import type { EventRecord } from '@polkadot/types/interfaces';
 
 // Ported from
 // https://github.com/crustio/crust.js/blob/main/packages/crust-pin/src/util.ts

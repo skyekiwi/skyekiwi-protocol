@@ -1,4 +1,4 @@
-// Copyright 2021 - 2022 @skyekiwi/metadata authors & contributors
+// Copyright 2021-2022 @skyekiwi/metadata authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { AsymmetricEncryption, DefaultSealer, EncryptionSchema, Seal } from '@skyekiwi/crypto';

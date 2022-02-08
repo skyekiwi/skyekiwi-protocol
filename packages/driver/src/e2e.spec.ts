@@ -1,4 +1,4 @@
-// Copyright 2021 - 2022 @skyekiwi/driver authors & contributors
+// Copyright 2021-2022 @skyekiwi/driver authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import { mnemonicToMiniSecret, mnemonicValidate } from '@polkadot/util-crypto';
@@ -6,13 +6,10 @@ import fs from 'fs';
 import path from 'path';
 import { randomBytes } from 'tweetnacl';
 
-import { Crust } from '@skyekiwi/crust-network';
 import { AsymmetricEncryption, DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
-import { WASMContract } from '@skyekiwi/wasm-contract';
+import { SecretRegistry } from '@skyekiwi/secret-registry';
 
-import abi from '../fixtures/skyekiwi.json';
-import types from '../fixtures/types';
 import { Driver } from '.';
 
 // eslint-disable-next-line
@@ -31,11 +28,9 @@ describe('@skyekiwi/driver', function () {
     throw new Error('mnemonic failed to read - e2e.spec.ts');
   }
 
-  const storage = new Crust(mnemonic);
-  const registry = new WASMContract(mnemonic, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
+  const registry = new SecretRegistry(mnemonic, {});
 
   afterAll(async () => {
-    await storage.disconnect();
     await registry.disconnect();
   });
 
@@ -50,7 +45,7 @@ describe('@skyekiwi/driver', function () {
     encryptionSchema.addMember(sealer.getAuthorKey());
 
     const result = await Driver.upstream(
-      file, sealer, encryptionSchema, storage, registry
+      file, sealer, encryptionSchema, registry
     );
 
     expect(result).toHaveProperty('ok');
@@ -73,15 +68,15 @@ describe('@skyekiwi/driver', function () {
       vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
     );
 
-    // const downstreamContent = fs.readFileSync(downstreamPath);
+    const downstreamContent = fs.readFileSync(downstreamPath);
 
-    // console.log(downstreamContent.length);
-    // console.log(Buffer.from(content).length);
+    console.log(downstreamContent.length);
+    console.log(Buffer.from(content).length);
 
-    // expect(Buffer.compare(
-    //   downstreamContent,
-    //   Buffer.from(content)
-    // )).toEqual(0);
+    expect(Buffer.compare(
+      downstreamContent,
+      Buffer.from(content)
+    )).toEqual(0);
 
     await cleanup();
   });
@@ -118,7 +113,7 @@ describe('@skyekiwi/driver', function () {
     encryptionSchema.addMember(publicKey2);
 
     const result = await Driver.updateEncryptionSchema(
-      vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], storage, registry, sealer
+      vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], registry, sealer
     );
 
     expect(result).toHaveProperty('ok');
