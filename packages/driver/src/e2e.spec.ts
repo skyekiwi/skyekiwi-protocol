@@ -48,12 +48,8 @@ describe('@skyekiwi/driver', function () {
       file, sealer, encryptionSchema, registry
     );
 
-    expect(result).toHaveProperty('ok');
-
-    /* eslint-disable */
-    // @ts-ignore
-    vaultId1 = result['ok']
-    /* eslint-enable */
+    expect(result).not.toBeNull();
+    vaultId1 = result;
 
     await cleanup();
   });

@@ -1,7 +1,6 @@
 // Copyright 2021-2022 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AnyJson } from '@polkadot/types/types';
 import type { WriteStream } from 'fs';
 import type { Signature } from '@skyekiwi/crypto/types';
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
@@ -29,7 +28,7 @@ export class Driver {
     sealer: Sealer,
     encryptionSchema: EncryptionSchema,
     registry: SecretRegistry
-  ): Promise<AnyJson> {
+  ): Promise<number> {
     const logger = getLogger('Driver.upstream');
 
     const ipfs = new IPFS();
@@ -72,16 +71,14 @@ export class Driver {
 
     logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
 
-    const storageResult = true;
+    logger.info('writting to registry');
+    const res = await registry.registerSecret(result.cid);
 
-    if (storageResult) {
-      logger.info('writting to registry');
-      const res = await registry.registerSecret(result.cid);
-
-      return res;
-    } else {
+    if (!res) {
       throw new Error('packaging works well, blockchain network err - Driver.upstream');
     }
+
+    return res;
   }
 
   /**
@@ -156,7 +153,7 @@ export class Driver {
     // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
 
-    const metadataCID = registry.getMetadata(secretId);
+    const metadataCID = await registry.getMetadata(secretId);
 
     logger.info('querying registry success');
 
@@ -272,7 +269,7 @@ export class Driver {
     keys: Uint8Array[],
     registry: SecretRegistry,
     sealer: Sealer
-  ): Promise<AnyJson> {
+  ): Promise<boolean> {
     // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
 
@@ -295,17 +292,9 @@ export class Driver {
     const ipfs = new IPFS();
     const result = await ipfs.add(sealedMetadata);
 
-    // Skipping submitting Crust network orders by using the Crust Web3 Auth Gateway
-    // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
-    const storageResult = true;
+    const res = await registry.updateMetadata(secretId, result.cid);
 
-    if (storageResult) {
-      const res = await registry.updateMetadata(secretId, result.cid);
-
-      return res;
-    } else {
-      throw new Error('packaging works well, blockchain network err - Driver.upstream');
-    }
+    return res;
   }
 
   /**

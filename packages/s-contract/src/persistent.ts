@@ -6,16 +6,13 @@ import type { SContractConfiguration } from './types';
 import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
 import fs from 'fs';
 
-import { Crust } from '@skyekiwi/crust-network';
 import { DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
 import { Driver } from '@skyekiwi/driver';
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
+import { SecretRegistry } from '@skyekiwi/secret-registry';
 import { hexToU8a, stringToIndex } from '@skyekiwi/util';
-import { WASMContract } from '@skyekiwi/wasm-contract';
 
-import abi from './fixtures/skyekiwi';
-import types from './fixtures/types';
 import { SContractReader } from './reader';
 
 /* eslint-disable */
@@ -30,7 +27,7 @@ export class SContractPersistent {
 
     const outputPath = `${config.localStoragePath}`;
     const sealer = new DefaultSealer();
-    const registry = new WASMContract(process.env.SEED_PHRASE, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
+    const registry = new SecretRegistry(process.env.SEED_PHRASE, {});
 
     sealer.unlock(mnemonicToMiniSecret(process.env.SEED_PHRASE));
 
@@ -66,7 +63,7 @@ export class SContractPersistent {
     const contractId = instance.getContractId();
 
     const sealer = new DefaultSealer();
-    const registry = new WASMContract(process.env.SEED_PHRASE, types, abi, '3gVh53DKMJMhQxNTc1fEegJFoZWvitpE7iCLPztDzSzef2Bg');
+    const registry = new SecretRegistry(process.env.SEED_PHRASE, {});
 
     sealer.unlock(mnemonicToMiniSecret(process.env.SEED_PHRASE));
 
@@ -80,15 +77,11 @@ export class SContractPersistent {
     const encryptionSchema = new EncryptionSchema();
 
     encryptionSchema.addMember(sealer.getAuthorKey());
-    const storage = new Crust(process.env.SEED_PHRASE);
 
-    const result = await Driver.upstream(contractFile, sealer, encryptionSchema, storage, registry);
+    const result = await Driver.upstream(contractFile, sealer, encryptionSchema, registry);
 
-    await storage.disconnect();
     await registry.disconnect();
-    /* eslint-disable */
-    // @ts-ignore
-    return result['ok']
-    /* eslint-enable */
+
+    return result;
   }
 }

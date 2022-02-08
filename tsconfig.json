@@ -8,8 +8,6 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@skyekiwi/crust-network": [ "packages/crust-network/src" ],
-      "@skyekiwi/crust-network/*": [ "packages/crust-network/src/*" ],
       "@skyekiwi/crypto": [ "packages/crypto/src" ],
       "@skyekiwi/crypto/*": [ "packages/crypto/src/*" ],
       "@skyekiwi/driver": [ "packages/driver/src" ],
@@ -26,8 +24,6 @@
       "@skyekiwi/secret-registry/*": [ "packages/secret-registry/src/*" ],
       "@skyekiwi/util": [ "packages/util/src" ],
       "@skyekiwi/util/*": [ "packages/util/src/*" ],
-      "@skyekiwi/wasm-contract": [ "packages/wasm-contract/src" ],
-      "@skyekiwi/wasm-contract/*": [ "packages/wasm-contract/src/*" ],
     },
     "skipLibCheck": true,
     "typeRoots": [
