@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/s-contract",
-  "version": "0.5.2-11",
+  "version": "0.6.2-0",
   "type": "module",
   "description": "secret contract host env based on SkyeKiwi Protocol",
   "main": "src/index.ts",
@@ -20,12 +20,12 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/crypto": "0.5.2-11",
-    "@skyekiwi/driver": "0.5.2-11",
-    "@skyekiwi/file": "0.5.2-11",
-    "@skyekiwi/ipfs": "0.5.2-11",
-    "@skyekiwi/secret-registry": "0.5.2-11",
-    "@skyekiwi/util": "0.5.2-11",
+    "@skyekiwi/crypto": "0.6.2-0",
+    "@skyekiwi/driver": "0.6.2-0",
+    "@skyekiwi/file": "0.6.2-0",
+    "@skyekiwi/ipfs": "0.6.2-0",
+    "@skyekiwi/secret-registry": "0.6.2-0",
+    "@skyekiwi/util": "0.6.2-0",
     "dotenv": "^10.0.0"
   },
   "devDependencies": {
