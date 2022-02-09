@@ -43,6 +43,8 @@ please reference to [Node.js Website](https://nodejs.org/en/download/)
 
 - The repo is tested with nodejs version `14.6.0` , to check on your nodejs version `node -v` , to switch version of node, I recommend using [n](https://github.com/tj/n) by TJ. 
 
+</p></details>
+
 <details><summary>My Environment</summary>
 
 <p>
