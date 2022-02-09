@@ -1,4 +1,10 @@
 # CHANGELOG
+## 0.6.1 Feb 09, 2022
+
+Remove unused packages
+Now register secrets to the SkyeKiwi Network
+Bump protocol version to `0x0 0x0 0x1 0x0`
+
 
 ## 0.5.1 Dec 03, 2021
 🎉 First Public Pre-release
