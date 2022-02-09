@@ -45,30 +45,6 @@ please reference to [Node.js Website](https://nodejs.org/en/download/)
 
 </p></details>
 
-<details><summary>My Environment</summary>
-
-<p>
-
-#### Versions 
-
-Codes are tested with the following environment:
-
-`binaryen`: `version 101` <br/>
-`cargo`: `cargo 1.51.0 (43b129a20 2021-03-16)` <br/>
-`cargo-contract`:  `cargo-contract 0.10.0` <br/>
-`node`: `v14.16.0` <br/>
-`rust`: `rustc 1.51.0 (2fd73fabe 2021-03-23)` <br/><br/>
-`canvas`: `canvas 0.1.0-385c4cc-x86_64-macos` <br/>
-`OS Version`: `macOS Big Sur 11.0.1` <br/>
-
-`ts-node`: `v10.0.0` <br/>
-`mocha`: `8.4.0` <br/>
-
-**Node Packages**
-Please refer to the `package.json`
-
-</p></details>
-
 ## Install
 
 |Package Name|Description|Status|
@@ -80,7 +56,7 @@ Please refer to the `package.json`
 |`@skyekiwi/metadata`|Metadata Packaer|Ready & Mostly Freezed|
 |`@skyekiwi/util`|Useful Utility Functions|Ready|
 |`@skyekiwi/secret-registry`|Register your secret to the SkyeKiwi Network|Limited Capcbility but Usable|
-|`@skyekiwi/wasm-contract`|Secret Registry: Substrate WASM Smart Contract connector|
+|`@skyekiwi/wasm-contract`|Secret Registry: Substrate WASM Smart Contract connector|Removed|
 |`@skyekiwi/crust-network`|The Crust Network Connector|Removed. Replaced w/Web3 Auth Gateways|
 
 Please refer to the `package/driver/e2e.spec.ts` folder which contains test cases for common useage.
