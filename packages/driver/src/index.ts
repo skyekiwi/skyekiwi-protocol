@@ -82,6 +82,74 @@ export class Driver {
   }
 
   /**
+    * the high level upstream API to upstream a contract
+    * @param {File} file content to be uploaded
+    * @param {Sealer} sealer a collection of sealer functions to be used
+    * @param {EncryptionSchema} encryptionSchema blueprint for the secret
+    * @param {SecretRegistry} registry secret registry connector to be used
+    * @param {string} wasmBlobCID the wasm blob cid of the contract
+    * @param {Uint8Array} contractPublicKey the public key of the contract
+    * @returns {Promise<void>} None.
+  */
+  public static async upstreamContract (
+    file: File,
+    sealer: Sealer,
+    encryptionSchema: EncryptionSchema,
+    registry: SecretRegistry
+  ): Promise<number> {
+    const logger = getLogger('Driver.upstream');
+
+    const ipfs = new IPFS();
+    const metadata = new Metadata(sealer);
+
+    await registry.init();
+
+    let chunkCount = 0;
+    const readStream = file.getReadStream();
+
+    logger.info('initiating chunk processing pipeline');
+
+    // main loop - the main upstreaming pipeline
+    for await (const chunk of readStream) {
+      await Driver.upstreamChunkProcessingPipeLine(
+        metadata, chunk, chunkCount++
+      );
+    }
+
+    const cidList: IPFSResult[] = metadata.getCIDList();
+
+    logger.info('CID List extraction success');
+
+    const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
+
+    logger.info('file metadata sealed');
+
+    const result = await ipfs.add(sealedData);
+
+    logger.info('sealed metadata uploaded to IPFS');
+
+    cidList.push({
+      cid: result.cid,
+      size: result.size
+    });
+
+    // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
+    // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+    // logger.info('Crust order placed');
+
+    logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
+
+    logger.info('writting to registry');
+    const res = await registry.registerSecretContract(result.cid);
+
+    if (!res) {
+      throw new Error('packaging works well, blockchain network err - Driver.upstream');
+    }
+
+    return res;
+  }
+
+  /**
     * upstream helper - pipeline to process each chunk
     * @param {Metadata} metadata an Metadata handler instance
     * @param {Uint8Array} chunk chunk to be processed
