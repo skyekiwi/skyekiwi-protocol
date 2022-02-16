@@ -140,7 +140,8 @@ export class Driver {
     logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
 
     logger.info('writting to registry');
-    const res = await registry.registerSecretContract(result.cid);
+    const res = await registry.registerSecret(
+      result.cid);
 
     if (!res) {
       throw new Error('packaging works well, blockchain network err - Driver.upstream');

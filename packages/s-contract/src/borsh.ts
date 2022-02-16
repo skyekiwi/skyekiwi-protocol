@@ -61,11 +61,20 @@ class Call {
   }
 }
 
+class Calls {
+  public ops: Call[]
+  constructor (config: {
+    ops: Call[]
+  }) {
+    this.ops = config.ops;
+  }
+}
+
 const callSchema = new Map([
   [Call, {
     kind: 'struct',
     fields: [
-      ['transactionAction', 'string'],
+      ['transaction_action', 'string'],
       ['receiver', 'string'],
       ['amount', { kind: 'option', type: 'u128' }],
       ['wasm_file', { kind: 'option', type: 'string' }],
@@ -75,6 +84,16 @@ const callSchema = new Map([
     ]
   }]
 ]);
+
+const callsSchema = new Map();
+
+callsSchema.set(Calls, {
+  kind: 'struct',
+  fields: [
+    ['ops', [Call]]
+  ]
+});
+callsSchema.set(Call, callSchema.get(Call));
 
 class Outcome {
   public view_result_log: string[]
@@ -134,6 +153,19 @@ class WrappedOutcome {
   }
 }
 
+class Outcomes {
+  public ops: Outcome[]
+  public state_root: Uint8Array
+
+  constructor (config: {
+    ops: Outcome[],
+    state_root: Uint8Array
+  }) {
+    this.ops = config.ops;
+    this.state_root = config.state_root;
+  }
+}
+
 const outcomeSchema = new Map([[Outcome, {
   kind: 'struct',
   fields: [
@@ -148,10 +180,29 @@ const outcomeSchema = new Map([[Outcome, {
   ]
 }]]);
 
+const outcomesSchema = new Map();
+
+outcomesSchema.set(Outcomes, {
+  kind: 'struct',
+  fields: [
+    ['ops', [Outcome]],
+    ['state_root', ['u8', 32]]
+  ]
+});
+outcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
+
 const buildCall = (
   call: Call
 ): Uint8Array => {
   const buf = serialize(callSchema, call);
+
+  return buf;
+};
+
+const buildCalls = (
+  calls: Calls
+): Uint8Array => {
+  const buf = serialize(callsSchema, calls);
 
   return buf;
 };
@@ -162,10 +213,24 @@ const parseCall = (
   return deserialize(callSchema, Call, Buffer.from(buf));
 };
 
+const parseCalls = (
+  buf: Uint8Array
+): Calls => {
+  return deserialize(callsSchema, Calls, Buffer.from(buf));
+};
+
 const buildOutcome = (
   outcome: Outcome
 ): Uint8Array => {
   const buf = serialize(outcomeSchema, outcome);
+
+  return buf;
+};
+
+const buildOutcomes = (
+  outcomes: Outcomes
+): Uint8Array => {
+  const buf = serialize(outcomesSchema, outcomes);
 
   return buf;
 };
@@ -176,7 +241,13 @@ const parseOutcome = (
   return deserialize(outcomeSchema, Outcome, Buffer.from(buf));
 };
 
+const parseOutcomes = (
+  buf: Uint8Array
+): Outcomes => {
+  return deserialize(outcomesSchema, Outcomes, Buffer.from(buf));
+};
+
 export {
-  WrappedCall, Call, callSchema, buildCall, parseCall,
-  WrappedOutcome, Outcome, outcomeSchema, buildOutcome, parseOutcome
+  WrappedCall, Call, Calls, buildCall, parseCall, buildCalls, parseCalls,
+  WrappedOutcome, Outcome, Outcomes, buildOutcome, parseOutcome, buildOutcomes, parseOutcomes
 };

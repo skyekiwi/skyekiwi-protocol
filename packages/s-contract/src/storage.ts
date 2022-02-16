@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ApiPromise } from '@polkadot/api';
-import { mnemonicToMiniSecret } from '@polkadot/util-crypto';
-import { randomBytes } from 'crypto';
 import fs from 'fs';
 
 import { SymmetricEncryption } from '@skyekiwi/crypto';
@@ -29,16 +27,6 @@ class CallInfo {
   public writeOutcome (outcome: Outcome) {
     this.rawOutcome = outcome;
   }
-  // public getWrappedCall() {
-  //     return new WrappedCall({
-  //         call: buildCall(this.call),
-  //         callIndex: this.call.callIndex,
-  //         contractId: this.call.contractId,
-  //         encrypted: this.call.encrypted,
-  //         origin: this.call.origin,
-  //         shardId: this.call.shardId,
-  //     });
-  // }
 }
 
 class ContractInfo {
@@ -104,17 +92,14 @@ export class Storage {
   public contracts: { [contractIndex: number]: ContractInfo }
   public calls: { [callIndex: number]: CallInfo }
   public shards: { [shardId: number]: ShardInfo }
+  #key: Uint8Array
 
-  public key: Uint8Array
+  constructor (public api: ApiPromise, key: Uint8Array, path?: string) {
+    this.#key = key;
 
-  constructor (public api: ApiPromise, path?: string) {
     if (path) {
       this.fromFile(path);
     } else {
-      const newKey = randomBytes(32);
-
-      this.#key = newKey;
-
       this.contracts = {};
       this.calls = {};
       this.shards = {};
@@ -123,16 +108,13 @@ export class Storage {
 
   public fromFile (path: string): void {
     const source = fs.readFileSync(path);
-    const seed = process.env.SEED_PHRASE;
-    const key = mnemonicToMiniSecret(seed);
 
-    const decrypted = SymmetricEncryption.decrypt(source, key);
+    const decrypted = SymmetricEncryption.decrypt(source, this.#key);
     const obj = JSON.parse(u8aToString(decrypted)) as this;
 
     this.contracts = obj.contracts;
     this.calls = obj.calls;
     this.shards = obj.shards;
-    this.#key = obj.key;
   }
 
   public saveToFile (path: string): void {

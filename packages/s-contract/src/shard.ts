@@ -31,7 +31,7 @@ export class ShardManager {
       this.#threshold = {};
     }
 
-    public async init () {
+    public async init (): Promise<void> {
       const seed = process.env.TEST_SEED_PHRASE;
 
       if (!seed) {
@@ -47,13 +47,13 @@ export class ShardManager {
       this.#keyring = new Keyring({ type: 'sr25519' }).addFromUri(seed);
     }
 
-    public async maybeRegisterSecretKeeper (blockNumber: number) {
+    public async maybeRegisterSecretKeeper (blockNumber: number): Promise<void> {
       const allExtrinsics = [];
 
       const maybeExpiration = await this.#api.query.registry.expiration(this.#keyring.address);
+      const expiration = Number(maybeExpiration.toString());
 
-      if (Number(maybeExpiration.toString()) === NaN ||
-            Number(maybeExpiration.toString()) - 10 < blockNumber) {
+      if (isNaN(expiration) || expiration - 10 < blockNumber) {
         // not previously registered
         allExtrinsics.push(this.#api.tx.registry.registerSecretKeeper(
           u8aToHex(AsymmetricEncryption.getPublicKey(this.#key)),
@@ -70,7 +70,7 @@ export class ShardManager {
       }
     }
 
-    public async maybeSubmitExecutionReport (blockNumber: number) {
+    public maybeSubmitExecutionReport (blockNumber: number): void {
       for (const shard of this.#shards) {
         console.log(this.beaconIsTurn(blockNumber, shard));
 
@@ -80,7 +80,7 @@ export class ShardManager {
       }
     }
 
-    public async fetchShardInfo () {
+    public async fetchShardInfo (): Promise<void> {
       for (const shard of this.#shards) {
         const maybeMembers = await this.#api.query.registry.shardMembers(shard);
         const maybeBeaconIndex = await this.#api.query.registry.beaconIndex(shard, this.#keyring.address);
@@ -98,7 +98,7 @@ export class ShardManager {
           this.#beaconIndex[shard] = beaconIndex;
         }
 
-        this.#threshold[shard] = threshold || threshold == 0 ? 1 : threshold;
+        this.#threshold[shard] = threshold || threshold === 0 ? 1 : threshold;
       }
     }
 
