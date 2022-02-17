@@ -92,62 +92,92 @@ export class Driver {
     * @returns {Promise<void>} None.
   */
   public static async upstreamContract (
-    file: File,
-    sealer: Sealer,
-    encryptionSchema: EncryptionSchema,
-    registry: SecretRegistry
+    wasmBlob: Uint8Array,
+    registry: SecretRegistry,
+    initialState?: File,
+    sealer?: Sealer,
+    encryptionSchema?: EncryptionSchema,
+    hasInitialSecretState?: boolean
   ): Promise<number> {
     const logger = getLogger('Driver.upstream');
 
     const ipfs = new IPFS();
-    const metadata = new Metadata(sealer);
+    const wasmFile = await ipfs.add(u8aToHex(wasmBlob));
 
     await registry.init();
 
-    let chunkCount = 0;
-    const readStream = file.getReadStream();
+    if (hasInitialSecretState) {
+      if (!initialState) {
+        throw new Error('initialState is required when hasInitialSecretState is true');
+      }
 
-    logger.info('initiating chunk processing pipeline');
+      if (!sealer) {
+        throw new Error('sealer is required when hasInitialSecretState is true');
+      }
 
-    // main loop - the main upstreaming pipeline
-    for await (const chunk of readStream) {
-      await Driver.upstreamChunkProcessingPipeLine(
-        metadata, chunk, chunkCount++
+      if (!encryptionSchema) {
+        throw new Error('encryptionSchema is required when hasInitialSecretState is true');
+      }
+
+      const metadata = new Metadata(sealer);
+
+      let chunkCount = 0;
+      const readStream = initialState.getReadStream();
+
+      logger.info('initiating chunk processing pipeline');
+
+      // main loop - the main upstreaming pipeline
+      for await (const chunk of readStream) {
+        await Driver.upstreamChunkProcessingPipeLine(
+          metadata, chunk, chunkCount++
+        );
+      }
+
+      const cidList: IPFSResult[] = metadata.getCIDList();
+
+      logger.info('CID List extraction success');
+
+      const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
+
+      logger.info('file metadata sealed');
+
+      const result = await ipfs.add(sealedData);
+
+      logger.info('sealed metadata uploaded to IPFS');
+
+      cidList.push({
+        cid: result.cid,
+        size: result.size
+      });
+
+      // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
+      // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+      // logger.info('Crust order placed');
+
+      logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
+
+      logger.info('writting to registry');
+      const res = await registry.registerSecretContract(
+        result.cid, wasmFile.cid
       );
+
+      if (!res) {
+        throw new Error('packaging works well, blockchain network err - Driver.upstream');
+      }
+
+      return res;
+    } else {
+      const res = await registry.registerSecretContract(
+        '0000000000000000000000000000000000000000000000',
+        wasmFile.cid
+      );
+
+      if (!res) {
+        throw new Error('packaging works well, blockchain network err - Driver.upstream');
+      }
+
+      return res;
     }
-
-    const cidList: IPFSResult[] = metadata.getCIDList();
-
-    logger.info('CID List extraction success');
-
-    const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
-
-    logger.info('file metadata sealed');
-
-    const result = await ipfs.add(sealedData);
-
-    logger.info('sealed metadata uploaded to IPFS');
-
-    cidList.push({
-      cid: result.cid,
-      size: result.size
-    });
-
-    // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
-    // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
-    // logger.info('Crust order placed');
-
-    logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
-
-    logger.info('writting to registry');
-    const res = await registry.registerSecret(
-      result.cid);
-
-    if (!res) {
-      throw new Error('packaging works well, blockchain network err - Driver.upstream');
-    }
-
-    return res;
   }
 
   /**
