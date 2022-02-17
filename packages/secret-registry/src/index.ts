@@ -155,7 +155,7 @@ export class SecretRegistry {
    * @returns {Promise<number>} the secret id
   */
   async nextSecretId (): Promise<number> {
-    const result = await this.api.query.secrets.currentSecertId();
+    const result = await this.api.query.secrets.currentSecretId();
 
     return Number(result.toString());
   }
