@@ -171,4 +171,16 @@ export class SecretRegistry {
     // result is the CID in hex form
     return u8aToString(hexToU8a(result.toString().substring(2)));
   }
+
+  /**
+   * get wasmblob by secretId
+   * @param {number} secretId secretId of the secret to be queryed
+   * @returns {Promise<String>} secret wasmblob in form of IPFS CID
+  */
+  async getWasmBlob (secretId: number): Promise<string> {
+    const result = await this.api.query.secrets.wasmBlob(secretId);
+
+    // result is the CID in hex form
+    return u8aToString(hexToU8a(result.toString().substring(2)));
+  }
 }

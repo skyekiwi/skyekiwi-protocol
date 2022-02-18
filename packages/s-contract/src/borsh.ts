@@ -202,6 +202,10 @@ const buildCall = (
 const buildCalls = (
   calls: Calls
 ): Uint8Array => {
+  if (calls.ops.length === 0) {
+    return new Uint8Array(0);
+  }
+
   const buf = serialize(callsSchema, calls);
 
   return buf;
@@ -216,6 +220,12 @@ const parseCall = (
 const parseCalls = (
   buf: Uint8Array
 ): Calls => {
+  if (buf.length === 0) {
+    return {
+      ops: []
+    };
+  }
+
   return deserialize(callsSchema, Calls, Buffer.from(buf));
 };
 

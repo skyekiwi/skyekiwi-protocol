@@ -154,4 +154,18 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
   });
+
+  test('encode/decode empty calls works', () => {
+    const calls = new Calls({
+      ops: []
+    });
+
+    const buf = buildCalls(calls);
+    const parsedCalls = parseCalls(buf);
+
+    expect(buf).toEqual(new Uint8Array(0));
+    expect(parsedCalls).toEqual({
+      ops: []
+    });
+  });
 });

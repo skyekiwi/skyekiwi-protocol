@@ -24,6 +24,10 @@ export class Chain {
       this.#api = await ApiPromise.create({ provider: this.#provider });
     }
 
+    public async disconnect (): Promise<void> {
+      await this.#provider.disconnect();
+    }
+
     public async subscribeNewBlock (
       newBlockHook: (blockNumber: number) => Promise<void>,
       newContractDeployHook: (contractIds: number[]) => void,

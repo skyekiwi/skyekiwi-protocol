@@ -47,6 +47,10 @@ export class ShardManager {
       this.#keyring = new Keyring({ type: 'sr25519' }).addFromUri(seed);
     }
 
+    public async disconnect (): Promise<void> {
+      await this.#provider.disconnect();
+    }
+
     public async maybeRegisterSecretKeeper (blockNumber: number): Promise<void> {
       const allExtrinsics = [];
 

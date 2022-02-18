@@ -5,6 +5,7 @@ import { buildCall, buildCalls, buildOutcome, buildOutcomes, Call, Calls, Outcom
   parseOutcome, parseOutcomes,
   WrappedCall, WrappedOutcome } from './borsh';
 import { Chain } from './chain';
+import { Contract } from './contract';
 import { ShardManager } from './shard';
 import { Storage } from './storage';
 
@@ -12,5 +13,5 @@ export {
   WrappedCall, Call, Calls, buildCall, parseCall, buildCalls, parseCalls,
   WrappedOutcome, Outcome, Outcomes, buildOutcome, parseOutcome, buildOutcomes, parseOutcomes,
 
-  ShardManager, Chain, Storage
+  ShardManager, Chain, Storage, Contract
 };

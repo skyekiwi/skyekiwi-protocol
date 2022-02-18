@@ -33,7 +33,8 @@
 //       async () => {
 
 //       }
-
 //     );
+
+//     await chain.disconnect
 //   });
 // });
