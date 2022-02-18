@@ -12,15 +12,16 @@ import { Call, Calls, Contract } from '.';
 
 dotenv.config();
 
-const mnemonic = process.env.SEED_PHRASE;
-
-if (!mnemonicValidate(mnemonic)) {
-  throw new Error('mnemonic failed to read - e2e.spec.ts');
-}
-
-const registry = new SecretRegistry(mnemonic, {});
-
 describe('@skyekiwi/s-contract/contract', function () {
+
+  const mnemonic = process.env.SEED_PHRASE;
+
+  if (!mnemonicValidate(mnemonic)) {
+    throw new Error('mnemonic failed to read - e2e.spec.ts');
+  }
+  
+  const registry = new SecretRegistry(mnemonic, {});
+  
   afterAll(async () => {
     await registry.disconnect();
   });
@@ -40,6 +41,8 @@ describe('@skyekiwi/s-contract/contract', function () {
     expect(downstreamedContract.initialState).toEqual(contract.initialState);
     expect(downstreamedContract.secretId).toEqual(result);
     expect(downstreamedContract.wasmBlob).toEqual(contract.wasmBlob);
+
+    // await registry.disconnect();
   });
 
   test('upstream/downstream contract with initial state', async () => {
@@ -79,5 +82,7 @@ describe('@skyekiwi/s-contract/contract', function () {
     expect(u8aToHex(downstreamedContract.initialState)).toEqual(u8aToHex(contract.initialState));
     expect(downstreamedContract.secretId).toEqual(result);
     expect(u8aToHex(downstreamedContract.wasmBlob)).toEqual(u8aToHex(contract.wasmBlob));
+
+    await registry.disconnect();
   });
 });

@@ -35,8 +35,6 @@ export class Contract {
       throw new Error('mnemonic failed to read - e2e.spec.ts');
     }
 
-    await registry.init();
-
     if (contract.initialState.length !== 0) {
       const provider = new WsProvider('wss://staging.rpc.skye.kiwi');
       const api = await ApiPromise.create({ provider: provider });
@@ -60,6 +58,8 @@ export class Contract {
         }
       }
 
+      await provider.disconnect();
+
       return await Driver.upstreamContract(
         registry, contract, sealer, encryptionSchema
       );
@@ -75,10 +75,7 @@ export class Contract {
       throw new Error('mnemonic failed to read - e2e.spec.ts');
     }
 
-    await registry.init();
-
     const sealer = new DefaultSealer();
-
     sealer.unlock(mnemonicToMiniSecret(mnemonic));
 
     return await Driver.downstreamContract(

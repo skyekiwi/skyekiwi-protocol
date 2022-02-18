@@ -65,16 +65,47 @@ export class IPFS {
 
   async add (content: string, authHeader?: string): Promise<IPFSResult> {
     const auth = authHeader || 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
-    const result = await this.upload(auth, content);
+    let reTries = 3;
+    let res;
 
-    await this.pin(auth, result.cid);
+    while (reTries >= 0) {
+      try {
+        res = await this.upload(auth, content);
+      } catch (e) {}
 
-    return result;
+      if (res) break;
+      reTries--;
+    }
+
+    reTries = 3;
+
+    while (reTries >= 0) {
+      try {
+        await this.pin(auth, res.cid);
+      } catch (e) {}
+
+      if (res) break;
+      reTries--;
+    }
+
+    return res;
   }
 
   async cat (cid: string, authHeader?: string): Promise<string> {
     const auth = authHeader || 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
 
-    return await this.download(auth, cid);
+    let reTries = 3;
+    let res;
+
+    while (reTries >= 0) {
+      try {
+        res = await this.download(auth, cid);
+      } catch (e) {}
+
+      if (res) break;
+      reTries--;
+    }
+
+    return res;
   }
 }
