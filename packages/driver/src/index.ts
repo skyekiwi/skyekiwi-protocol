@@ -1,10 +1,10 @@
 // Copyright 2021-2022 @skyekiwi/util authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { WriteStream } from 'fs';
 import type { Signature } from '@skyekiwi/crypto/types';
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
+import type { SecretContract } from './types';
 
 import { EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
@@ -82,6 +82,96 @@ export class Driver {
   }
 
   /**
+    * the high level upstream API to upstream a contract
+    * @param {File} file content to be uploaded
+    * @param {Sealer} sealer a collection of sealer functions to be used
+    * @param {EncryptionSchema} encryptionSchema blueprint for the secret
+    * @param {SecretRegistry} registry secret registry connector to be used
+    * @param {string} wasmBlobCID the wasm blob cid of the contract
+    * @param {Uint8Array} contractPublicKey the public key of the contract
+    * @returns {Promise<void>} None.
+  */
+  public static async upstreamContract (
+    registry: SecretRegistry,
+    contract: SecretContract,
+    sealer?: Sealer,
+    encryptionSchema?: EncryptionSchema
+  ): Promise<number> {
+    const logger = getLogger('Driver.upstream');
+
+    const ipfs = new IPFS();
+    const wasmFile = await ipfs.add(u8aToHex(contract.wasmBlob));
+
+    await registry.init();
+
+    if (contract.initialState && contract.initialState.length !== 0) {
+      if (!sealer) {
+        throw new Error('sealer is required when hasInitialSecretState is true');
+      }
+
+      if (!encryptionSchema) {
+        throw new Error('encryptionSchema is required when hasInitialSecretState is true');
+      }
+
+      const metadata = new Metadata(sealer);
+
+      let chunkCount = 0;
+
+      logger.info('initiating chunk processing pipeline');
+
+      // main loop - the main upstreaming pipeline
+      await Driver.upstreamChunkProcessingPipeLine(
+        metadata, contract.initialState, chunkCount++
+      );
+
+      const cidList: IPFSResult[] = metadata.getCIDList();
+
+      logger.info('CID List extraction success');
+
+      const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
+
+      logger.info('file metadata sealed');
+
+      const result = await ipfs.add(sealedData);
+
+      logger.info('sealed metadata uploaded to IPFS');
+
+      cidList.push({
+        cid: result.cid,
+        size: result.size
+      });
+
+      // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
+      // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
+      // logger.info('Crust order placed');
+
+      logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
+
+      logger.info('writting to registry');
+      const res = await registry.registerSecretContract(
+        result.cid, wasmFile.cid
+      );
+
+      if (!res) {
+        throw new Error('packaging works well, blockchain network err - Driver.upstream');
+      }
+
+      return res;
+    } else {
+      const res = await registry.registerSecretContract(
+        '0000000000000000000000000000000000000000000000',
+        wasmFile.cid
+      );
+
+      if (!res) {
+        throw new Error('packaging works well, blockchain network err - Driver.upstream');
+      }
+
+      return res;
+    }
+  }
+
+  /**
     * upstream helper - pipeline to process each chunk
     * @param {Metadata} metadata an Metadata handler instance
     * @param {Uint8Array} chunk chunk to be processed
@@ -145,8 +235,8 @@ export class Driver {
   public static async getPreSealDataByVaultId (
     secretId: number,
     registry: SecretRegistry,
-    keys: Uint8Array[],
-    sealer: Sealer
+    keys?: Uint8Array[],
+    sealer?: Sealer
   ): Promise<PreSealData> {
     const logger = getLogger('Driver.getPreSealDataByVaultId');
 
@@ -154,6 +244,14 @@ export class Driver {
     await registry.init();
 
     const metadataCID = await registry.getMetadata(secretId);
+
+    if (metadataCID === '0000000000000000000000000000000000000000000000') {
+      return null;
+    }
+
+    if (!keys || !sealer) {
+      throw new Error('keys and sealer are required');
+    }
 
     logger.info('querying registry success');
 
@@ -184,8 +282,8 @@ export class Driver {
     secretId: number,
     keys: Uint8Array[],
     registry: SecretRegistry,
-    writeStream: WriteStream,
-    sealer: Sealer
+    sealer: Sealer,
+    write: (chunk: Uint8Array) => void
   ): Promise<void> {
     const logger = getLogger('Driver.downstream');
 
@@ -198,8 +296,54 @@ export class Driver {
       unsealed.chunkCID,
       unsealed.hash,
       unsealed.sealingKey,
-      writeStream
+      write
     );
+  }
+
+  /**
+    * high level downstream API for secret contracts
+    * @param {number} vaultId the vaultId from the secret registry
+    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
+    * @param {WASMContract} registry connector to the blockchain secret registry
+    * @param {WriteSteram} writeStream output writeStream
+    * @param {Sealer} sealer sealer functions used to decrypt the shares
+    * @returns {Promise<SecretContract>} a secret contract instance.
+  */
+  public static async downstreamContract (
+    secretId: number,
+    registry: SecretRegistry,
+    keys?: Uint8Array[],
+    sealer?: Sealer
+  ): Promise<SecretContract> {
+    const logger = getLogger('Driver.downstreamContract');
+
+    logger.info('fetching pre-seal data');
+    const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
+
+    let initialState: Uint8Array = new Uint8Array(0);
+
+    if (unsealed) {
+      logger.info('entering downstream processing pipeline');
+      await this.downstreamChunkProcessingPipeLine(
+        unsealed.chunkCID,
+        unsealed.hash,
+        unsealed.sealingKey,
+        (chunk: Uint8Array) => {
+          initialState = new Uint8Array([...initialState, ...chunk]);
+        }
+      );
+    } else {
+      logger.info('no initialState data found, downloading wasmBlob only');
+    }
+
+    const ipfs = new IPFS();
+    const wasmBlob = await ipfs.cat(await registry.getWasmBlob(secretId));
+
+    return {
+      initialState: initialState,
+      secretId: secretId,
+      wasmBlob: hexToU8a(wasmBlob)
+    } as SecretContract;
   }
 
   /**
@@ -214,7 +358,7 @@ export class Driver {
     chunks: string,
     hash: Uint8Array,
     sealingKey: Uint8Array,
-    writeStream: WriteStream
+    write: (chunk: Uint8Array) => void
   ): Promise<void> {
     const logger = getLogger('Driver.downstream');
 
@@ -245,7 +389,7 @@ export class Driver {
 
       logger.info('writting to file');
 
-      writeStream.write(chunk);
+      write(chunk);
     }
 
     if (u8aToHex(currentHash) !== u8aToHex(hash)) {
@@ -258,7 +402,6 @@ export class Driver {
     * @param {number} vaultId the vaultId from the secret registry
     * @param {EncryptionSchema} newEncryptionSchema the new encryptionSchema
     * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
-    * @param {Crust} storage storage network connector
     * @param {WASMContract} registry connector to the blockchain secret registry
     * @param {Sealer} sealer sealer functions used to decrypt the shares
     * @returns {Promise<void>} None.

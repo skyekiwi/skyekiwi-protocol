@@ -81,18 +81,14 @@ const result = await Driver.upstream(
 
 DOWNSTREAM
 ```javascript
-const registry = new SecretRegistry(mnemonic, {});
-
-const stream = fs.createWriteStream(downstreamPath, { flags: 'a' });
-const sealer = new DefaultSealer();
-
-sealer.unlock(mnemonicToMiniSecret(mnemonic));
-
+let downstreamContent = new Uint8Array(0);
 await Driver.downstream(
-  vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, stream, sealer
+  vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
+  (chunk: Uint8Array) => {
+    downstreamContent = new Uint8Array([...downstreamContent, ...chunk])
+  }
 );
 ```
-
 
 UPDATE ENCRYPTION SCHEMA
 ```javascript
