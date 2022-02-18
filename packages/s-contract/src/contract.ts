@@ -28,14 +28,12 @@ export class Contract {
     };
   }
 
-  public static async upstream (contract: SecretContract): Promise<number> {
+  public static async upstream (registry: SecretRegistry, contract: SecretContract): Promise<number> {
     const mnemonic = process.env.SEED_PHRASE;
 
     if (!mnemonicValidate(mnemonic)) {
       throw new Error('mnemonic failed to read - e2e.spec.ts');
     }
-
-    const registry = new SecretRegistry(mnemonic, {});
 
     await registry.init();
 
@@ -47,9 +45,13 @@ export class Contract {
       const sksRaw = await api.query.registry.secretKeepers();
       const sks = sksRaw.toJSON() as unknown as string[];
 
+      const sealer = new DefaultSealer();
+
+      sealer.unlock(mnemonicToMiniSecret(process.env.SEED_PHRASE));
+
       if (!sks || sks.length === 0) {
         console.warn('no secret keepers found. Testing mode only.');
-        encryptionSchema.addMember(mnemonicToMiniSecret(mnemonic));
+        encryptionSchema.addMember(sealer.getAuthorKey());
       } else {
         for (const sk of sks) {
           const pk = (await api.query.registry.publicKey(sk)).toString();
@@ -58,34 +60,20 @@ export class Contract {
         }
       }
 
-      const sealer = new DefaultSealer();
-
-      sealer.unlock(mnemonicToMiniSecret(process.env.SEED_PHRASE));
-
-      const result = await Driver.upstreamContract(
+      return await Driver.upstreamContract(
         registry, contract, sealer, encryptionSchema
       );
-
-      await registry.disconnect();
-
-      return result;
     } else {
-      const res = await Driver.upstreamContract(registry, contract);
-
-      await registry.disconnect();
-
-      return res;
+      return await Driver.upstreamContract(registry, contract);
     }
   }
 
-  public static async downstream (secretId: number): Promise<SecretContract> {
+  public static async downstream (registry: SecretRegistry, secretId: number): Promise<SecretContract> {
     const mnemonic = process.env.SEED_PHRASE;
 
     if (!mnemonicValidate(mnemonic)) {
       throw new Error('mnemonic failed to read - e2e.spec.ts');
     }
-
-    const registry = new SecretRegistry(mnemonic, {});
 
     await registry.init();
 
@@ -93,12 +81,8 @@ export class Contract {
 
     sealer.unlock(mnemonicToMiniSecret(mnemonic));
 
-    const res = await Driver.downstreamContract(
+    return await Driver.downstreamContract(
       secretId, registry, [mnemonicToMiniSecret(mnemonic)], sealer
     );
-
-    await registry.disconnect();
-
-    return res;
   }
 }

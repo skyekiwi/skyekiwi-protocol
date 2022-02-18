@@ -1,25 +1,41 @@
 // Copyright 2021-2022 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { mnemonicValidate } from '@polkadot/util-crypto';
 import BN from 'bn.js';
 import dotenv from 'dotenv';
+
+import { SecretRegistry } from '@skyekiwi/secret-registry';
+import { u8aToHex } from '@skyekiwi/util';
 
 import { Call, Calls, Contract } from '.';
 
 dotenv.config();
 
+const mnemonic = process.env.SEED_PHRASE;
+
+if (!mnemonicValidate(mnemonic)) {
+  throw new Error('mnemonic failed to read - e2e.spec.ts');
+}
+
+const registry = new SecretRegistry(mnemonic, {});
+
 describe('@skyekiwi/s-contract/contract', function () {
+  afterAll(async () => {
+    await registry.disconnect();
+  });
+
   test('upstream/downstream contract without initial state', async () => {
     const calls = new Calls({
       ops: []
     });
 
     const contract = Contract.intoSecretContract(calls, new Uint8Array([0x1, 0x2, 0x3, 0x4]));
-    const result = await Contract.upstream(contract);
+    const result = await Contract.upstream(registry, contract);
 
     expect(result).not.toBeNull();
 
-    const downstreamedContract = await Contract.downstream(result);
+    const downstreamedContract = await Contract.downstream(registry, result);
 
     expect(downstreamedContract.initialState).toEqual(contract.initialState);
     expect(downstreamedContract.secretId).toEqual(result);
@@ -54,14 +70,14 @@ describe('@skyekiwi/s-contract/contract', function () {
     });
 
     const contract = Contract.intoSecretContract(calls, new Uint8Array([0x1, 0x2, 0x3, 0x4]));
-    const result = await Contract.upstream(contract);
+    const result = await Contract.upstream(registry, contract);
 
     expect(result).not.toBeNull();
 
-    const downstreamedContract = await Contract.downstream(result);
+    const downstreamedContract = await Contract.downstream(registry, result);
 
-    expect(downstreamedContract.initialState).toEqual(contract.initialState);
+    expect(u8aToHex(downstreamedContract.initialState)).toEqual(u8aToHex(contract.initialState));
     expect(downstreamedContract.secretId).toEqual(result);
-    expect(downstreamedContract.wasmBlob).toEqual(contract.wasmBlob);
+    expect(u8aToHex(downstreamedContract.wasmBlob)).toEqual(u8aToHex(contract.wasmBlob));
   });
 });
