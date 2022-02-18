@@ -13,15 +13,14 @@ import { Call, Calls, Contract } from '.';
 dotenv.config();
 
 describe('@skyekiwi/s-contract/contract', function () {
-
   const mnemonic = process.env.SEED_PHRASE;
 
   if (!mnemonicValidate(mnemonic)) {
     throw new Error('mnemonic failed to read - e2e.spec.ts');
   }
-  
+
   const registry = new SecretRegistry(mnemonic, {});
-  
+
   afterAll(async () => {
     await registry.disconnect();
   });

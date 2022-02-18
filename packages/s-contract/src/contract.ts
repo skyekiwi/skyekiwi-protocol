@@ -76,6 +76,7 @@ export class Contract {
     }
 
     const sealer = new DefaultSealer();
+
     sealer.unlock(mnemonicToMiniSecret(mnemonic));
 
     return await Driver.downstreamContract(
