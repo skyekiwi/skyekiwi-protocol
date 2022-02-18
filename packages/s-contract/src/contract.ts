@@ -39,7 +39,7 @@ export class Contract {
 
     await registry.init();
 
-    if (contract.initialState.length === 0) {
+    if (contract.initialState.length !== 0) {
       const provider = new WsProvider('wss://staging.rpc.skye.kiwi');
       const api = await ApiPromise.create({ provider: provider });
 
@@ -47,10 +47,15 @@ export class Contract {
       const sksRaw = await api.query.registry.secretKeepers();
       const sks = sksRaw.toJSON() as unknown as string[];
 
-      for (const sk of sks) {
-        const pk = (await api.query.registry.publicKey(sk)).toString();
+      if (!sks || sks.length === 0) {
+        console.warn('no secret keepers found. Testing mode only.');
+        encryptionSchema.addMember(mnemonicToMiniSecret(mnemonic));
+      } else {
+        for (const sk of sks) {
+          const pk = (await api.query.registry.publicKey(sk)).toString();
 
-        encryptionSchema.addMember(hexToU8a(pk));
+          encryptionSchema.addMember(hexToU8a(pk));
+        }
       }
 
       const sealer = new DefaultSealer();

@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import BN from 'bn.js';
+import dotenv from 'dotenv';
 
 import { Call, Calls, Contract } from '.';
+
+dotenv.config();
 
 describe('@skyekiwi/s-contract/contract', function () {
   test('upstream/downstream contract without initial state', async () => {
@@ -23,7 +26,7 @@ describe('@skyekiwi/s-contract/contract', function () {
     expect(downstreamedContract.wasmBlob).toEqual(contract.wasmBlob);
   });
 
-  test('upstream/downstream contract without initial state', async () => {
+  test('upstream/downstream contract with initial state', async () => {
     /* eslint-disable sort-keys, camelcase */
     const call1 = new Call({
       transaction_action: 'create_account',
