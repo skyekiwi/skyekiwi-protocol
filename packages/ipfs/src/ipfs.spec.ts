@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { randomBytes } from 'tweetnacl';
+
 import { u8aToHex } from '@skyekiwi/util';
+
 import { IPFS } from '.';
 
 describe('@skyekiwi/ipfs', function () {
