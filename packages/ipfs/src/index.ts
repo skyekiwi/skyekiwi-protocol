@@ -3,64 +3,47 @@
 
 import type { IPFSResult } from './types';
 
-import got from 'got';
-import { create } from 'ipfs-http-client';
+import superagent from 'superagent';
 
 // WIP - the IPFS connector might go through lots of changes
 export class IPFS {
-  private async pin (authHeader: string, cid: string): Promise<string> {
+  private async pin (authHeader: string, cid: string): Promise<boolean> {
     if (cid.length !== 46) {
       throw new Error('CID len err');
     }
 
-    const { body } = await got.post(
-      'https://pin.crustcode.com/psa' + '/pins',
-      {
-        headers: {
-          authorization: 'Bearer ' + authHeader
-        },
-        json: {
-          cid: cid,
-          name: 'near-live-file.txt'
-        }
-      }
-    );
+    const res = await superagent
+      .post('https://pin.crustcode.com/psa/pins')
+      .set('Authorization', `Bearer ${authHeader}`)
+      .send({
+        cid: cid,
+        name: 'skyekiwi-protocol-file'
+      });
 
-    return body;
+    return res.statusCode === 200;
   }
 
   private async upload (authHeader: string, content: string): Promise<IPFSResult> {
-    const ipfs = create({
-      headers: {
-        authorization: 'Basic ' + authHeader
-      },
-      url: 'https://crustwebsites.net'
-    });
+    const res = await superagent
+      .post('https://crustwebsites.net/api/v0/add')
+      .set('Authorization', `Basic ${authHeader}`)
+      .type('form')
+      .field('file', content);
 
-    const result = await ipfs.add(content);
-
+    /* eslint-disable */
     return {
-      cid: result.cid.toString(),
-      size: result.size
+      cid: res.body.Hash,
+      size: Number(res.body.Size)
     };
+    /* eslint-enable */
   }
 
   private async download (authHeader: string, cid: string): Promise<string> {
-    let result = '';
-    const ipfs = create({
-      headers: {
-        authorization: 'Basic ' + authHeader
-      },
-      url: 'https://crustwebsites.net'
-    });
+    const res = await superagent
+      .post(`https://crustwebsites.net/api/v0/cat?arg=${cid}`)
+      .set('Authorization', `Basic ${authHeader}`);
 
-    const content = ipfs.cat(cid);
-
-    for await (const chunk of content) {
-      result += chunk.toString();
-    }
-
-    return result;
+    return res.text;
   }
 
   async add (content: string, authHeader?: string): Promise<IPFSResult> {
@@ -81,10 +64,11 @@ export class IPFS {
 
     while (reTries >= 0) {
       try {
-        await this.pin(auth, res.cid);
+        const r = await this.pin(auth, res.cid);
+
+        if (r) break;
       } catch (e) {}
 
-      if (res) break;
       reTries--;
     }
 

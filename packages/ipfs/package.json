@@ -21,8 +21,9 @@
   },
   "dependencies": {
     "@skyekiwi/util": "0.6.2-1",
-    "got": "^11.8.2",
-    "ipfs-http-client": "56.0.0",
-    "node-fetch": "3.2.0"
+    "superagent": "^7.1.1"
+  },
+  "devDependencies": {
+    "@types/superagent": "^4.1.15"
   }
 }

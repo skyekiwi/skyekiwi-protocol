@@ -28,4 +28,32 @@ describe('@skyekiwi/ipfs', function () {
       expect(content).toEqual(u8aToHex(data[i]));
     }
   });
+
+  // test('header', async() => {
+  //   const authHeader = 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
+  //   const content = "asdjfkjasklfjsdkjfsjdf";
+
+  //   const result = await request
+  //     .post('https://crustwebsites.net/api/v0/add')
+  //     .set('Authorization', `Basic ${authHeader}`)
+  //     .type('form')
+  //     .field('file', content);
+
+  //   const catResult = await request
+  //     .post(`https://crustwebsites.net/api/v0/cat?arg=${result.body.Hash}`)
+  //     .set('Authorization', `Basic ${authHeader}`);
+
+  //   // ({
+  //   //   method: "POST",
+  //   //   url: 'https://crustwebsites.net' + '/api/v0/add',
+  //   //   headers: {'Authentication': `Basic ${authHeader}`},
+  //   //   data: {
+  //   //     file: content
+  //   //   }
+  //   // });
+
+  //   console.log(result.body);
+  //   console.log(catResult.text);
+
+  // })
 });
