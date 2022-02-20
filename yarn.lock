@@ -3060,12 +3060,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/crypto@0.6.2-1, @skyekiwi/crypto@workspace:packages/crypto":
+"@skyekiwi/crypto@0.6.2-2, @skyekiwi/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
-    "@skyekiwi/metadata": 0.6.2-1
-    "@skyekiwi/util": 0.6.2-1
+    "@skyekiwi/metadata": 0.6.2-2
+    "@skyekiwi/util": 0.6.2-2
     ethers: ^5.5.4
     tweetnacl: ^1.0.3
   languageName: unknown
@@ -3164,24 +3164,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/driver@0.6.2-1, @skyekiwi/driver@workspace:packages/driver":
+"@skyekiwi/driver@0.6.2-2, @skyekiwi/driver@workspace:packages/driver":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/driver@workspace:packages/driver"
   dependencies:
     "@polkadot/types": ^7.7.1
     "@polkadot/util-crypto": ^8.3.3
     "@skyekiwi/crust-network": 0.5.2-10
-    "@skyekiwi/crypto": 0.6.2-1
-    "@skyekiwi/file": 0.6.2-1
-    "@skyekiwi/ipfs": 0.6.2-1
-    "@skyekiwi/metadata": 0.6.2-1
-    "@skyekiwi/util": 0.6.2-1
+    "@skyekiwi/crypto": 0.6.2-2
+    "@skyekiwi/file": 0.6.2-2
+    "@skyekiwi/ipfs": 0.6.2-2
+    "@skyekiwi/metadata": 0.6.2-2
+    "@skyekiwi/util": 0.6.2-2
     "@skyekiwi/wasm-contract": 0.5.2-10
     dotenv: ^10.0.0
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/file@0.6.2-1, @skyekiwi/file@workspace:packages/file":
+"@skyekiwi/file@0.6.2-2, @skyekiwi/file@workspace:packages/file":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/file@workspace:packages/file"
   dependencies:
@@ -3194,11 +3194,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/ipfs@0.6.2-1, @skyekiwi/ipfs@workspace:packages/ipfs":
+"@skyekiwi/ipfs@0.6.2-2, @skyekiwi/ipfs@workspace:packages/ipfs":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
-    "@skyekiwi/util": 0.6.2-1
+    "@skyekiwi/util": 0.6.2-2
     "@types/superagent": ^4.1.15
     superagent: ^7.1.1
   languageName: unknown
@@ -3216,14 +3216,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/metadata@0.6.2-1, @skyekiwi/metadata@workspace:packages/metadata":
+"@skyekiwi/metadata@0.6.2-2, @skyekiwi/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/metadata@workspace:packages/metadata"
   dependencies:
     "@polkadot/util-crypto": ^8.3.3
-    "@skyekiwi/crypto": 0.6.2-1
-    "@skyekiwi/ipfs": 0.6.2-1
-    "@skyekiwi/util": 0.6.2-1
+    "@skyekiwi/crypto": 0.6.2-2
+    "@skyekiwi/ipfs": 0.6.2-2
+    "@skyekiwi/util": 0.6.2-2
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -3235,12 +3235,12 @@ __metadata:
     "@polkadot/api": ^7.7.1
     "@polkadot/util-crypto": ^8.3.3
     "@polkadot/wasm-crypto": ^4.5.1
-    "@skyekiwi/crypto": 0.6.2-1
-    "@skyekiwi/driver": 0.6.2-1
-    "@skyekiwi/file": 0.6.2-1
-    "@skyekiwi/ipfs": 0.6.2-1
-    "@skyekiwi/secret-registry": 0.6.2-1
-    "@skyekiwi/util": 0.6.2-1
+    "@skyekiwi/crypto": 0.6.2-2
+    "@skyekiwi/driver": 0.6.2-2
+    "@skyekiwi/file": 0.6.2-2
+    "@skyekiwi/ipfs": 0.6.2-2
+    "@skyekiwi/secret-registry": 0.6.2-2
+    "@skyekiwi/util": 0.6.2-2
     "@types/bn.js": 4.11.6
     bn.js: 4.12
     borsh: ^0.7.0
@@ -3249,7 +3249,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/secret-registry@0.6.2-1, @skyekiwi/secret-registry@workspace:packages/secret-registry":
+"@skyekiwi/secret-registry@0.6.2-2, @skyekiwi/secret-registry@workspace:packages/secret-registry":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/secret-registry@workspace:packages/secret-registry"
   dependencies:
@@ -3257,11 +3257,11 @@ __metadata:
     "@polkadot/keyring": ^8.3.3
     "@polkadot/types": ^7.7.1
     "@polkadot/wasm-crypto": ^4.5.1
-    "@skyekiwi/util": 0.6.2-1
+    "@skyekiwi/util": 0.6.2-2
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/util@0.6.2-1, @skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@0.6.2-2, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:
