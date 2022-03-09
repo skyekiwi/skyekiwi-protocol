@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/metadata",
-  "version": "0.6.2-2",
+  "version": "0.6.2-3",
   "type": "module",
   "description": "core metadata handler for @skyekiwi protocol",
   "main": "index.js",
@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@polkadot/util-crypto": "^8.3.3",
-    "@skyekiwi/crypto": "0.6.2-2",
-    "@skyekiwi/ipfs": "0.6.2-2",
-    "@skyekiwi/util": "0.6.2-2",
+    "@skyekiwi/crypto": "0.6.2-3",
+    "@skyekiwi/ipfs": "0.6.2-3",
+    "@skyekiwi/util": "0.6.2-3",
     "tweetnacl": "^1.0.3"
   }
 }
