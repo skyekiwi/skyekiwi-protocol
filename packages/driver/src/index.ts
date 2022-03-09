@@ -27,14 +27,12 @@ export class Driver {
     file: File,
     sealer: Sealer,
     encryptionSchema: EncryptionSchema,
-    registry: SecretRegistry
-  ): Promise<number> {
+    callback: (cid: string) => Promise<void>
+  ): Promise<void> {
     const logger = getLogger('Driver.upstream');
 
     const ipfs = new IPFS();
     const metadata = new Metadata(sealer);
-
-    await registry.init();
 
     let chunkCount = 0;
     const readStream = file.getReadStream();
@@ -71,14 +69,7 @@ export class Driver {
 
     logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
 
-    logger.info('writting to registry');
-    const res = await registry.registerSecret(result.cid);
-
-    if (!res) {
-      throw new Error('packaging works well, blockchain network err - Driver.upstream');
-    }
-
-    return res;
+    await callback(result.cid);
   }
 
   /**
@@ -411,8 +402,9 @@ export class Driver {
     newEncryptionSchema: EncryptionSchema,
     keys: Uint8Array[],
     registry: SecretRegistry,
-    sealer: Sealer
-  ): Promise<boolean> {
+    sealer: Sealer,
+    callback: (cid: string) => Promise<void>
+  ): Promise<void> {
     // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
 
@@ -429,15 +421,10 @@ export class Driver {
       version: SKYEKIWI_VERSION
     });
 
-    // 4. upload the updated sealed data and write to the secret registry
-    await registry.init();
-
     const ipfs = new IPFS();
     const result = await ipfs.add(sealedMetadata);
 
-    const res = await registry.updateMetadata(secretId, result.cid);
-
-    return res;
+    await callback(result.cid);
   }
 
   /**

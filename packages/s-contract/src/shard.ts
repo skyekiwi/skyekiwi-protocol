@@ -84,28 +84,6 @@ export class ShardManager {
     }
   }
 
-  public async fetchShardInfo (): Promise<void> {
-    for (const shard of this.#shards) {
-      const maybeMembers = await this.#api.query.registry.shardMembers(shard);
-      const maybeBeaconIndex = await this.#api.query.registry.beaconIndex(shard, this.#keyring.address);
-      const maybeThreshold = await this.#api.query.parentchain.shardConfirmationThreshold(shard);
-
-      const members = maybeMembers.toJSON();
-      const beaconIndex = Number(maybeBeaconIndex.toString());
-      const threshold = Number(maybeThreshold.toString());
-
-      if (members) {
-        this.#shardMembers[shard] = members as string[];
-      }
-
-      if (beaconIndex) {
-        this.#beaconIndex[shard] = beaconIndex;
-      }
-
-      this.#threshold[shard] = threshold || threshold === 0 ? 1 : threshold;
-    }
-  }
-
   private beaconIsTurn (
     blockNumber: number, shard: number
   ): boolean {

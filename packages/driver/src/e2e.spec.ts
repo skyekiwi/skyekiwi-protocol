@@ -19,7 +19,7 @@ const filePath = path.join(__dirname, '../mock/file.file');
 const downstreamPath = path.join(__dirname, '../mock/down.file');
 
 describe('@skyekiwi/driver', function () {
-  const content = randomBytes(1200000);
+  const content = randomBytes(120000);
 
   let vaultId1: number;
   const mnemonic = process.env.SEED_PHRASE;
@@ -44,12 +44,19 @@ describe('@skyekiwi/driver', function () {
 
     encryptionSchema.addMember(sealer.getAuthorKey());
 
-    const result = await Driver.upstream(
-      file, sealer, encryptionSchema, registry
-    );
+    await Driver.upstream(
+      file, sealer, encryptionSchema, async (cid: string) => {
+        await registry.init();
+        const res = await registry.registerSecret(cid);
 
-    expect(result).not.toBeNull();
-    vaultId1 = result;
+        expect(res).not.toBeNull();
+        vaultId1 = res;
+
+        if (!res) {
+          throw new Error('packaging works well, blockchain network err - Driver.upstream');
+        }
+      }
+    );
 
     await cleanup();
   });
@@ -61,6 +68,7 @@ describe('@skyekiwi/driver', function () {
 
     let downstreamContent = new Uint8Array(0);
 
+    console.log(vaultId1);
     await Driver.downstream(
       vaultId1, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
       (chunk: Uint8Array) => {
@@ -107,11 +115,16 @@ describe('@skyekiwi/driver', function () {
     encryptionSchema.addMember(publicKey1);
     encryptionSchema.addMember(publicKey2);
 
-    const result = await Driver.updateEncryptionSchema(
-      vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], registry, sealer
+    await Driver.updateEncryptionSchema(
+      vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
+      async (cid: string) => {
+        await registry.init();
+        const res = await registry.updateMetadata(vaultId1, cid);
+
+        expect(res).toEqual(true);
+      }
     );
 
-    expect(result).toEqual(true);
     await cleanup();
   });
 
