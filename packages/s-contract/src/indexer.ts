@@ -24,7 +24,7 @@ export class Indexer {
     this.#db = level('local');
   }
 
-  public async initializeLocalMetadata () {
+  public async initializeLocalMetadata (): Promise<void> {
     const localMetadata = new LocalMetadata({
       shard_id: [0],
       high_remote_block: 0,
@@ -86,8 +86,8 @@ export class Indexer {
       const callContent = callContentRaw as unknown as CallRecord;
 
       // logger.debug(callContent);
-      console.log(callContent[0])
-      console.log(callContent[1])
+      console.log(callContent[0]);
+      console.log(callContent[1]);
 
       // const callRecord = parseCall(callContent[0])
       // this.#ops.push(Storage.writeCallRecord(shardId, blockNumber, call, callRecord));
@@ -144,7 +144,7 @@ export class Indexer {
     logger.info(`contract import complete at block# ${blockNumber}`);
   }
 
-  public async fetchOnce (api: ApiPromise, address: string) {
+  public async fetchOnce (api: ApiPromise, address: string): Promise<void> {
     const localMetadata = await Storage.getMetadata(this.#db);
 
     for (const shard of localMetadata.shard_id) {
@@ -181,7 +181,7 @@ export class Indexer {
     }
   }
 
-  public async writeAll () {
+  public async writeAll (): Promise<void> {
     await Storage.writeAll(this.#db, this.#ops);
   }
 }
