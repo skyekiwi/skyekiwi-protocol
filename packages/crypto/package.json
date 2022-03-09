@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/crypto",
-  "version": "0.6.2-3",
+  "version": "0.6.2-4",
   "type": "module",
   "description": "cryptographic wrapper for @skyekiwi",
   "main": "index.js",
@@ -20,8 +20,8 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/metadata": "0.6.2-3",
-    "@skyekiwi/util": "0.6.2-3",
+    "@skyekiwi/metadata": "0.6.2-4",
+    "@skyekiwi/util": "0.6.2-4",
     "ethers": "^5.5.4",
     "tweetnacl": "^1.0.3"
   }
