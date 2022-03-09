@@ -30,3 +30,5 @@ store.db.compacted
 **.contract
 **.wasm
 driver/mock/*.file
+local/
+output

@@ -1,126 +1,199 @@
 // Copyright 2021-2022 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { ApiPromise } from '@polkadot/api';
-import fs from 'fs';
+import type { DBOps } from './types';
 
-import { SymmetricEncryption } from '@skyekiwi/crypto';
-import { IPFS } from '@skyekiwi/ipfs';
-import { hexToU8a, stringToU8a, u8aToString } from '@skyekiwi/util';
+import level from 'level';
 
-import { Call, Outcome } from './borsh';
-// import {Driver} from '@skyekiwi/driver';
+import { Block, buildBlock, buildCall, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildShard, buildShardMetadata, Call, Contract, ExecutionSummary, LocalMetadata, Outcome, parseBlock,
+  parseCall,
+  parseContract,
+  parseExecutionSummary,
+  parseLocalMetadata,
+  parseOutcome,
+  parseShard,
+  parseShardMetadata,
+  Shard, ShardMetadata } from './borsh';
 
-class CallInfo {
-  public rawOutcome: Outcome | undefined
+const numberPadding = (n: number, pad: number): string => {
+  return String(n).padStart(pad, '0');
+};
 
-  constructor (public rawCall: Call,
-    public isArchive: boolean,
-    public isEncrypted: boolean,
-    public origin: string,
-    public originPublicKey: string,
-    public contractIndex: number
-  ) {
-    this.rawOutcome = undefined;
-  }
-
-  public writeOutcome (outcome: Outcome) {
-    this.rawOutcome = outcome;
-  }
-}
-
-class ContractInfo {
-  public wasmBlob: Uint8Array
-  public homeShard: number
-  public metadataCID: string
-  public metadata: Uint8Array
-  public isInitialStateDecrypted: boolean
-
-  constructor (public contractIndex: number) {
-    this.isInitialStateDecrypted = false;
-  }
-
-  public async init (api: ApiPromise) {
-    const ipfs = new IPFS();
-
-    try {
-      this.homeShard = Number((await api.query.secrets.homeShard(this.contractIndex)).toString());
-
-      const wasmCID = (await api.query.secrets.wasmBlob(this.contractIndex)).toString();
-      const content = await ipfs.cat(wasmCID);
-
-      this.wasmBlob = hexToU8a(content);
-
-      this.metadataCID = (await api.query.secrets.metadata(this.contractIndex)).toString();
-
-      if (this.metadataCID !== '0000000000000000000000000000000000000000000000') {
-        // the contract has no private initial state
-        this.isInitialStateDecrypted = true;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }
-}
-
-class ShardInfo {
-  public calls: number[]
-
-  public highRemoteCallIndex: number
-  public highLocalCallIndex: number
-  public highRemoteSyncedBlockIndex: number
-  public highRemoteConfirmedBlockIndex: number
-
-  public confirmationThreshold: number
-  constructor (public shardId: number) {
-    this.calls = [];
-    this.highRemoteCallIndex = 0;
-    this.highLocalCallIndex = 0;
-    this.highRemoteSyncedBlockIndex = 0;
-    this.highRemoteConfirmedBlockIndex = 0;
-    this.confirmationThreshold = 0;
-  }
-
-  public async init (api: ApiPromise) {
-    const calls = (await api.query.sContract.callHistory(this.shardId)).toJSON();
-
-    console.log(calls);
-  }
-}
-
+/* eslint-disable sort-keys, camelcase, @typescript-eslint/ban-ts-comment */
 export class Storage {
-  public contracts: { [contractIndex: number]: ContractInfo }
-  public calls: { [callIndex: number]: CallInfo }
-  public shards: { [shardId: number]: ShardInfo }
-  #key: Uint8Array
+  public static getCallIndex (shardId: number, callIndex: number): string {
+    const shard = numberPadding(shardId, 4);
+    const block = numberPadding(callIndex, 16);
 
-  constructor (public api: ApiPromise, key: Uint8Array, path?: string) {
-    this.#key = key;
-
-    if (path) {
-      this.fromFile(path);
-    } else {
-      this.contracts = {};
-      this.calls = {};
-      this.shards = {};
-    }
+    return shard + block + 'RAWC';
   }
 
-  public fromFile (path: string): void {
-    const source = fs.readFileSync(path);
+  public static getCallOutcomeIndex (shardId: number, callIndex: number): string {
+    const shard = numberPadding(shardId, 4);
+    const block = numberPadding(callIndex, 16);
 
-    const decrypted = SymmetricEncryption.decrypt(source, this.#key);
-    const obj = JSON.parse(u8aToString(decrypted)) as this;
-
-    this.contracts = obj.contracts;
-    this.calls = obj.calls;
-    this.shards = obj.shards;
+    return shard + block + 'OUTC';
   }
 
-  public saveToFile (path: string): void {
-    const obj = stringToU8a(JSON.stringify(this));
-    const encrypted = SymmetricEncryption.encrypt(obj, this.#key);
+  public static getBlockIndex (shardId: number, blockNumber: number): string {
+    const shard = numberPadding(shardId, 4);
+    const block = numberPadding(blockNumber, 16);
 
-    fs.writeFileSync(path, encrypted);
+    return shard + block + 'BLOC';
+  }
+
+  public static getContractIndex (contractIndex: number): string {
+    return numberPadding(contractIndex, 20) + 'CONT';
+  }
+
+  public static getShardIndex (shardId: number): string {
+    return numberPadding(shardId, 20) + 'SHAR';
+  }
+
+  public static getShardMetadataIndex (shardId: number): string {
+    return numberPadding(shardId, 20) + 'SHAM';
+  }
+
+  public static writeMetadata (
+    metadata: LocalMetadata
+  ): DBOps {
+    return {
+      type: 'put',
+      key: 'METADATA',
+      value: buildLocalMetadata(metadata)
+    };
+  }
+
+  public static async getMetadata (db: level.LevelDB): Promise<LocalMetadata> {
+    return parseLocalMetadata(await db.get('METADATA'));
+  }
+
+  public static writeCallRecord (shard_id: number, callIndex: number, call: Call): DBOps {
+    const key = Storage.getCallIndex(shard_id, callIndex);
+
+    return {
+      type: 'put',
+      key: key,
+      value: buildCall(call)
+    };
+  }
+
+  public static writeCallOutcome (shardId: number, callIndex: number, outcome: Outcome): DBOps {
+    const key = Storage.getCallOutcomeIndex(shardId, callIndex);
+
+    return {
+      type: 'put',
+      key: key,
+      value: buildOutcome(outcome)
+    };
+  }
+
+  public static writeBlockRecord (shardId: number, blockNumber: number, block: Block): DBOps {
+    const key = Storage.getBlockIndex(shardId, blockNumber);
+
+    return {
+      type: 'put',
+      key: key,
+      value: buildBlock(block)
+    };
+  }
+
+  public static writeContractRecord (contractIndex: number, contract: Contract): DBOps {
+    const key = Storage.getContractIndex(contractIndex);
+
+    return {
+      type: 'put',
+      key: key,
+      value: buildContract(contract)
+    };
+  }
+
+  public static writeShardRecord (shardId: number, shard: Shard): DBOps {
+    const key = Storage.getShardIndex(shardId);
+
+    return {
+      type: 'put',
+      key: key,
+      value: buildShard(shard)
+    };
+  }
+
+  public static writeShardMetadataRecord (shardId: number, shardm: ShardMetadata): DBOps {
+    const key = Storage.getShardIndex(shardId);
+
+    return {
+      type: 'put',
+      key: key,
+      value: buildShardMetadata(shardm)
+    };
+  }
+
+  public static writeExecutionSummary (a: ExecutionSummary): DBOps {
+    return {
+      type: 'put',
+      key: 'EXECUTION_SUMMARY',
+      value: buildExecutionSummary(a)
+    };
+  }
+
+  public static async writeAll (db: level.LevelDB, ops: DBOps[]): Promise<void> {
+    // eslint-diable
+    // @ts-ignore
+    await db.batch(ops);
+    // eslint-enable
+  }
+
+  public static async getCallRecord (
+    db: level.LevelDB, shardId: number, callIndex: number
+  ): Promise<Call> {
+    const key = Storage.getCallIndex(shardId, callIndex);
+
+    return parseCall(await db.get(key));
+  }
+
+  public static async getOutcomeRecord (
+    db: level.LevelDB, shardId: number, callIndex: number
+  ): Promise<Outcome> {
+    const key = Storage.getCallOutcomeIndex(shardId, callIndex);
+
+    return parseOutcome(await db.get(key));
+  }
+
+  public static async getBlockRecord (
+    db: level.LevelDB, shardId: number, blockNumber: number
+  ): Promise<Block> {
+    const key = Storage.getBlockIndex(shardId, blockNumber);
+
+    return parseBlock(await db.get(key));
+  }
+
+  public static async getContractRecord (
+    db: level.LevelDB, contractIndex: number
+  ): Promise<Contract> {
+    const key = Storage.getContractIndex(contractIndex);
+
+    return parseContract(await db.get(key));
+  }
+
+  public static async getShardRecord (
+    db: level.LevelDB, shardId: number
+  ): Promise<Shard> {
+    const key = Storage.getShardIndex(shardId);
+
+    return parseShard(await db.get(key));
+  }
+
+  public static async getShardMetadataRecord (
+    db: level.LevelDB, shardId: number
+  ): Promise<ShardMetadata> {
+    const key = Storage.getShardMetadataIndex(shardId);
+
+    return parseShardMetadata(await db.get(key));
+  }
+
+  public static async getExecutionSummary (
+    db: level.LevelDB
+  ): Promise<ExecutionSummary> {
+    return parseExecutionSummary(await db.get('EXECUTION_SUMMARY'));
   }
 }

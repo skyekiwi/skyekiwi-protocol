@@ -3,6 +3,7 @@
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { mnemonicToMiniSecret, mnemonicValidate } from '@polkadot/util-crypto';
+import { baseDecode, baseEncode } from 'borsh';
 
 import { DefaultSealer, EncryptionSchema } from '@skyekiwi/crypto';
 import { Driver } from '@skyekiwi/driver';
@@ -12,18 +13,18 @@ import { hexToU8a } from '@skyekiwi/util';
 
 import { buildCalls, Calls, parseCalls } from './borsh';
 
-export class Contract {
+export class ContractController {
   public static buildInitialState (calls: Calls): Uint8Array {
-    return buildCalls(calls);
+    return baseDecode(buildCalls(calls));
   }
 
   public static parseInitialState (encodedCalls: Uint8Array): Calls {
-    return parseCalls(encodedCalls);
+    return parseCalls(baseEncode(encodedCalls));
   }
 
   public static intoSecretContract (calls: Calls, wasmBlob: Uint8Array): SecretContract {
     return {
-      initialState: Contract.buildInitialState(calls),
+      initialState: ContractController.buildInitialState(calls),
       wasmBlob: wasmBlob
     };
   }
