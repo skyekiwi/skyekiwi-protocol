@@ -4,7 +4,6 @@
 import type { Signature } from '@skyekiwi/crypto/types';
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
-import type { SecretContract } from './types';
 
 import { EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { File } from '@skyekiwi/file';
@@ -77,62 +76,6 @@ export class Driver {
     logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
 
     await callback(result.cid);
-  }
-
-  /**
-    * the high level upstream API to upstream a contract
-    * @param {File} file content to be uploaded
-    * @param {Sealer} sealer a collection of sealer functions to be used
-    * @param {EncryptionSchema} encryptionSchema blueprint for the secret
-    * @param {SecretRegistry} registry secret registry connector to be used
-    * @param {string} wasmBlobCID the wasm blob cid of the contract
-    * @param {Uint8Array} contractPublicKey the public key of the contract
-    * @returns {Promise<void>} None.
-  */
-  public static async upstreamContract (
-    registry: SecretRegistry,
-    contract: SecretContract,
-    sealer?: Sealer,
-    encryptionSchema?: EncryptionSchema
-  ): Promise<number> {
-    const logger = getLogger('Driver.upstream');
-    let res: number;
-
-    logger.info('uploading wasm blob of contract');
-    const ipfs = new IPFS();
-    const wasmFile = await ipfs.add(u8aToHex(contract.wasmBlob));
-
-    await registry.init();
-
-    if (contract.initialState && contract.initialState.length !== 0) {
-      if (!sealer) {
-        throw new Error('sealer is required when hasInitialSecretState is true');
-      }
-
-      if (!encryptionSchema) {
-        throw new Error('encryptionSchema is required when hasInitialSecretState is true');
-      }
-
-      await this.upstream(
-        contract.initialState, sealer, encryptionSchema, async (cid: string) => {
-          logger.info('writting to registry');
-          res = await registry.registerSecretContract(
-            cid, wasmFile.cid
-          );
-        }
-      );
-    } else {
-      res = await registry.registerSecretContract(
-        '0000000000000000000000000000000000000000000000',
-        wasmFile.cid
-      );
-    }
-
-    if (!res) {
-      throw new Error('packaging works well, blockchain network err - Driver.upstream');
-    }
-
-    return res;
   }
 
   /**
@@ -262,52 +205,6 @@ export class Driver {
       unsealed.sealingKey,
       write
     );
-  }
-
-  /**
-    * high level downstream API for secret contracts
-    * @param {number} vaultId the vaultId from the secret registry
-    * @param {Uint8Array[]} keys all keys the user has access to; used to decrypt the shares
-    * @param {WASMContract} registry connector to the blockchain secret registry
-    * @param {WriteSteram} writeStream output writeStream
-    * @param {Sealer} sealer sealer functions used to decrypt the shares
-    * @returns {Promise<SecretContract>} a secret contract instance.
-  */
-  public static async downstreamContract (
-    secretId: number,
-    registry: SecretRegistry,
-    keys?: Uint8Array[],
-    sealer?: Sealer
-  ): Promise<SecretContract> {
-    const logger = getLogger('Driver.downstreamContract');
-
-    logger.info('fetching pre-seal data');
-    const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
-
-    let initialState: Uint8Array = new Uint8Array(0);
-
-    if (unsealed) {
-      logger.info('entering downstream processing pipeline');
-      await this.downstreamChunkProcessingPipeLine(
-        unsealed.chunkCID,
-        unsealed.hash,
-        unsealed.sealingKey,
-        (chunk: Uint8Array) => {
-          initialState = new Uint8Array([...initialState, ...chunk]);
-        }
-      );
-    } else {
-      logger.info('no initialState data found, downloading wasmBlob only');
-    }
-
-    const ipfs = new IPFS();
-    const wasmBlob = await ipfs.cat(await registry.getWasmBlob(secretId));
-
-    return {
-      initialState: initialState,
-      secretId: secretId,
-      wasmBlob: hexToU8a(wasmBlob)
-    } as SecretContract;
   }
 
   /**

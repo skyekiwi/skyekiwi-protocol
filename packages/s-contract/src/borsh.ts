@@ -4,8 +4,6 @@
 import BN from 'bn.js';
 import { baseDecode, baseEncode, deserialize, serialize } from 'borsh';
 
-import { stringToU8a } from '@skyekiwi/util';
-
 /* eslint-disable sort-keys, camelcase */
 class Call {
   public origin: string
@@ -103,16 +101,13 @@ class Outcomes {
 
 class LocalMetadata {
   public shard_id: number[]
-  public high_remote_block: number
   public high_local_block: number
 
   constructor (config: {
     shard_id: number[],
-    high_remote_block: number,
     high_local_block: number,
   }) {
     this.shard_id = config.shard_id;
-    this.high_remote_block = config.high_remote_block;
     this.high_local_block = config.high_local_block;
   }
 }
@@ -121,32 +116,29 @@ class Block {
   public shard_id: number
   public block_number: number
   public calls: number[]
+  public contracts: string[]
 
   constructor (config: {
     shard_id: number,
     block_number: number,
     calls: number[],
+    contracts: string[],
   }) {
     this.shard_id = config.shard_id;
     this.block_number = config.block_number;
     this.calls = config.calls;
+    this.contracts = config.contracts;
   }
 }
 
 class Shard {
-  public high_remote_call_index: number
-  public high_local_call_index: number
   public high_remote_synced_block_index: number
   public high_remote_confirmed_block_index: number
 
   constructor (config: {
-    high_remote_call_index: number,
-    high_local_call_index: number,
     high_remote_synced_block_index: number,
     high_remote_confirmed_block_index: number,
   }) {
-    this.high_remote_call_index = config.high_remote_call_index;
-    this.high_local_call_index = config.high_local_call_index;
     this.high_remote_synced_block_index = config.high_remote_synced_block_index;
     this.high_remote_confirmed_block_index = config.high_remote_confirmed_block_index;
   }
@@ -174,21 +166,18 @@ class ShardMetadata {
 class Contract {
   public home_shard: number
   public wasm_blob: Uint8Array
-  public metadata_cid: Uint8Array
-  public metadata: Uint8Array
+  public deployment_call: Calls
   public is_initial_state_empty: boolean
 
   constructor (config: {
     home_shard: number,
     wasm_blob: Uint8Array,
-    metadata_cid: string,
-    metadata: Uint8Array,
+    deployment_call: Calls,
     is_initial_state_empty: boolean
   }) {
     this.home_shard = config.home_shard;
     this.wasm_blob = config.wasm_blob;
-    this.metadata_cid = stringToU8a(config.metadata_cid);
-    this.metadata = config.metadata;
+    this.deployment_call = config.deployment_call;
     this.is_initial_state_empty = config.is_initial_state_empty;
   }
 }
@@ -208,7 +197,8 @@ const blockSchema = new Map([
     fields: [
       ['shard_id', 'u32'],
       ['block_number', 'u32'],
-      ['calls', { kind: 'option', type: ['u32'] }]
+      ['calls', { kind: 'option', type: ['u32'] }],
+      ['contracts', { kind: 'option', type: ['string'] }]
     ]
   }]
 ]);
@@ -265,16 +255,20 @@ outcomesSchema.set(Outcomes, {
 });
 outcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
 
-const contractSchema = new Map([[Contract, {
+const contractSchema = new Map();
+
+contractSchema.set(Contract, {
   kind: 'struct',
   fields: [
     ['home_shard', 'u32'],
     ['wasm_blob', ['u8']],
-    ['metadata_cid', ['u8', 46]],
-    ['metadata', ['u8']],
+    ['deployment_call', Calls],
     ['is_initial_state_empty', 'u8']
   ]
-}]]);
+});
+contractSchema.set(Calls, callsSchema.get(Calls));
+contractSchema.set(Call, callSchema.get(Call));
+
 const shardMetadataSchema = new Map([
   [ShardMetadata, {
     kind: 'struct',
@@ -290,8 +284,6 @@ const shardSchema = new Map([
   [Shard, {
     kind: 'struct',
     fields: [
-      ['high_remote_call_index', 'u32'],
-      ['high_local_call_index', 'u32'],
       ['high_remote_synced_block_index', 'u32'],
       ['high_remote_confirmed_block_index', 'u32']
     ]
@@ -302,7 +294,6 @@ const localMetadataSchema = new Map([
     kind: 'struct',
     fields: [
       ['shard_id', ['u32']],
-      ['high_remote_block', 'u32'],
       ['high_local_block', 'u32']
     ]
   }]

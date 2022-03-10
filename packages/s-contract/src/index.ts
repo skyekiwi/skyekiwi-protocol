@@ -10,10 +10,6 @@ import { Block, blockSchema, buildBlock, buildCall, buildCalls, buildContract, b
   parseOutcomes,
   parseShard,
   Shard, shardSchema } from './borsh';
-import { ContractController } from './contract';
-import { ShardManager } from './shard';
-import { Storage } from './storage';
-import { Subscriber } from './subscriber';
 
 export {
   Call, callSchema, buildCall, parseCall,
@@ -23,7 +19,5 @@ export {
   Block, blockSchema, buildBlock, parseBlock,
   Contract, contractSchema, buildContract, parseContract,
   Shard, shardSchema, buildShard, parseShard,
-  LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
-
-  ShardManager, Subscriber, Storage, ContractController
+  LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata
 };

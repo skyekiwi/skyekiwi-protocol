@@ -35,11 +35,11 @@ export class SecretRegistry {
     sender: string,
     types: AnyJson,
     signer?: Signer,
-    testnet = true
+    testnet = false
   ) {
     const logger = getLogger('SecretRegistry.constructor');
 
-    this.#provider = testnet ? new WsProvider('wss://staging.rpc.skye.kiwi') : new WsProvider('wss://staging.rpc.skye.kiwi');
+    this.#provider = testnet ? new WsProvider('ws://localhost:9944') : new WsProvider('wss://staging.rpc.skye.kiwi');
     // this.#provider = new WsProvider('ws://localhost:9944');
     this.api = new ApiPromise({
       provider: this.#provider,
@@ -115,24 +115,6 @@ export class SecretRegistry {
   }
 
   /**
-   * register a secret contract
-   * @param {string} metadata metadata to be stored by the blockchain module
-   * @returns {Promise<number | null>} the secret id assigned, or null if failed
-  */
-  async registerSecretContract (metadata: string, wasmBloblCID: string): Promise<number | null> {
-    const extrinsic = this.api.tx.secrets.registerSecretContract(metadata, wasmBloblCID, 0);
-    const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
-
-    if (txResult) {
-      // time to get the secretId of the newly registered secret
-
-      const secretId = txResult.find(({ event: { method } }) => method === 'SecretContractRegistered').event.data[0].toString();
-
-      return Number(secretId);
-    } else { return null; }
-  }
-
-  /**
    * register a secret
    * @param {string} metadata metadata to be stored by the blockchain module
    * @returns {Promise<number | null>} the secret id assigned, or null if failed
@@ -167,18 +149,6 @@ export class SecretRegistry {
   */
   async getMetadata (secretId: number): Promise<string> {
     const result = await this.api.query.secrets.metadata(secretId);
-
-    // result is the CID in hex form
-    return u8aToString(hexToU8a(result.toString().substring(2)));
-  }
-
-  /**
-   * get wasmblob by secretId
-   * @param {number} secretId secretId of the secret to be queryed
-   * @returns {Promise<String>} secret wasmblob in form of IPFS CID
-  */
-  async getWasmBlob (secretId: number): Promise<string> {
-    const result = await this.api.query.secrets.wasmBlob(secretId);
 
     // result is the CID in hex form
     return u8aToString(hexToU8a(result.toString().substring(2)));

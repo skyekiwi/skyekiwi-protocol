@@ -127,56 +127,6 @@ describe('@skyekiwi/driver', function () {
 
     await cleanup();
   });
-
-  it('contract up/down with no iniitla state', async () => {
-    const result = await Driver.upstreamContract(
-      registry, {
-        initialState: new Uint8Array(0),
-        secretId: -1,
-        wasmBlob: new Uint8Array([0x1, 0x2, 0x3, 0x4, 0x5])
-      }
-    );
-
-    expect(result).not.toBeNull();
-
-    const downloadedContract = await Driver.downstreamContract(result, registry);
-
-    expect(downloadedContract.initialState).toEqual(new Uint8Array(0));
-    expect(downloadedContract.secretId).toEqual(result);
-    expect(downloadedContract.wasmBlob).toEqual(new Uint8Array([0x1, 0x2, 0x3, 0x4, 0x5]));
-
-    await cleanup();
-  });
-
-  it('contract up/down with iniitla state', async () => {
-    const sealer = new DefaultSealer();
-
-    sealer.unlock(mnemonicToMiniSecret(mnemonic));
-
-    const encryptionSchema = new EncryptionSchema();
-
-    encryptionSchema.addMember(sealer.getAuthorKey());
-
-    const result = await Driver.upstreamContract(
-      registry, {
-        initialState: new Uint8Array([0x2, 0x2, 0x2, 0x2]),
-        secretId: -1,
-        wasmBlob: new Uint8Array([0x1, 0x2, 0x3, 0x4, 0x5])
-      }, sealer, encryptionSchema
-    );
-
-    expect(result).not.toBeNull();
-
-    const downloadedContract = await Driver.downstreamContract(
-      result, registry, [mnemonicToMiniSecret(mnemonic)], sealer
-    );
-
-    expect(downloadedContract.initialState).toEqual(new Uint8Array([0x2, 0x2, 0x2, 0x2]));
-    expect(downloadedContract.secretId).toEqual(result);
-    expect(downloadedContract.wasmBlob).toEqual(new Uint8Array([0x1, 0x2, 0x3, 0x4, 0x5]));
-
-    await cleanup();
-  });
 });
 
 const setup = async (content: Uint8Array): Promise<File> => {

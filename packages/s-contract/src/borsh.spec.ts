@@ -191,7 +191,8 @@ describe('@skyekiwi/s-contract/borsh', function () {
     const block = new Block({
       shard_id: 0,
       block_number: 1,
-      calls: [1, 2, 3]
+      calls: [1, 2, 3],
+      contracts: ['status']
     });
 
     const buf = buildBlock(block);
@@ -200,16 +201,34 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedBlock).toEqual({
       shard_id: 0,
       block_number: 1,
-      calls: [1, 2, 3]
+      calls: [1, 2, 3],
+      contracts: ['status']
     });
   });
 
   test('encode/decode contract works', () => {
+    const call = new Call({
+      origin: 'deployer',
+      origin_public_key: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+      encrypted_egress: false,
+
+      transaction_action: 'deploy',
+      receiver: 'status',
+      amount: new BN(0x100, 16),
+      wasm_blob: new Uint8Array([1, 2, 3]),
+      method: undefined,
+      args: undefined,
+      to: undefined
+    });
+
+    const calls = new Calls({
+      ops: [call]
+    });
+
     const contract = new Contract({
       home_shard: 0,
       wasm_blob: new Uint8Array([1, 2, 3]),
-      metadata_cid: 'QmZMpQ8K7Tp1Uwae8SXi3ZJqJDES8JGBiMmNWV2iRatwbW',
-      metadata: new Uint8Array([1, 2, 3]),
+      deployment_call: calls,
       is_initial_state_empty: false
     });
 
@@ -219,7 +238,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedContract.home_shard).toEqual(contract.home_shard);
     expect(u8aToHex(parsedContract.wasm_blob)).toEqual(u8aToHex(contract.wasm_blob));
     expect(u8aToString(new Uint8Array(parsedContract.wasm_blob))).toEqual(u8aToString(new Uint8Array(contract.wasm_blob)));
-    expect(u8aToHex(parsedContract.metadata)).toEqual(u8aToHex(contract.metadata));
+    expect(buildCalls(parsedContract.deployment_call)).toEqual(buildCalls(calls));
     expect(parsedContract.is_initial_state_empty).toEqual(contract.is_initial_state_empty);
   });
 
@@ -231,8 +250,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       threshold: 1
     });
     const shard = new Shard({
-      high_remote_call_index: 1,
-      high_local_call_index: 1,
       high_remote_synced_block_index: 1,
       high_remote_confirmed_block_index: 1
     });
@@ -248,8 +265,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedShardMetadata.beacon_index).toEqual(shardMetadata.beacon_index);
     expect(parsedShardMetadata.threshold).toEqual(shardMetadata.threshold);
 
-    expect(parsedShard.high_remote_call_index).toEqual(shard.high_remote_call_index);
-    expect(parsedShard.high_local_call_index).toEqual(shard.high_local_call_index);
     expect(parsedShard.high_remote_synced_block_index).toEqual(shard.high_remote_synced_block_index);
     expect(parsedShard.high_remote_confirmed_block_index).toEqual(shard.high_remote_confirmed_block_index);
   });
@@ -271,7 +286,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
   test('encode/decode local metadata works', () => {
     const localMetadata = new LocalMetadata({
       shard_id: [0, 1],
-      high_remote_block: 1,
       high_local_block: 1
     });
 
@@ -279,7 +293,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
     const parsedLocalMetadata = parseLocalMetadata(buf);
 
     expect(localMetadata.shard_id).toEqual(parsedLocalMetadata.shard_id);
-    expect(localMetadata.high_remote_block).toEqual(parsedLocalMetadata.high_remote_block);
     expect(localMetadata.high_local_block).toEqual(parsedLocalMetadata.high_local_block);
   });
 
