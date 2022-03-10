@@ -24,7 +24,7 @@ export class Driver {
     * @returns {Promise<void>} None.
   */
   public static async upstream (
-    file: File,
+    file: File | Uint8Array,
     sealer: Sealer,
     encryptionSchema: EncryptionSchema,
     callback: (cid: string) => Promise<void>
@@ -35,14 +35,21 @@ export class Driver {
     const metadata = new Metadata(sealer);
 
     let chunkCount = 0;
-    const readStream = file.getReadStream();
 
-    logger.info('initiating chunk processing pipeline');
+    if (file instanceof File) {
+      const readStream = file.getReadStream();
 
-    // main loop - the main upstreaming pipeline
-    for await (const chunk of readStream) {
+      logger.info('initiating chunk processing pipeline');
+
+      // main loop - the main upstreaming pipeline
+      for await (const chunk of readStream) {
+        await Driver.upstreamChunkProcessingPipeLine(
+          metadata, chunk, chunkCount++
+        );
+      }
+    } else {
       await Driver.upstreamChunkProcessingPipeLine(
-        metadata, chunk, chunkCount++
+        metadata, file, chunkCount++
       );
     }
 
@@ -89,7 +96,9 @@ export class Driver {
     encryptionSchema?: EncryptionSchema
   ): Promise<number> {
     const logger = getLogger('Driver.upstream');
+    let res: number;
 
+    logger.info('uploading wasm blob of contract');
     const ipfs = new IPFS();
     const wasmFile = await ipfs.add(u8aToHex(contract.wasmBlob));
 
@@ -104,62 +113,26 @@ export class Driver {
         throw new Error('encryptionSchema is required when hasInitialSecretState is true');
       }
 
-      const metadata = new Metadata(sealer);
-
-      let chunkCount = 0;
-
-      logger.info('initiating chunk processing pipeline');
-
-      // main loop - the main upstreaming pipeline
-      await Driver.upstreamChunkProcessingPipeLine(
-        metadata, contract.initialState, chunkCount++
+      await this.upstream(
+        contract.initialState, sealer, encryptionSchema, async (cid: string) => {
+          logger.info('writting to registry');
+          res = await registry.registerSecretContract(
+            cid, wasmFile.cid
+          );
+        }
       );
-
-      const cidList: IPFSResult[] = metadata.getCIDList();
-
-      logger.info('CID List extraction success');
-
-      const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
-
-      logger.info('file metadata sealed');
-
-      const result = await ipfs.add(sealedData);
-
-      logger.info('sealed metadata uploaded to IPFS');
-
-      cidList.push({
-        cid: result.cid,
-        size: result.size
-      });
-
-      // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
-      // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
-      // logger.info('Crust order placed');
-
-      logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
-
-      logger.info('writting to registry');
-      const res = await registry.registerSecretContract(
-        result.cid, wasmFile.cid
-      );
-
-      if (!res) {
-        throw new Error('packaging works well, blockchain network err - Driver.upstream');
-      }
-
-      return res;
     } else {
-      const res = await registry.registerSecretContract(
+      res = await registry.registerSecretContract(
         '0000000000000000000000000000000000000000000000',
         wasmFile.cid
       );
-
-      if (!res) {
-        throw new Error('packaging works well, blockchain network err - Driver.upstream');
-      }
-
-      return res;
     }
+
+    if (!res) {
+      throw new Error('packaging works well, blockchain network err - Driver.upstream');
+    }
+
+    return res;
   }
 
   /**
