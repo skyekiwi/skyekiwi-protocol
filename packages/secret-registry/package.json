@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/secret-registry",
-  "version": "0.6.2-5",
+  "version": "0.6.2-6",
   "type": "module",
   "description": "wrapper for interacting with SkyeKiwi Network secret registry",
   "main": "index.js",
@@ -24,6 +24,6 @@
     "@polkadot/keyring": "^8.3.3",
     "@polkadot/types": "^7.7.1",
     "@polkadot/wasm-crypto": "^4.5.1",
-    "@skyekiwi/util": "0.6.2-5"
+    "@skyekiwi/util": "0.6.2-6"
   }
 }
