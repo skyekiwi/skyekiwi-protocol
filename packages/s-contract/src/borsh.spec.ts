@@ -28,7 +28,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 'create_account',
       receiver: 'test',
       amount: new BN(0x100, 16),
-      wasm_blob: new Uint8Array([1, 2, 3]),
+      wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
       to: undefined
@@ -44,7 +44,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedCall.transaction_action).toEqual(call.transaction_action);
     expect(parsedCall.receiver).toEqual(call.receiver);
     expect(parsedCall.amount.toNumber()).toEqual(call.amount.toNumber());
-    expect(u8aToHex(parsedCall.wasm_blob)).toEqual(u8aToHex(call.wasm_blob));
+    expect(parsedCall.wasm_blob_path).toEqual(call.wasm_blob_path);
     expect(parsedCall.method).toEqual(call.method);
     expect(parsedCall.args).toEqual(call.args);
     expect(parsedCall.to).toEqual(call.to);
@@ -59,7 +59,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 'create_account',
       receiver: 'test',
       amount: new BN(0x100, 16),
-      wasm_blob: new Uint8Array([1, 2, 3]),
+      wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
       to: undefined
@@ -73,7 +73,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 'create_account',
       receiver: 'test2',
       amount: new BN(0x100, 16),
-      wasm_blob: new Uint8Array([1, 2, 3]),
+      wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
       to: undefined
@@ -93,7 +93,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedCalls.ops[0].transaction_action).toEqual(calls.ops[0].transaction_action);
     expect(parsedCalls.ops[0].receiver).toEqual(calls.ops[0].receiver);
     expect(parsedCalls.ops[0].amount.toNumber()).toEqual(calls.ops[0].amount.toNumber());
-    expect(u8aToHex(parsedCalls.ops[0].wasm_blob)).toEqual(u8aToHex(calls.ops[0].wasm_blob));
+    expect(parsedCalls.ops[0].wasm_blob_path).toEqual(calls.ops[0].wasm_blob_path);
     expect(parsedCalls.ops[0].method).toEqual(calls.ops[0].method);
     expect(parsedCalls.ops[0].args).toEqual(calls.ops[0].args);
     expect(parsedCalls.ops[0].to).toEqual(calls.ops[0].to);
@@ -105,7 +105,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedCalls.ops[1].transaction_action).toEqual(calls.ops[1].transaction_action);
     expect(parsedCalls.ops[1].receiver).toEqual(calls.ops[1].receiver);
     expect(parsedCalls.ops[1].amount.toNumber()).toEqual(calls.ops[1].amount.toNumber());
-    expect(u8aToHex(parsedCalls.ops[1].wasm_blob)).toEqual(u8aToHex(calls.ops[1].wasm_blob));
+    expect(parsedCalls.ops[1].wasm_blob_path).toEqual(calls.ops[1].wasm_blob_path);
     expect(parsedCalls.ops[1].method).toEqual(calls.ops[1].method);
     expect(parsedCalls.ops[1].args).toEqual(calls.ops[1].args);
     expect(parsedCalls.ops[1].to).toEqual(calls.ops[1].to);
@@ -215,7 +215,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 'deploy',
       receiver: 'status',
       amount: new BN(0x100, 16),
-      wasm_blob: new Uint8Array([1, 2, 3]),
+      wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
       to: undefined
@@ -226,20 +226,16 @@ describe('@skyekiwi/s-contract/borsh', function () {
     });
 
     const contract = new Contract({
-      home_shard: 0,
       wasm_blob: new Uint8Array([1, 2, 3]),
-      deployment_call: calls,
-      is_initial_state_empty: false
+      deployment_call: calls
     });
 
     const buf = buildContract(contract);
     const parsedContract = parseContract(buf);
 
-    expect(parsedContract.home_shard).toEqual(contract.home_shard);
     expect(u8aToHex(parsedContract.wasm_blob)).toEqual(u8aToHex(contract.wasm_blob));
     expect(u8aToString(new Uint8Array(parsedContract.wasm_blob))).toEqual(u8aToString(new Uint8Array(contract.wasm_blob)));
     expect(buildCalls(parsedContract.deployment_call)).toEqual(buildCalls(calls));
-    expect(parsedContract.is_initial_state_empty).toEqual(contract.is_initial_state_empty);
   });
 
   test('encode/decode shard works', () => {

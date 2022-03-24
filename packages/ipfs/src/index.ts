@@ -5,6 +5,14 @@ import type { IPFSResult } from './types';
 
 import superagent from 'superagent';
 
+const crustGateways = [
+  'https://crustipfs.xyz',
+  'https://ipfs-gw.decloud.foundation',
+  'https://crustwebsites.net',
+  'https://gw.crustapps.net',
+  'https://ipfs-gw.dkskcloud.com'
+];
+
 // WIP - the IPFS connector might go through lots of changes
 export class IPFS {
   private async pin (authHeader: string, cid: string): Promise<boolean> {
@@ -24,11 +32,35 @@ export class IPFS {
   }
 
   private async upload (authHeader: string, content: string): Promise<IPFSResult> {
-    const res = await superagent
-      .post('https://crustwebsites.net/api/v0/add')
-      .set('Authorization', `Basic ${authHeader}`)
-      .type('form')
-      .field('file', content);
+    const req = [];
+
+    for (const endpoint of crustGateways) {
+      req.push(
+        superagent
+          .post(`${endpoint}/api/v0/add`)
+          .timeout({
+            deadline: 60000, // but allow 1 minute for the file to finish loading.
+            response: 10000 // Wait 10 seconds for the server to start sending,
+          })
+          .set('Authorization', `Basic ${authHeader}`)
+          .type('form')
+          .field('file', content)
+      );
+    }
+
+    const res = await (async () => {
+      for (const r of req) {
+        try {
+          return await r;
+        } catch (e) { }
+      }
+
+      return null;
+    })();
+
+    if (!res) {
+      return null;
+    }
 
     /* eslint-disable */
     return {
@@ -39,9 +71,33 @@ export class IPFS {
   }
 
   private async download (authHeader: string, cid: string): Promise<string> {
-    const res = await superagent
-      .post(`https://crustwebsites.net/api/v0/cat?arg=${cid}`)
-      .set('Authorization', `Basic ${authHeader}`);
+    const req = [];
+
+    for (const endpoint of crustGateways) {
+      req.push(
+        superagent
+          .post(`${endpoint}/api/v0/cat?arg=${cid}`)
+          .timeout({
+            deadline: 120000, // but allow 2 minute for the file to finish loading.
+            response: 60000 // Wait 1 minute for the server to start sending,
+          })
+          .set('Authorization', `Basic ${authHeader}`)
+      );
+    }
+
+    const res = await (async () => {
+      for (const r of req) {
+        try {
+          return await r;
+        } catch (e) { }
+      }
+
+      return null;
+    })();
+
+    if (!res) {
+      return null;
+    }
 
     return res.text;
   }

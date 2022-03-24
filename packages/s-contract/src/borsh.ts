@@ -14,7 +14,7 @@ class Call {
   public transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy'
   public receiver: string
   public amount: BN | null
-  public wasm_blob: Uint8Array | null
+  public wasm_blob_path: string | null
   public method: string | null
   public args: string | null
   public to: string | null
@@ -28,7 +28,7 @@ class Call {
     transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy',
     receiver: string,
     amount: BN | null,
-    wasm_blob: Uint8Array | null,
+    wasm_blob_path: string | null,
     method: string | null,
     args: string | null,
     to: string | null,
@@ -40,7 +40,7 @@ class Call {
     this.transaction_action = config.transaction_action;
     this.receiver = config.receiver;
     this.amount = config.amount;
-    this.wasm_blob = config.wasm_blob;
+    this.wasm_blob_path = config.wasm_blob_path;
     this.method = config.method;
     this.args = config.args;
     this.to = config.to;
@@ -164,23 +164,18 @@ class ShardMetadata {
 }
 
 class Contract {
-  public home_shard: number
   public wasm_blob: Uint8Array
   public deployment_call: Calls
-  public is_initial_state_empty: boolean
 
   constructor (config: {
-    home_shard: number,
     wasm_blob: Uint8Array,
     deployment_call: Calls,
-    is_initial_state_empty: boolean
   }) {
-    this.home_shard = config.home_shard;
     this.wasm_blob = config.wasm_blob;
     this.deployment_call = config.deployment_call;
-    this.is_initial_state_empty = config.is_initial_state_empty;
   }
 }
+
 class ExecutionSummary {
   public high_local_execution_block: number
 
@@ -202,6 +197,7 @@ const blockSchema = new Map([
     ]
   }]
 ]);
+
 const callSchema = new Map([
   [Call, {
     kind: 'struct',
@@ -214,7 +210,7 @@ const callSchema = new Map([
       ['transaction_action', 'string'],
       ['receiver', 'string'],
       ['amount', { kind: 'option', type: 'u128' }],
-      ['wasm_blob', { kind: 'option', type: ['u8'] }],
+      ['wasm_blob_path', { kind: 'option', type: 'string' }],
       ['method', { kind: 'option', type: 'string' }],
       ['args', { kind: 'option', type: 'string' }],
       ['to', { kind: 'option', type: 'string' }]
@@ -260,10 +256,8 @@ const contractSchema = new Map();
 contractSchema.set(Contract, {
   kind: 'struct',
   fields: [
-    ['home_shard', 'u32'],
     ['wasm_blob', ['u8']],
-    ['deployment_call', Calls],
-    ['is_initial_state_empty', 'u8']
+    ['deployment_call', Calls]
   ]
 });
 contractSchema.set(Calls, callsSchema.get(Calls));
@@ -438,11 +432,7 @@ const parseBlock = (
 const parseContract = (
   buf: string
 ): Contract => {
-  const c = deserialize(contractSchema, Contract, baseDecode(buf));
-
-  c.is_initial_state_empty = !!c.is_initial_state_empty;
-
-  return c;
+  return deserialize(contractSchema, Contract, baseDecode(buf));
 };
 
 const parseShard = (
