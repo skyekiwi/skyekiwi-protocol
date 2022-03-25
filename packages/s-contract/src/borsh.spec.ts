@@ -3,7 +3,7 @@
 
 import BN from 'bn.js';
 
-import { hexToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { hexToU8a, u8aToHex } from '@skyekiwi/util';
 
 import { Block, buildBlock, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
   parseCall,
@@ -226,16 +226,19 @@ describe('@skyekiwi/s-contract/borsh', function () {
     });
 
     const contract = new Contract({
-      wasm_blob: new Uint8Array([1, 2, 3]),
-      deployment_call: calls
+      home_shard: 0,
+      wasm_blob: '/fakepath/wasm_blob.wasm',
+      deployment_call: calls,
+      deployment_call_index: 12
     });
 
     const buf = buildContract(contract);
     const parsedContract = parseContract(buf);
 
-    expect(u8aToHex(parsedContract.wasm_blob)).toEqual(u8aToHex(contract.wasm_blob));
-    expect(u8aToString(new Uint8Array(parsedContract.wasm_blob))).toEqual(u8aToString(new Uint8Array(contract.wasm_blob)));
+    expect(parsedContract.home_shard).toEqual(contract.home_shard);
+    expect(parsedContract.wasm_blob).toEqual(contract.wasm_blob);
     expect(buildCalls(parsedContract.deployment_call)).toEqual(buildCalls(calls));
+    expect(parsedContract.deployment_call_index).toEqual(contract.deployment_call_index);
   });
 
   test('encode/decode shard works', () => {
@@ -282,7 +285,8 @@ describe('@skyekiwi/s-contract/borsh', function () {
   test('encode/decode local metadata works', () => {
     const localMetadata = new LocalMetadata({
       shard_id: [0, 1],
-      high_local_block: 1
+      high_local_block: 1,
+      latest_state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     });
 
     const buf = buildLocalMetadata(localMetadata);
@@ -290,6 +294,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(localMetadata.shard_id).toEqual(parsedLocalMetadata.shard_id);
     expect(localMetadata.high_local_block).toEqual(parsedLocalMetadata.high_local_block);
+    expect(u8aToHex(localMetadata.latest_state_root)).toEqual(u8aToHex(parsedLocalMetadata.latest_state_root));
   });
 
   test('encode/decode execution summary works', () => {

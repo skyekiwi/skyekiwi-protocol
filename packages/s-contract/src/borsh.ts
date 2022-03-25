@@ -50,7 +50,7 @@ class Call {
 class Calls {
   public ops: Call[]
   constructor (config: {
-    ops: Call[]
+    ops: Call[],
   }) {
     this.ops = config.ops;
   }
@@ -98,17 +98,19 @@ class Outcomes {
     this.state_root = config.state_root;
   }
 }
-
 class LocalMetadata {
   public shard_id: number[]
   public high_local_block: number
+  public latest_state_root: Uint8Array
 
   constructor (config: {
     shard_id: number[],
     high_local_block: number,
+    latest_state_root: Uint8Array,
   }) {
     this.shard_id = config.shard_id;
     this.high_local_block = config.high_local_block;
+    this.latest_state_root = config.latest_state_root;
   }
 }
 
@@ -164,15 +166,21 @@ class ShardMetadata {
 }
 
 class Contract {
-  public wasm_blob: Uint8Array
+  public home_shard: number
+  public wasm_blob: string
   public deployment_call: Calls
+  public deployment_call_index: number
 
   constructor (config: {
-    wasm_blob: Uint8Array,
+    home_shard: number,
+    wasm_blob: string,
     deployment_call: Calls,
+    deployment_call_index: number,
   }) {
+    this.home_shard = config.home_shard;
     this.wasm_blob = config.wasm_blob;
     this.deployment_call = config.deployment_call;
+    this.deployment_call_index = config.deployment_call_index;
   }
 }
 
@@ -256,8 +264,10 @@ const contractSchema = new Map();
 contractSchema.set(Contract, {
   kind: 'struct',
   fields: [
-    ['wasm_blob', ['u8']],
-    ['deployment_call', Calls]
+    ['home_shard', 'u32'],
+    ['wasm_blob', 'string'],
+    ['deployment_call', Calls],
+    ['deployment_call_index', 'u32']
   ]
 });
 contractSchema.set(Calls, callsSchema.get(Calls));
@@ -288,7 +298,8 @@ const localMetadataSchema = new Map([
     kind: 'struct',
     fields: [
       ['shard_id', ['u32']],
-      ['high_local_block', 'u32']
+      ['high_local_block', 'u32'],
+      ['latest_state_root', ['u8', 32]]
     ]
   }]
 ]);
@@ -397,9 +408,7 @@ const parseCalls = (
   buf: string
 ): Calls => {
   if (buf.length === 0) {
-    return {
-      ops: []
-    };
+    return { ops: [] };
   }
 
   const cs = deserialize(callsSchema, Calls, baseDecode(buf));
