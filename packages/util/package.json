@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/util",
-  "version": "0.6.2-6",
+  "version": "0.6.2-7",
   "type": "module",
   "description": "a collection of utility functions for @skyekiwi",
   "main": "index.js",
