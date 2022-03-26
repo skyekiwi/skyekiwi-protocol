@@ -13,7 +13,7 @@ class Call {
 
   public transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy'
   public receiver: string
-  public amount: BN | null
+  public amount: number | null
   public wasm_blob_path: string | null
   public method: string | null
   public args: string | null
@@ -27,7 +27,7 @@ class Call {
 
     transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy',
     receiver: string,
-    amount: BN | null,
+    amount: number | null,
     wasm_blob_path: string | null,
     method: string | null,
     args: string | null,
@@ -217,7 +217,7 @@ const callSchema = new Map([
 
       ['transaction_action', 'string'],
       ['receiver', 'string'],
-      ['amount', { kind: 'option', type: 'u128' }],
+      ['amount', { kind: 'option', type: 'u32' }],
       ['wasm_blob_path', { kind: 'option', type: 'string' }],
       ['method', { kind: 'option', type: 'string' }],
       ['args', { kind: 'option', type: 'string' }],

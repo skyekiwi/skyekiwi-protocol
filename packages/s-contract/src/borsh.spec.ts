@@ -27,7 +27,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
       transaction_action: 'create_account',
       receiver: 'test',
-      amount: new BN(0x100, 16),
+      amount: 10,
       wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
@@ -43,7 +43,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(parsedCall.transaction_action).toEqual(call.transaction_action);
     expect(parsedCall.receiver).toEqual(call.receiver);
-    expect(parsedCall.amount.toNumber()).toEqual(call.amount.toNumber());
+    expect(parsedCall.amount).toEqual(call.amount);
     expect(parsedCall.wasm_blob_path).toEqual(call.wasm_blob_path);
     expect(parsedCall.method).toEqual(call.method);
     expect(parsedCall.args).toEqual(call.args);
@@ -58,7 +58,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
       transaction_action: 'create_account',
       receiver: 'test',
-      amount: new BN(0x100, 16),
+      amount: 100,
       wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
@@ -72,7 +72,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
       transaction_action: 'create_account',
       receiver: 'test2',
-      amount: new BN(0x100, 16),
+      amount: 10,
       wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
@@ -92,7 +92,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(parsedCalls.ops[0].transaction_action).toEqual(calls.ops[0].transaction_action);
     expect(parsedCalls.ops[0].receiver).toEqual(calls.ops[0].receiver);
-    expect(parsedCalls.ops[0].amount.toNumber()).toEqual(calls.ops[0].amount.toNumber());
+    expect(parsedCalls.ops[0].amount).toEqual(calls.ops[0].amount);
     expect(parsedCalls.ops[0].wasm_blob_path).toEqual(calls.ops[0].wasm_blob_path);
     expect(parsedCalls.ops[0].method).toEqual(calls.ops[0].method);
     expect(parsedCalls.ops[0].args).toEqual(calls.ops[0].args);
@@ -104,7 +104,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(parsedCalls.ops[1].transaction_action).toEqual(calls.ops[1].transaction_action);
     expect(parsedCalls.ops[1].receiver).toEqual(calls.ops[1].receiver);
-    expect(parsedCalls.ops[1].amount.toNumber()).toEqual(calls.ops[1].amount.toNumber());
+    expect(parsedCalls.ops[1].amount).toEqual(calls.ops[1].amount);
     expect(parsedCalls.ops[1].wasm_blob_path).toEqual(calls.ops[1].wasm_blob_path);
     expect(parsedCalls.ops[1].method).toEqual(calls.ops[1].method);
     expect(parsedCalls.ops[1].args).toEqual(calls.ops[1].args);
@@ -214,7 +214,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
       transaction_action: 'deploy',
       receiver: 'status',
-      amount: new BN(0x100, 16),
+      amount: 100,
       wasm_blob_path: '/fakepath/wasm_blob.wasm',
       method: undefined,
       args: undefined,
