@@ -1,23 +1,29 @@
 // Copyright 2021-2022 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Block, blockSchema, buildBlock, buildCall, buildCalls, buildContract, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, Call, Calls, callSchema, callsSchema, Contract, contractSchema, LocalMetadata, localMetadataSchema, Outcome, Outcomes, outcomeSchema, outcomesSchema, parseBlock,
+import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
+  parseBlockSummary,
   parseCall,
   parseCalls,
   parseContract,
+  parseExecutionSummary,
   parseLocalMetadata,
   parseOutcome,
   parseOutcomes,
   parseShard,
-  Shard, shardSchema } from './borsh';
+  parseShardMetadata,
+  Shard, ShardMetadata } from './borsh';
 
 export {
-  Call, callSchema, buildCall, parseCall,
-  Calls, callsSchema, buildCalls, parseCalls,
-  Outcome, outcomeSchema, buildOutcome, parseOutcome,
-  Outcomes, outcomesSchema, buildOutcomes, parseOutcomes,
-  Block, blockSchema, buildBlock, parseBlock,
-  Contract, contractSchema, buildContract, parseContract,
-  Shard, shardSchema, buildShard, parseShard,
-  LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata
+  Call, buildCall, parseCall,
+  Calls, buildCalls, parseCalls,
+  Outcome, buildOutcome, parseOutcome,
+  Outcomes, buildOutcomes, parseOutcomes,
+  Block, buildBlock, parseBlock,
+  Contract, buildContract, parseContract,
+  Shard, buildShard, parseShard,
+  ShardMetadata, buildShardMetadata, parseShardMetadata,
+  LocalMetadata, buildLocalMetadata, parseLocalMetadata,
+  ExecutionSummary, buildExecutionSummary, parseExecutionSummary,
+  BlockSummary, buildBlockSummary, parseBlockSummary
 };

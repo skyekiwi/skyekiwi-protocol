@@ -5,8 +5,8 @@ import BN from 'bn.js';
 
 import { hexToU8a, u8aToHex } from '@skyekiwi/util';
 
-import { Block, buildBlock, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
-  parseCall,
+import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
+  parseBlockSummary, parseCall,
   parseCalls,
   parseContract,
   parseExecutionSummary,
@@ -306,5 +306,18 @@ describe('@skyekiwi/s-contract/borsh', function () {
     const parsedExecutionSummary = parseExecutionSummary(buf);
 
     expect(executionSummary.high_local_execution_block).toEqual(parsedExecutionSummary.high_local_execution_block);
+  });
+
+  test('encode/decode block summary works', () => {
+    const blockSum = new BlockSummary({
+      block_number: 12,
+      block_state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    });
+
+    const buf = buildBlockSummary(blockSum);
+    const parsedBlockSummary = parseBlockSummary(buf);
+
+    expect(blockSum.block_number).toEqual(parsedBlockSummary.block_number);
+    expect(u8aToHex(blockSum.block_state_root)).toEqual(u8aToHex(parsedBlockSummary.block_state_root));
   });
 });

@@ -194,6 +194,29 @@ class ExecutionSummary {
   }
 }
 
+class BlockSummary {
+  public block_number: number
+  public block_state_root: Uint8Array
+
+  constructor (config: {
+    block_number: number,
+    block_state_root: Uint8Array,
+  }) {
+    this.block_number = config.block_number;
+    this.block_state_root = config.block_state_root;
+  }
+}
+
+const blockSummarySchema = new Map([
+  [BlockSummary, {
+    kind: 'struct',
+    fields: [
+      ['block_number', 'u32'],
+      ['block_state_root', ['u8', 32]]
+    ]
+  }]
+]);
+
 const blockSchema = new Map([
   [Block, {
     kind: 'struct',
@@ -393,6 +416,12 @@ const buildExecutionSummary = (a: ExecutionSummary): string => {
   return baseEncode(buf);
 };
 
+const buildBlockSummary = (a: BlockSummary): string => {
+  const buf = serialize(blockSummarySchema, a);
+
+  return baseEncode(buf);
+};
+
 // de
 const parseCall = (
   buf: string
@@ -466,6 +495,12 @@ const parseExecutionSummary = (
   return deserialize(executionSummarySchema, ExecutionSummary, baseDecode(buf));
 };
 
+const parseBlockSummary = (
+  buf: string
+): BlockSummary => {
+  return deserialize(blockSummarySchema, BlockSummary, baseDecode(buf));
+};
+
 export {
   Call, callSchema, buildCall, parseCall,
   Calls, callsSchema, buildCalls, parseCalls,
@@ -476,5 +511,6 @@ export {
   Shard, shardSchema, buildShard, parseShard,
   ShardMetadata, shardMetadataSchema, buildShardMetadata, parseShardMetadata,
   LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
-  ExecutionSummary, executionSummarySchema, buildExecutionSummary, parseExecutionSummary
+  ExecutionSummary, executionSummarySchema, buildExecutionSummary, parseExecutionSummary,
+  BlockSummary, blockSummarySchema, buildBlockSummary, parseBlockSummary
 };
