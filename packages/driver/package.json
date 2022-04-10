@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/driver",
-  "version": "0.6.2-10",
+  "version": "0.6.2-11",
   "type": "module",
   "description": "core driver of the SkyeKiwi Protocol client lib for @skyekiwi",
   "main": "index.js",
@@ -21,11 +21,11 @@
   },
   "dependencies": {
     "@polkadot/types": "^7.15.1",
-    "@skyekiwi/crypto": "0.6.2-9",
-    "@skyekiwi/file": "0.6.2-9",
-    "@skyekiwi/ipfs": "0.6.2-9",
-    "@skyekiwi/metadata": "0.6.2-9",
-    "@skyekiwi/util": "0.6.2-9"
+    "@skyekiwi/crypto": "0.6.2-11",
+    "@skyekiwi/file": "0.6.2-11",
+    "@skyekiwi/ipfs": "0.6.2-11",
+    "@skyekiwi/metadata": "0.6.2-11",
+    "@skyekiwi/util": "0.6.2-11"
   },
   "devDependencies": {
     "@polkadot/util-crypto": "^8.7.1",

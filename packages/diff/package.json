@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/diff",
-  "version": "0.6.2-9",
+  "version": "0.6.2-11",
   "type": "module",
   "description": "TypeScript implementation of Myres Diff algorithm",
   "main": "index.js",
@@ -20,7 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/util": "0.6.2-9",
+    "@skyekiwi/util": "0.6.2-11",
     "tweetnacl": "^1.0.3"
   }
 }
