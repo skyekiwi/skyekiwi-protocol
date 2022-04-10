@@ -10,6 +10,8 @@
     "paths": {
       "@skyekiwi/crypto": [ "packages/crypto/src" ],
       "@skyekiwi/crypto/*": [ "packages/crypto/src/*" ],
+      "@skyekiwi/diff": [ "packages/util/src" ],
+      "@skyekiwi/diff/*": [ "packages/util/src/*" ],
       "@skyekiwi/driver": [ "packages/driver/src" ],
       "@skyekiwi/driver/*": [ "packages/driver/src/*" ],
       "@skyekiwi/file": [ "packages/file/src" ],

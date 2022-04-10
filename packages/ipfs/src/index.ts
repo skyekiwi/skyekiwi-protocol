@@ -3,7 +3,11 @@
 
 import type { IPFSResult } from './types';
 
+import { Keyring } from '@polkadot/keyring';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 import superagent from 'superagent';
+
+import { u8aToHex } from '@skyekiwi/util';
 
 const crustGateways = [
   'https://crustipfs.xyz',
@@ -15,7 +19,7 @@ const crustGateways = [
 
 // WIP - the IPFS connector might go through lots of changes
 export class IPFS {
-  private async pin (authHeader: string, cid: string): Promise<boolean> {
+  private static async pin (authHeader: string, cid: string): Promise<boolean> {
     if (cid.length !== 46) {
       throw new Error('CID len err');
     }
@@ -31,7 +35,7 @@ export class IPFS {
     return res.statusCode === 200;
   }
 
-  private async upload (authHeader: string, content: string): Promise<IPFSResult> {
+  private static async upload (authHeader: string, content: string): Promise<IPFSResult> {
     const req = [];
 
     for (const endpoint of crustGateways) {
@@ -70,7 +74,7 @@ export class IPFS {
     /* eslint-enable */
   }
 
-  private async download (authHeader: string, cid: string): Promise<string> {
+  private static async download (authHeader: string, cid: string): Promise<string> {
     const req = [];
 
     for (const endpoint of crustGateways) {
@@ -102,8 +106,8 @@ export class IPFS {
     return res.text;
   }
 
-  async add (content: string, authHeader?: string): Promise<IPFSResult> {
-    const auth = authHeader || 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
+  public static async add (content: string, authHeader?: string): Promise<IPFSResult> {
+    const auth = authHeader || this.generateRandomAuthHeader();
     let reTries = 3;
     let res;
 
@@ -131,8 +135,8 @@ export class IPFS {
     return res;
   }
 
-  async cat (cid: string, authHeader?: string): Promise<string> {
-    const auth = authHeader || 'bmVhci03Wm9zdjVIQmRINmNTcGFVQXZmcDZMVjk4clpQMlZhYlI2R2ZpQXlQUGI4UjpmM2ZkNDYwNTM3MDYzYTgyM2VjMzdlNGJmZmNhZTQzMWY3MmYzODhkNmU5MWExMzZkMzNhYzRmODU0N2IwMzE5MjMzMGYxNmQ3NGQ0Y2RmZTIzOWNmY2M4ZGFjZTA1ZWVlMDRjNTkyNGNkOGNhM2I4N2EzNWQ2NjExMjM4MGQwOA==';
+  public static async cat (cid: string, authHeader?: string): Promise<string> {
+    const auth = authHeader || this.generateRandomAuthHeader();
 
     let reTries = 3;
     let res;
@@ -147,5 +151,15 @@ export class IPFS {
     }
 
     return res;
+  }
+
+  private static generateRandomAuthHeader (): string {
+    const seed = mnemonicGenerate();
+    const pair = (new Keyring()).addFromUri(seed);
+
+    const sig = u8aToHex(pair.sign(pair.address));
+    const authHeader = Buffer.from(`sub-${pair.address}:0x${sig}`).toString('base64');
+
+    return authHeader;
   }
 }

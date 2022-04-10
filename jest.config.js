@@ -6,6 +6,7 @@ const config = require('@skyekiwi/dev/config/jest.cjs');
 module.exports = Object.assign({}, config, {
   moduleNameMapper: {
     '@skyekiwi/crypto(.*)$': '<rootDir>/packages/crypto/src/$1',
+    '@skyekiwi/diff(.*)$': '<rootDir>/packages/diff/src/$1',
     '@skyekiwi/driver(.*)$': '<rootDir>/packages/driver/src/$1',
     '@skyekiwi/file(.*)$': '<rootDir>/packages/file/src/$1',
     '@skyekiwi/ipfs(.*)$': '<rootDir>/packages/ipfs/src/$1',
@@ -16,7 +17,7 @@ module.exports = Object.assign({}, config, {
   },
   modulePathIgnorePatterns: [
     '<rootDir>/packages/crypto/build',
-    '<rootDir>/packages/dev/build',
+    '<rootDir>/packages/diff/build',
     '<rootDir>/packages/driver/build',
     '<rootDir>/packages/file/build',
     '<rootDir>/packages/ipfs/build',

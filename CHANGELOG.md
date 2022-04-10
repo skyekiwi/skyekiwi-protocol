@@ -1,4 +1,9 @@
 # CHANGELOG
+
+## 0.7.1 Feb 09, 2022
+
+`s-contract` package now only contains the pre-defined borsh schema
+
 ## 0.6.1 Feb 09, 2022
 
 Remove unused packages

@@ -63,8 +63,7 @@ export class Metadata {
 
     const encryptedChunk = u8aToHex(SymmetricEncryption.encrypt(this.#sealingKey, stringToU8a(chunk)));
 
-    const ipfs = new IPFS();
-    const cid = await ipfs.add(encryptedChunk);
+    const cid = await IPFS.add(encryptedChunk);
 
     this.#chunkListCID = {
       cid: cid.cid.toString(),

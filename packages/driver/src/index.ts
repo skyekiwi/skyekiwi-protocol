@@ -30,7 +30,6 @@ export class Driver {
   ): Promise<void> {
     const logger = getLogger('Driver.upstream');
 
-    const ipfs = new IPFS();
     const metadata = new Metadata(sealer);
 
     let chunkCount = 0;
@@ -60,7 +59,7 @@ export class Driver {
 
     logger.info('file metadata sealed');
 
-    const result = await ipfs.add(sealedData);
+    const result = await IPFS.add(sealedData);
 
     logger.info('sealed metadata uploaded to IPFS');
 
@@ -116,8 +115,7 @@ export class Driver {
     logger.info(`chunk encryption success for ${chunkId}`);
 
     // 4. upload to IPFS
-    const ipfs = new IPFS();
-    const IPFS_CID = await ipfs.add(u8aToHex(chunk));
+    const IPFS_CID = await IPFS.add(u8aToHex(chunk));
 
     logger.info(`chunk uploaded to ipfs for ${chunkId}`);
 
@@ -163,8 +161,7 @@ export class Driver {
     logger.info('querying registry success');
 
     // 2. fetch the sealedData from IPFS
-    const ipfs = new IPFS();
-    const metadata = Metadata.decodeSealedData(await ipfs.cat(metadataCID));
+    const metadata = Metadata.decodeSealedData(await IPFS.cat(metadataCID));
 
     logger.info('prase sealed metadata success');
 
@@ -223,9 +220,7 @@ export class Driver {
   ): Promise<void> {
     const logger = getLogger('Driver.downstream');
 
-    const ipfs = new IPFS();
-
-    const chunksListRaw = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunks))));
+    const chunksListRaw = u8aToString(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await IPFS.cat(chunks))));
     const chunksList = [];
 
     for (let offset = 0; offset < chunksListRaw.length; offset += 46) {
@@ -238,7 +233,7 @@ export class Driver {
 
     for (const chunkCID of chunksList) {
       logger.info(`downstreaming chunk ${chunkCID}`);
-      const chunk = File.inflatDeflatedChunk(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await ipfs.cat(chunkCID))));
+      const chunk = File.inflatDeflatedChunk(SymmetricEncryption.decrypt(sealingKey, hexToU8a(await IPFS.cat(chunkCID))));
 
       logger.info(`downstreaming chunk ${chunkCID} success`);
 
@@ -291,8 +286,7 @@ export class Driver {
       version: SKYEKIWI_VERSION
     });
 
-    const ipfs = new IPFS();
-    const result = await ipfs.add(sealedMetadata);
+    const result = await IPFS.add(sealedMetadata);
 
     await callback(result.cid);
   }

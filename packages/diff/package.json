@@ -1,8 +1,8 @@
 {
-  "name": "@skyekiwi/metadata",
+  "name": "@skyekiwi/diff",
   "version": "0.6.2-9",
   "type": "module",
-  "description": "core metadata handler for @skyekiwi protocol",
+  "description": "TypeScript implementation of Myres Diff algorithm",
   "main": "index.js",
   "sideEffects": [
     "./detectPackage.js",
@@ -20,9 +20,6 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/util-crypto": "^9.0.1",
-    "@skyekiwi/crypto": "0.6.2-9",
-    "@skyekiwi/ipfs": "0.6.2-9",
     "@skyekiwi/util": "0.6.2-9",
     "tweetnacl": "^1.0.3"
   }
