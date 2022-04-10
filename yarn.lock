@@ -2958,12 +2958,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@skyekiwi/crypto@0.6.2-9, @skyekiwi/crypto@workspace:packages/crypto":
+"@skyekiwi/crypto@0.6.2-10, @skyekiwi/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/crypto@workspace:packages/crypto"
   dependencies:
-    "@skyekiwi/metadata": 0.6.2-9
-    "@skyekiwi/util": 0.6.2-9
+    "@skyekiwi/metadata": 0.6.2-10
+    "@skyekiwi/util": 0.6.2-10
     ethers: ^5.5.4
     tweetnacl: ^1.0.3
   languageName: unknown
@@ -3075,6 +3075,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/driver@workspace:packages/driver"
   dependencies:
+<<<<<<< HEAD
     "@polkadot/types": ^7.15.1
     "@polkadot/util-crypto": ^8.7.1
     "@skyekiwi/crypto": 0.6.2-9
@@ -3082,11 +3083,20 @@ __metadata:
     "@skyekiwi/ipfs": 0.6.2-9
     "@skyekiwi/metadata": 0.6.2-9
     "@skyekiwi/util": 0.6.2-9
+=======
+    "@polkadot/types": ^7.7.1
+    "@polkadot/util-crypto": ^8.3.3
+    "@skyekiwi/crypto": 0.6.2-10
+    "@skyekiwi/file": 0.6.2-10
+    "@skyekiwi/ipfs": 0.6.2-10
+    "@skyekiwi/metadata": 0.6.2-10
+    "@skyekiwi/util": 0.6.2-10
+>>>>>>> 735628392f4d347d319564db368f5ab6c18960c1
     dotenv: ^10.0.0
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/file@0.6.2-9, @skyekiwi/file@workspace:packages/file":
+"@skyekiwi/file@0.6.2-10, @skyekiwi/file@workspace:packages/file":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/file@workspace:packages/file"
   dependencies:
@@ -3098,27 +3108,38 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/ipfs@0.6.2-9, @skyekiwi/ipfs@workspace:packages/ipfs":
+"@skyekiwi/ipfs@0.6.2-10, @skyekiwi/ipfs@workspace:packages/ipfs":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/ipfs@workspace:packages/ipfs"
   dependencies:
+<<<<<<< HEAD
     "@polkadot/keyring": ^8.7.1
     "@polkadot/util-crypto": ^8.7.1
     "@skyekiwi/util": 0.6.2-9
+=======
+    "@skyekiwi/util": 0.6.2-10
+>>>>>>> 735628392f4d347d319564db368f5ab6c18960c1
     "@types/superagent": ^4.1.15
     superagent: ^7.1.1
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/metadata@0.6.2-9, @skyekiwi/metadata@workspace:packages/metadata":
+"@skyekiwi/metadata@0.6.2-10, @skyekiwi/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/metadata@workspace:packages/metadata"
   dependencies:
+<<<<<<< HEAD
     "@polkadot/util-crypto": ^9.0.1
     "@skyekiwi/crypto": 0.6.2-9
     "@skyekiwi/ipfs": 0.6.2-9
     "@skyekiwi/util": 0.6.2-9
+=======
+    "@polkadot/util-crypto": ^8.3.3
+    "@skyekiwi/crypto": 0.6.2-10
+    "@skyekiwi/ipfs": 0.6.2-10
+    "@skyekiwi/util": 0.6.2-10
+>>>>>>> 735628392f4d347d319564db368f5ab6c18960c1
     tweetnacl: ^1.0.3
   languageName: unknown
   linkType: soft
@@ -3127,7 +3148,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/s-contract@workspace:packages/s-contract"
   dependencies:
-    "@skyekiwi/util": 0.6.2-9
+    "@skyekiwi/util": 0.6.2-10
     "@types/bn.js": 4.11.6
     bn.js: 4.12
     borsh: ^0.7.0
@@ -3138,15 +3159,23 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@skyekiwi/secret-registry@workspace:packages/secret-registry"
   dependencies:
+<<<<<<< HEAD
     "@polkadot/api": ^7.15.1
     "@polkadot/keyring": ^8.7.1
     "@polkadot/types": ^7.15.1
     "@polkadot/wasm-crypto": ^5.1.1
     "@skyekiwi/util": 0.6.2-9
+=======
+    "@polkadot/api": ^7.7.1
+    "@polkadot/keyring": ^8.3.3
+    "@polkadot/types": ^7.7.1
+    "@polkadot/wasm-crypto": ^4.5.1
+    "@skyekiwi/util": 0.6.2-10
+>>>>>>> 735628392f4d347d319564db368f5ab6c18960c1
   languageName: unknown
   linkType: soft
 
-"@skyekiwi/util@0.6.2-9, @skyekiwi/util@workspace:packages/util":
+"@skyekiwi/util@0.6.2-10, @skyekiwi/util@workspace:packages/util":
   version: 0.0.0-use.local
   resolution: "@skyekiwi/util@workspace:packages/util"
   dependencies:

@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/secret-registry",
-  "version": "0.6.2-9",
+  "version": "0.6.2-10",
   "type": "module",
   "description": "wrapper for interacting with SkyeKiwi Network secret registry",
   "main": "index.js",

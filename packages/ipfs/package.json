@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/ipfs",
-  "version": "0.6.2-9",
+  "version": "0.6.2-10",
   "type": "module",
   "description": "ipfs wrapper for @skyekiwi",
   "main": "index.js",
@@ -20,11 +20,16 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
+<<<<<<< HEAD
     "@polkadot/keyring": "^8.7.1",
     "@polkadot/util-crypto": "^8.7.1",
     "@skyekiwi/util": "0.6.2-9",
     "superagent": "^7.1.1",
     "tweetnacl": "^1.0.3"
+=======
+    "@skyekiwi/util": "0.6.2-10",
+    "superagent": "^7.1.1"
+>>>>>>> 735628392f4d347d319564db368f5ab6c18960c1
   },
   "devDependencies": {
     "@types/superagent": "^4.1.15"
