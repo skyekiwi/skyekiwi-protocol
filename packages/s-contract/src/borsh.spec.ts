@@ -5,7 +5,7 @@ import BN from 'bn.js';
 
 import { hexToU8a, u8aToHex } from '@skyekiwi/util';
 
-import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
+import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildRawOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
   parseBlockSummary, parseCall,
   parseCalls,
   parseContract,
@@ -13,8 +13,10 @@ import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCal
   parseLocalMetadata,
   parseOutcome,
   parseOutcomes,
+  parseRawOutcomes,
   parseShard,
   parseShardMetadata,
+  RawOutcomes,
   Shard, ShardMetadata } from './borsh';
 
 /* eslint-disable sort-keys, camelcase */
@@ -185,6 +187,59 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(u8aToHex(parsedOutcomes.ops[1].outcome_status)).toEqual(u8aToHex(outcomes.ops[1].outcome_status));
 
     expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
+  });
+
+  test('encode/decode batch outcome works', () => {
+    const outcome1 = new Outcome({
+      view_result_log: ['test', 'nothing'],
+      view_result: hexToU8a('0123456789abcdef'),
+      outcome_logs: [],
+      outcome_receipt_ids: [],
+      outcome_gas_burnt: new BN(0x10, 16),
+      outcome_token_burnt: new BN(0x100, 16),
+      outcome_executor_id: 'alice',
+      outcome_status: hexToU8a('0123456789abcdef')
+    });
+
+    const outcome2 = new Outcome({
+      view_result_log: ['test', 'nothingelse'],
+      view_result: hexToU8a('0123456789abcdef'),
+      outcome_logs: [],
+      outcome_receipt_ids: [],
+      outcome_gas_burnt: new BN(0x10, 16),
+      outcome_token_burnt: new BN(0x100, 16),
+      outcome_executor_id: 'alice',
+      outcome_status: hexToU8a('0123456789abcdef')
+    });
+
+    const outcomes = new RawOutcomes({
+      ops: [outcome1, outcome2],
+      state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+      state_patch: new Uint8Array([1, 2, 3, 4, 5, 6])
+    });
+    const buf = buildRawOutcomes(outcomes);
+    const parsedOutcomes = parseRawOutcomes(buf);
+
+    expect(parsedOutcomes.ops[0].view_result_log).toEqual(outcomes.ops[0].view_result_log);
+    expect(u8aToHex(parsedOutcomes.ops[0].view_result)).toEqual(u8aToHex(outcomes.ops[0].view_result));
+    expect(parsedOutcomes.ops[0].outcome_logs).toEqual(outcomes.ops[0].outcome_logs);
+    expect(parsedOutcomes.ops[0].outcome_receipt_ids).toEqual(outcomes.ops[0].outcome_receipt_ids);
+    expect(parsedOutcomes.ops[0].outcome_gas_burnt.toNumber()).toEqual(outcomes.ops[0].outcome_gas_burnt.toNumber());
+    expect(parsedOutcomes.ops[0].outcome_token_burnt.toNumber()).toEqual(outcomes.ops[0].outcome_token_burnt.toNumber());
+    expect(parsedOutcomes.ops[0].outcome_executor_id).toEqual(outcomes.ops[0].outcome_executor_id);
+    expect(u8aToHex(parsedOutcomes.ops[0].outcome_status)).toEqual(u8aToHex(outcomes.ops[0].outcome_status));
+
+    expect(parsedOutcomes.ops[1].view_result_log).toEqual(outcomes.ops[1].view_result_log);
+    expect(u8aToHex(parsedOutcomes.ops[1].view_result)).toEqual(u8aToHex(outcomes.ops[1].view_result));
+    expect(parsedOutcomes.ops[1].outcome_logs).toEqual(outcomes.ops[1].outcome_logs);
+    expect(parsedOutcomes.ops[1].outcome_receipt_ids).toEqual(outcomes.ops[1].outcome_receipt_ids);
+    expect(parsedOutcomes.ops[1].outcome_gas_burnt.toNumber()).toEqual(outcomes.ops[1].outcome_gas_burnt.toNumber());
+    expect(parsedOutcomes.ops[1].outcome_token_burnt.toNumber()).toEqual(outcomes.ops[1].outcome_token_burnt.toNumber());
+    expect(parsedOutcomes.ops[1].outcome_executor_id).toEqual(outcomes.ops[1].outcome_executor_id);
+    expect(u8aToHex(parsedOutcomes.ops[1].outcome_status)).toEqual(u8aToHex(outcomes.ops[1].outcome_status));
+
+    expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
+    expect(u8aToHex(parsedOutcomes.state_patch)).toEqual(u8aToHex(outcomes.state_patch));
   });
 
   test('encode/decode block works', () => {

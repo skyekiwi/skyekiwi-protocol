@@ -98,6 +98,22 @@ class Outcomes {
     this.state_root = config.state_root;
   }
 }
+
+class RawOutcomes {
+  public ops: Outcome[]
+  public state_root: Uint8Array
+  public state_patch: Uint8Array
+
+  constructor (config: {
+    ops: Outcome[],
+    state_root: Uint8Array,
+    state_patch: Uint8Array,
+  }) {
+    this.ops = config.ops;
+    this.state_root = config.state_root;
+    this.state_patch = config.state_patch;
+  }
+}
 class LocalMetadata {
   public shard_id: number[]
   public high_local_block: number
@@ -282,6 +298,20 @@ outcomesSchema.set(Outcomes, {
 });
 outcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
 
+
+const rawOutcomesSchema = new Map();
+
+rawOutcomesSchema.set(RawOutcomes, {
+  kind: 'struct',
+  fields: [
+    ['ops', [Outcome]],
+    ['state_root', ['u8', 32]],
+    ['state_patch', ['u8']],
+  ]
+});
+rawOutcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
+
+
 const contractSchema = new Map();
 
 contractSchema.set(Contract, {
@@ -422,6 +452,12 @@ const buildBlockSummary = (a: BlockSummary): string => {
   return baseEncode(buf);
 };
 
+const buildRawOutcomes = (a: RawOutcomes): string => {
+  const buf = serialize(rawOutcomesSchema, a);
+
+  return baseEncode(buf);
+};
+
 // de
 const parseCall = (
   buf: string
@@ -501,6 +537,12 @@ const parseBlockSummary = (
   return deserialize(blockSummarySchema, BlockSummary, baseDecode(buf));
 };
 
+const parseRawOutcomes = (
+  buf: string
+): RawOutcomes => {
+  return deserialize(rawOutcomesSchema, RawOutcomes, baseDecode(buf));
+};
+
 export {
   Call, callSchema, buildCall, parseCall,
   Calls, callsSchema, buildCalls, parseCalls,
@@ -512,5 +554,6 @@ export {
   ShardMetadata, shardMetadataSchema, buildShardMetadata, parseShardMetadata,
   LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
   ExecutionSummary, executionSummarySchema, buildExecutionSummary, parseExecutionSummary,
-  BlockSummary, blockSummarySchema, buildBlockSummary, parseBlockSummary
+  BlockSummary, blockSummarySchema, buildBlockSummary, parseBlockSummary,
+  RawOutcomes, rawOutcomesSchema, buildRawOutcomes, parseRawOutcomes,
 };
