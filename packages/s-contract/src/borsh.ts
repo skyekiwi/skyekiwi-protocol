@@ -298,7 +298,6 @@ outcomesSchema.set(Outcomes, {
 });
 outcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
 
-
 const rawOutcomesSchema = new Map();
 
 rawOutcomesSchema.set(RawOutcomes, {
@@ -306,11 +305,10 @@ rawOutcomesSchema.set(RawOutcomes, {
   fields: [
     ['ops', [Outcome]],
     ['state_root', ['u8', 32]],
-    ['state_patch', ['u8']],
+    ['state_patch', ['u8']]
   ]
 });
 rawOutcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
-
 
 const contractSchema = new Map();
 
@@ -555,5 +553,5 @@ export {
   LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
   ExecutionSummary, executionSummarySchema, buildExecutionSummary, parseExecutionSummary,
   BlockSummary, blockSummarySchema, buildBlockSummary, parseBlockSummary,
-  RawOutcomes, rawOutcomesSchema, buildRawOutcomes, parseRawOutcomes,
+  RawOutcomes, rawOutcomesSchema, buildRawOutcomes, parseRawOutcomes
 };
