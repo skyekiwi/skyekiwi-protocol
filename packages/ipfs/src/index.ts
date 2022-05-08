@@ -10,9 +10,10 @@ import superagent from 'superagent';
 import { u8aToHex } from '@skyekiwi/util';
 
 const crustGateways = [
-  'https://crustipfs.xyz',
   'https://ipfs-gw.decloud.foundation',
   'https://crustwebsites.net',
+  'https://crustipfs.xyz',
+  'https://ipfs-gw.decloud.foundation',
   'https://gw.crustapps.net',
   'https://ipfs-gw.dkskcloud.com'
 ];

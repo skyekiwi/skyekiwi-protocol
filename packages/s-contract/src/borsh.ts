@@ -213,13 +213,19 @@ class ExecutionSummary {
 class BlockSummary {
   public block_number: number
   public block_state_root: Uint8Array
+  public contract_state_patch_from_previous_block: Uint8Array
+  public call_state_patch_from_previous_block: Uint8Array
 
   constructor (config: {
     block_number: number,
     block_state_root: Uint8Array,
+    contract_state_patch_from_previous_block: Uint8Array,
+    call_state_patch_from_previous_block: Uint8Array,
   }) {
     this.block_number = config.block_number;
     this.block_state_root = config.block_state_root;
+    this.contract_state_patch_from_previous_block = config.contract_state_patch_from_previous_block;
+    this.call_state_patch_from_previous_block = config.call_state_patch_from_previous_block;
   }
 }
 
@@ -228,7 +234,9 @@ const blockSummarySchema = new Map([
     kind: 'struct',
     fields: [
       ['block_number', 'u32'],
-      ['block_state_root', ['u8', 32]]
+      ['block_state_root', ['u8', 32]],
+      ['contract_state_patch_from_previous_block', ['u8']],
+      ['call_state_patch_from_previous_block', ['u8']]
     ]
   }]
 ]);

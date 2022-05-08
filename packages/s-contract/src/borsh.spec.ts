@@ -366,7 +366,9 @@ describe('@skyekiwi/s-contract/borsh', function () {
   test('encode/decode block summary works', () => {
     const blockSum = new BlockSummary({
       block_number: 12,
-      block_state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+      block_state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+      contract_state_patch_from_previous_block: new Uint8Array([1, 2, 3, 4]),
+      call_state_patch_from_previous_block: new Uint8Array([1, 2, 3, 4])
     });
 
     const buf = buildBlockSummary(blockSum);
@@ -374,5 +376,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(blockSum.block_number).toEqual(parsedBlockSummary.block_number);
     expect(u8aToHex(blockSum.block_state_root)).toEqual(u8aToHex(parsedBlockSummary.block_state_root));
+    expect(u8aToHex(blockSum.contract_state_patch_from_previous_block)).toEqual(u8aToHex(parsedBlockSummary.contract_state_patch_from_previous_block));
+    expect(u8aToHex(blockSum.call_state_patch_from_previous_block)).toEqual(u8aToHex(parsedBlockSummary.call_state_patch_from_previous_block));
   });
 });
