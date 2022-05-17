@@ -10,12 +10,12 @@ import superagent from 'superagent';
 import { u8aToHex } from '@skyekiwi/util';
 
 const crustGateways = [
-  'https://ipfs-gw.decloud.foundation',
-  'https://crustwebsites.net',
+  'https://ipfs-gw.dkskcloud.com',
+  'https://gw.crustapps.net',
   'https://crustipfs.xyz',
   'https://ipfs-gw.decloud.foundation',
-  'https://gw.crustapps.net',
-  'https://ipfs-gw.dkskcloud.com'
+  'https://crustwebsites.net',
+  'https://ipfs-gw.decloud.foundation'
 ];
 
 // WIP - the IPFS connector might go through lots of changes
@@ -73,6 +73,19 @@ export class IPFS {
       size: Number(res.body.Size)
     };
     /* eslint-enable */
+  }
+
+  private static async downloadLocal (cid: string): Promise<string> {
+    const r = await superagent
+      .post(`http://127.0.0.1:5001/api/v0/cat?arg=${cid}`)
+      .timeout({
+        deadline: 120000, // but allow 2 minute for the file to finish loading.
+        response: 60000 // Wait 1 minute for the server to start sending,
+      });
+
+    console.log(r);
+
+    return r.text;
   }
 
   private static async download (authHeader: string, cid: string): Promise<string> {
@@ -145,6 +158,22 @@ export class IPFS {
     while (reTries >= 0) {
       try {
         res = await this.download(auth, cid);
+      } catch (e) {}
+
+      if (res) break;
+      reTries--;
+    }
+
+    return res;
+  }
+
+  public static async catLocal (cid: string): Promise<string> {
+    let reTries = 3;
+    let res;
+
+    while (reTries >= 0) {
+      try {
+        res = await this.downloadLocal(cid);
       } catch (e) {}
 
       if (res) break;
