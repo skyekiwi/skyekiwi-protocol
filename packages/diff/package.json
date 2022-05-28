@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/diff",
-  "version": "0.7.2-3",
+  "version": "0.7.6",
   "type": "module",
   "description": "TypeScript implementation of Myres Diff algorithm",
   "main": "index.js",
