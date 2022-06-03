@@ -21,10 +21,6 @@
   },
   "dependencies": {
     "@skyekiwi/util": "0.7.2-3",
-    "bn.js": "4.12",
     "borsh": "^0.7.0"
-  },
-  "devDependencies": {
-    "@types/bn.js": "4.11.6"
   }
 }

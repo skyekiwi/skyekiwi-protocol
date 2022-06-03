@@ -1,85 +1,90 @@
 // Copyright 2021-2022 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import BN from 'bn.js';
 import { baseDecode, baseEncode, deserialize, serialize } from 'borsh';
 
 /* eslint-disable sort-keys, camelcase */
 class Call {
-  public origin: string
   public origin_public_key: Uint8Array
-
+  public receipt_public_key: Uint8Array
   public encrypted_egress: boolean
 
-  public transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy'
-  public receiver: string
+  // public transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy'
+  public transaction_action: number
+
   public amount: number | null
-  public wasm_blob_path: string | null
-  public method: string | null
-  public args: string | null
-  public to: string | null
+  public wasm_blob_path: Uint8Array | null
+  public method: Uint8Array | null
+  public args: Uint8Array | null
 
   constructor (config: {
-    origin: string,
     origin_public_key: Uint8Array,
-
+    receipt_public_key: Uint8Array,
     encrypted_egress: boolean,
 
-    transaction_action: 'create_account' | 'call' | 'transfer' | 'view_method_call' | 'deploy',
-    receiver: string,
+    transaction_action: number,
+
     amount: number | null,
-    wasm_blob_path: string | null,
-    method: string | null,
-    args: string | null,
-    to: string | null,
+    wasm_blob_path: Uint8Array | null,
+    method: Uint8Array | null,
+    args: Uint8Array | null,
   }) {
-    this.origin = config.origin;
     this.origin_public_key = config.origin_public_key;
+    this.receipt_public_key = config.receipt_public_key;
     this.encrypted_egress = config.encrypted_egress;
 
     this.transaction_action = config.transaction_action;
-    this.receiver = config.receiver;
+
     this.amount = config.amount;
     this.wasm_blob_path = config.wasm_blob_path;
     this.method = config.method;
     this.args = config.args;
-    this.to = config.to;
   }
 }
 
 class Calls {
   public ops: Call[]
+  public shard_id: number
+  public block_number: number | null
+
   constructor (config: {
     ops: Call[],
+    shard_id: number,
+    block_number: number | null,
   }) {
     this.ops = config.ops;
+    this.shard_id = config.shard_id;
+    this.block_number = config.block_number;
   }
 }
 class Outcome {
-  public view_result_log: string[]
-  public view_result: Uint8Array
-  public outcome_logs: string[]
+  public view_result_log: Uint8Array[]
+  public view_result: Uint8Array | null
+  public view_error: Uint8Array | null
+
+  public outcome_logs: Uint8Array[]
   public outcome_receipt_ids: Uint8Array[]
-  public outcome_gas_burnt: BN
-  public outcome_token_burnt: BN
-  public outcome_executor_id: string
+  public outcome_token_burnt: number
+  public outcome_executor_id: Uint8Array
   public outcome_status: Uint8Array | null
 
   constructor (config: {
-    view_result_log: string[],
-    view_result: Uint8Array,
-    outcome_logs: string[],
+    view_result_log: Uint8Array[],
+    view_result: Uint8Array | null,
+    view_error: Uint8Array | null,
+
+    outcome_logs: Uint8Array[],
     outcome_receipt_ids: Uint8Array[],
-    outcome_gas_burnt: BN,
-    outcome_token_burnt: BN,
-    outcome_executor_id: string,
+    outcome_token_burnt: number,
+    outcome_executor_id: Uint8Array,
     outcome_status: Uint8Array | null,
   }) {
     this.view_result_log = config.view_result_log;
     this.view_result = config.view_result;
+    this.view_error = config.view_error;
+
     this.outcome_logs = config.outcome_logs;
     this.outcome_receipt_ids = config.outcome_receipt_ids;
-    this.outcome_gas_burnt = config.outcome_gas_burnt;
     this.outcome_token_burnt = config.outcome_token_burnt;
     this.outcome_executor_id = config.outcome_executor_id;
     this.outcome_status = config.outcome_status;
@@ -257,18 +262,16 @@ const callSchema = new Map([
   [Call, {
     kind: 'struct',
     fields: [
-      ['origin', { kind: 'option', type: 'string' }],
-      ['origin_public_key', { kind: 'option', type: ['u8', 32] }],
-
+      ['origin_public_key', ['u8', 32]],
+      ['receipt_public_key', ['u8', 32]],
       ['encrypted_egress', 'u8'],
 
-      ['transaction_action', 'string'],
-      ['receiver', 'string'],
+      ['transaction_action', 'u8'],
+
       ['amount', { kind: 'option', type: 'u32' }],
-      ['wasm_blob_path', { kind: 'option', type: 'string' }],
-      ['method', { kind: 'option', type: 'string' }],
-      ['args', { kind: 'option', type: 'string' }],
-      ['to', { kind: 'option', type: 'string' }]
+      ['wasm_blob_path', { kind: 'option', type: ['u8'] }],
+      ['method', { kind: 'option', type: ['u8'] }],
+      ['args', { kind: 'option', type: ['u8'] }]
     ]
   }]
 ]);
@@ -277,7 +280,9 @@ const callsSchema = new Map();
 callsSchema.set(Calls, {
   kind: 'struct',
   fields: [
-    ['ops', [Call]]
+    ['ops', [Call]],
+    ['shard_id', 'u32'],
+    ['block_number', 'u32']
   ]
 });
 callsSchema.set(Call, callSchema.get(Call));
@@ -285,13 +290,14 @@ callsSchema.set(Call, callSchema.get(Call));
 const outcomeSchema = new Map([[Outcome, {
   kind: 'struct',
   fields: [
-    ['view_result_log', ['string']],
-    ['view_result', ['u8']],
-    ['outcome_logs', ['string']],
+    ['view_result_log', { kind: 'option', type: [['u8']] }],
+    ['view_result', { kind: 'option', type: ['u8'] }],
+    ['view_error', { kind: 'option', type: ['u8'] }],
+
+    ['outcome_logs', [['u8']]],
     ['outcome_receipt_ids', [['u8', 32]]],
-    ['outcome_gas_burnt', 'u64'],
-    ['outcome_token_burnt', 'u128'],
-    ['outcome_executor_id', 'String'],
+    ['outcome_token_burnt', 'u32'],
+    ['outcome_executor_id', ['u8']],
     ['outcome_status', { kind: 'option', type: ['u8'] }]
   ]
 }]]);
@@ -399,10 +405,6 @@ const buildContract = (
 const buildCalls = (
   calls: Calls
 ): string => {
-  if (calls.ops.length === 0) {
-    return '';
-  }
-
   const buf = serialize(callsSchema, calls);
 
   return baseEncode(buf);
@@ -478,10 +480,6 @@ const parseCall = (
 const parseCalls = (
   buf: string
 ): Calls => {
-  if (buf.length === 0) {
-    return { ops: [] };
-  }
-
   const cs = deserialize(callsSchema, Calls, baseDecode(buf));
 
   for (let i = 0; i < cs.ops.length; i++) {
