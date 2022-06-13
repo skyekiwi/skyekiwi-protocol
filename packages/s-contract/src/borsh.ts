@@ -282,7 +282,7 @@ callsSchema.set(Calls, {
   fields: [
     ['ops', [Call]],
     ['shard_id', 'u32'],
-    ['block_number', 'u32']
+    ['block_number', { kind: 'option', type: 'u32' }]
   ]
 });
 callsSchema.set(Call, callSchema.get(Call));
@@ -559,5 +559,7 @@ export {
   LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
   ExecutionSummary, executionSummarySchema, buildExecutionSummary, parseExecutionSummary,
   BlockSummary, blockSummarySchema, buildBlockSummary, parseBlockSummary,
-  RawOutcomes, rawOutcomesSchema, buildRawOutcomes, parseRawOutcomes
+  RawOutcomes, rawOutcomesSchema, buildRawOutcomes, parseRawOutcomes,
+
+  baseEncode, baseDecode
 };
