@@ -13,7 +13,7 @@ class Call {
   public transaction_action: number
 
   public amount: number | null
-  public wasm_blob_path: Uint8Array | null
+  public contract_name: Uint8Array | null
   public method: Uint8Array | null
   public args: Uint8Array | null
 
@@ -25,7 +25,7 @@ class Call {
     transaction_action: number,
 
     amount: number | null,
-    wasm_blob_path: Uint8Array | null,
+    contract_name: Uint8Array | null,
     method: Uint8Array | null,
     args: Uint8Array | null,
   }) {
@@ -36,7 +36,7 @@ class Call {
     this.transaction_action = config.transaction_action;
 
     this.amount = config.amount;
-    this.wasm_blob_path = config.wasm_blob_path;
+    this.contract_name = config.contract_name;
     this.method = config.method;
     this.args = config.args;
   }
@@ -269,7 +269,7 @@ const callSchema = new Map([
       ['transaction_action', 'u8'],
 
       ['amount', { kind: 'option', type: 'u32' }],
-      ['wasm_blob_path', { kind: 'option', type: ['u8'] }],
+      ['contract_name', { kind: 'option', type: ['u8'] }],
       ['method', { kind: 'option', type: ['u8'] }],
       ['args', { kind: 'option', type: ['u8'] }]
     ]

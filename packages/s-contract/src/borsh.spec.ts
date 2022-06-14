@@ -47,7 +47,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
       transaction_action: 1,
       amount: 10,
-      wasm_blob_path: stringToU8a('/fakepath/wasm_blob.wasm'),
+      contract_name: stringToU8a('/fakepath/wasm_blob.wasm'),
       method: undefined,
       args: undefined
     });
@@ -63,8 +63,8 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(parsedCall.amount).toEqual(call.amount);
     expect(u8aToString(
-      new Uint8Array(parsedCall.wasm_blob_path))).toEqual(u8aToString(
-      new Uint8Array(call.wasm_blob_path)));
+      new Uint8Array(parsedCall.contract_name))).toEqual(u8aToString(
+      new Uint8Array(call.contract_name)));
     expect(parsedCall.method).toEqual(call.method);
     expect(parsedCall.args).toEqual(call.args);
   });
@@ -78,7 +78,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 1,
 
       amount: 100,
-      wasm_blob_path: stringToU8a('/fakepath/wasm_blob.wasm'),
+      contract_name: stringToU8a('/fakepath/wasm_blob.wasm'),
       method: undefined,
       args: undefined
     });
@@ -91,7 +91,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 1,
 
       amount: 100,
-      wasm_blob_path: undefined,
+      contract_name: undefined,
       method: stringToU8a('some_method'),
       args: undefined
     });
@@ -112,9 +112,9 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedCalls.ops[0].transaction_action).toEqual(calls.ops[0].transaction_action);
     expect(parsedCalls.ops[0].amount).toEqual(calls.ops[0].amount);
     expect(u8aToString(
-      new Uint8Array(new Uint8Array(parsedCalls.ops[0].wasm_blob_path))))
+      new Uint8Array(new Uint8Array(parsedCalls.ops[0].contract_name))))
       .toEqual(u8aToString(
-        new Uint8Array(new Uint8Array(calls.ops[0].wasm_blob_path))));
+        new Uint8Array(new Uint8Array(calls.ops[0].contract_name))));
     expect(parsedCalls.ops[0].method).toEqual(undefined);
     expect(parsedCalls.ops[0].args).toEqual(undefined);
 
@@ -124,7 +124,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(parsedCalls.ops[1].transaction_action).toEqual(calls.ops[1].transaction_action);
     expect(parsedCalls.ops[1].amount).toEqual(calls.ops[1].amount);
-    expect(parsedCalls.ops[1].wasm_blob_path).toEqual(undefined);
+    expect(parsedCalls.ops[1].contract_name).toEqual(undefined);
     expect(u8aToString(
       new Uint8Array(parsedCalls.ops[0].method))).toEqual(u8aToString(
       new Uint8Array(calls.ops[0].method)));
@@ -253,7 +253,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 1,
 
       amount: 100,
-      wasm_blob_path: stringToU8a('/fakepath/wasm_blob.wasm'),
+      contract_name: stringToU8a('/fakepath/wasm_blob.wasm'),
       method: undefined,
       args: undefined
     });
