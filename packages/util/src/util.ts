@@ -71,4 +71,23 @@ const isValidSubstrateAddress = (address: string): boolean => {
   }
 };
 
-export { stringToIndex, indexToString, isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64 };
+const padSize = (size: number): Uint8Array => {
+  const res = new Uint8Array(4);
+
+  res[3] = size & 0xff;
+  res[2] = (size >> 8) & 0xff;
+  res[1] = (size >> 16) & 0xff;
+  res[0] = (size >> 24) & 0xff;
+
+  return res;
+};
+
+const unpadSize = (size: Uint8Array): number => {
+  return size[3] | (size[2] << 8) | (size[1] << 16) | (size[0] << 24);
+};
+
+const sleep = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+export { stringToIndex, indexToString, isValidSubstrateAddress, hexToU8a, u8aToHex, isValidHex, numberPadding, trimEnding, stringToU8a, u8aToString, toBase64, fromBase64, padSize, unpadSize, sleep };
