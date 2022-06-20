@@ -6,10 +6,9 @@ import { baseEncode } from 'borsh';
 
 import { hexToU8a, stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 
-import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildContract, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, Contract, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
+import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
   parseBlockSummary, parseCall,
   parseCalls,
-  parseContract,
   parseExecutionSummary,
   parseLocalMetadata,
   parseOutcome,
@@ -140,7 +139,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       outcome_logs: [],
       outcome_receipt_ids: [],
       outcome_token_burnt: 10,
-      outcome_executor_id: stringToU8a('alice'),
       outcome_status: hexToU8a('0123456789abcdef')
     });
 
@@ -155,9 +153,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedOutcome.outcome_logs).toEqual(outcome.outcome_logs);
     expect(parsedOutcome.outcome_receipt_ids).toEqual(outcome.outcome_receipt_ids);
     expect(parsedOutcome.outcome_token_burnt).toEqual(outcome.outcome_token_burnt);
-    expect(u8aToString(
-      new Uint8Array(parsedOutcome.outcome_executor_id))).toEqual(u8aToString(
-      new Uint8Array(outcome.outcome_executor_id)));
     expect(u8aToHex(parsedOutcome.outcome_status)).toEqual(u8aToHex(outcome.outcome_status));
   });
 
@@ -170,7 +165,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       outcome_logs: [],
       outcome_receipt_ids: [],
       outcome_token_burnt: 10,
-      outcome_executor_id: stringToU8a('alice'),
       outcome_status: hexToU8a('0123456789abcdef')
     });
 
@@ -182,7 +176,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       outcome_logs: [],
       outcome_receipt_ids: [],
       outcome_token_burnt: 10,
-      outcome_executor_id: stringToU8a('alice'),
       outcome_status: hexToU8a('0123456789abcdef')
     });
 
@@ -201,12 +194,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedOutcomes.ops[0].outcome_logs).toEqual(outcomes.ops[0].outcome_logs);
     expect(parsedOutcomes.ops[0].outcome_receipt_ids).toEqual(outcomes.ops[0].outcome_receipt_ids);
     expect(parsedOutcomes.ops[0].outcome_token_burnt).toEqual(outcomes.ops[0].outcome_token_burnt);
-    expect(
-      u8aToString(new Uint8Array(parsedOutcomes.ops[0].outcome_executor_id))
-    )
-      .toEqual(
-        u8aToString(new Uint8Array(outcomes.ops[0].outcome_executor_id))
-      );
     expect(u8aToHex(parsedOutcomes.ops[0].outcome_status)).toEqual(u8aToHex(outcomes.ops[0].outcome_status));
 
     expect(u8aToHex(parsedOutcomes.ops[1].view_result_log[0])).toEqual(u8aToHex(outcomes.ops[1].view_result_log[0]));
@@ -214,12 +201,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedOutcomes.ops[1].outcome_logs).toEqual(outcomes.ops[1].outcome_logs);
     expect(parsedOutcomes.ops[1].outcome_receipt_ids).toEqual(outcomes.ops[1].outcome_receipt_ids);
     expect(parsedOutcomes.ops[1].outcome_token_burnt).toEqual(outcomes.ops[1].outcome_token_burnt);
-    expect(
-      u8aToString(new Uint8Array(parsedOutcomes.ops[1].outcome_executor_id))
-    )
-      .toEqual(
-        u8aToString(new Uint8Array(outcomes.ops[1].outcome_executor_id))
-      );
     expect(u8aToHex(parsedOutcomes.ops[1].outcome_status)).toEqual(u8aToHex(outcomes.ops[1].outcome_status));
 
     expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
@@ -229,8 +210,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
     const block = new Block({
       shard_id: 0,
       block_number: 1,
-      calls: [1, 2, 3],
-      contracts: ['status']
+      calls: [1, 2, 3]
     });
 
     const buf = buildBlock(block);
@@ -239,45 +219,8 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedBlock).toEqual({
       shard_id: 0,
       block_number: 1,
-      calls: [1, 2, 3],
-      contracts: ['status']
+      calls: [1, 2, 3]
     });
-  });
-
-  test('encode/decode contract works', () => {
-    const call = new Call({
-      origin_public_key: hexToU8a('0123456789012345678901234567891201234567890123456789012345678912'),
-      receipt_public_key: hexToU8a('0123456789012345678901234567891201234567890123456789012345678912'),
-      encrypted_egress: false,
-
-      transaction_action: 1,
-
-      amount: 100,
-      contract_name: stringToU8a('/fakepath/wasm_blob.wasm'),
-      method: undefined,
-      args: undefined
-    });
-
-    const calls = new Calls({
-      ops: [call],
-      shard_id: 0,
-      block_number: 10
-    });
-
-    const contract = new Contract({
-      home_shard: 0,
-      wasm_blob: '/fakepath/wasm_blob.wasm',
-      deployment_call: calls,
-      deployment_call_index: 12
-    });
-
-    const buf = buildContract(contract);
-    const parsedContract = parseContract(buf);
-
-    expect(parsedContract.home_shard).toEqual(contract.home_shard);
-    expect(parsedContract.wasm_blob).toEqual(contract.wasm_blob);
-    expect(buildCalls(parsedContract.deployment_call)).toEqual(buildCalls(calls));
-    expect(parsedContract.deployment_call_index).toEqual(contract.deployment_call_index);
   });
 
   test('encode/decode shard works', () => {
@@ -328,8 +271,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
   test('encode/decode local metadata works', () => {
     const localMetadata = new LocalMetadata({
       shard_id: [0, 1],
-      high_local_block: 1,
-      latest_state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+      high_local_block: 1
     });
 
     const buf = buildLocalMetadata(localMetadata);
@@ -337,18 +279,19 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(localMetadata.shard_id).toEqual(parsedLocalMetadata.shard_id);
     expect(localMetadata.high_local_block).toEqual(parsedLocalMetadata.high_local_block);
-    expect(u8aToHex(localMetadata.latest_state_root)).toEqual(u8aToHex(parsedLocalMetadata.latest_state_root));
   });
 
   test('encode/decode execution summary works', () => {
     const executionSummary = new ExecutionSummary({
-      high_local_execution_block: 10
+      high_local_execution_block: 10,
+      latest_state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     });
 
     const buf = buildExecutionSummary(executionSummary);
     const parsedExecutionSummary = parseExecutionSummary(buf);
 
     expect(executionSummary.high_local_execution_block).toEqual(parsedExecutionSummary.high_local_execution_block);
+    expect(u8aToHex(executionSummary.latest_state_root)).toEqual(u8aToHex(parsedExecutionSummary.latest_state_root));
   });
 
   test('encode/decode block summary works', () => {

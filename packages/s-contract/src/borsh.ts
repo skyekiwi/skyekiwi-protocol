@@ -65,7 +65,6 @@ class Outcome {
   public outcome_logs: Uint8Array[]
   public outcome_receipt_ids: Uint8Array[]
   public outcome_token_burnt: number
-  public outcome_executor_id: Uint8Array
   public outcome_status: Uint8Array | null
 
   constructor (config: {
@@ -76,7 +75,6 @@ class Outcome {
     outcome_logs: Uint8Array[],
     outcome_receipt_ids: Uint8Array[],
     outcome_token_burnt: number,
-    outcome_executor_id: Uint8Array,
     outcome_status: Uint8Array | null,
   }) {
     this.view_result_log = config.view_result_log;
@@ -86,7 +84,6 @@ class Outcome {
     this.outcome_logs = config.outcome_logs;
     this.outcome_receipt_ids = config.outcome_receipt_ids;
     this.outcome_token_burnt = config.outcome_token_burnt;
-    this.outcome_executor_id = config.outcome_executor_id;
     this.outcome_status = config.outcome_status;
   }
 }
@@ -119,19 +116,17 @@ class RawOutcomes {
     this.state_patch = config.state_patch;
   }
 }
+
 class LocalMetadata {
   public shard_id: number[]
   public high_local_block: number
-  public latest_state_root: Uint8Array
 
   constructor (config: {
     shard_id: number[],
     high_local_block: number,
-    latest_state_root: Uint8Array,
   }) {
     this.shard_id = config.shard_id;
     this.high_local_block = config.high_local_block;
-    this.latest_state_root = config.latest_state_root;
   }
 }
 
@@ -139,18 +134,15 @@ class Block {
   public shard_id: number
   public block_number: number
   public calls: number[]
-  public contracts: string[]
 
   constructor (config: {
     shard_id: number,
     block_number: number,
     calls: number[],
-    contracts: string[],
   }) {
     this.shard_id = config.shard_id;
     this.block_number = config.block_number;
     this.calls = config.calls;
-    this.contracts = config.contracts;
   }
 }
 
@@ -186,32 +178,16 @@ class ShardMetadata {
   }
 }
 
-class Contract {
-  public home_shard: number
-  public wasm_blob: string
-  public deployment_call: Calls
-  public deployment_call_index: number
-
-  constructor (config: {
-    home_shard: number,
-    wasm_blob: string,
-    deployment_call: Calls,
-    deployment_call_index: number,
-  }) {
-    this.home_shard = config.home_shard;
-    this.wasm_blob = config.wasm_blob;
-    this.deployment_call = config.deployment_call;
-    this.deployment_call_index = config.deployment_call_index;
-  }
-}
-
 class ExecutionSummary {
   public high_local_execution_block: number
+  public latest_state_root: Uint8Array
 
   constructor (config: {
     high_local_execution_block: number,
+    latest_state_root: Uint8Array,
   }) {
     this.high_local_execution_block = config.high_local_execution_block;
+    this.latest_state_root = config.latest_state_root;
   }
 }
 
@@ -252,8 +228,7 @@ const blockSchema = new Map([
     fields: [
       ['shard_id', 'u32'],
       ['block_number', 'u32'],
-      ['calls', { kind: 'option', type: ['u32'] }],
-      ['contracts', { kind: 'option', type: ['string'] }]
+      ['calls', { kind: 'option', type: ['u32'] }]
     ]
   }]
 ]);
@@ -290,14 +265,13 @@ callsSchema.set(Call, callSchema.get(Call));
 const outcomeSchema = new Map([[Outcome, {
   kind: 'struct',
   fields: [
-    ['view_result_log', { kind: 'option', type: [['u8']] }],
+    ['view_result_log', [['u8']]],
     ['view_result', { kind: 'option', type: ['u8'] }],
     ['view_error', { kind: 'option', type: ['u8'] }],
 
     ['outcome_logs', [['u8']]],
     ['outcome_receipt_ids', [['u8', 32]]],
     ['outcome_token_burnt', 'u32'],
-    ['outcome_executor_id', ['u8']],
     ['outcome_status', { kind: 'option', type: ['u8'] }]
   ]
 }]]);
@@ -324,20 +298,6 @@ rawOutcomesSchema.set(RawOutcomes, {
 });
 rawOutcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
 
-const contractSchema = new Map();
-
-contractSchema.set(Contract, {
-  kind: 'struct',
-  fields: [
-    ['home_shard', 'u32'],
-    ['wasm_blob', 'string'],
-    ['deployment_call', Calls],
-    ['deployment_call_index', 'u32']
-  ]
-});
-contractSchema.set(Calls, callsSchema.get(Calls));
-contractSchema.set(Call, callSchema.get(Call));
-
 const shardMetadataSchema = new Map([
   [ShardMetadata, {
     kind: 'struct',
@@ -363,8 +323,7 @@ const localMetadataSchema = new Map([
     kind: 'struct',
     fields: [
       ['shard_id', ['u32']],
-      ['high_local_block', 'u32'],
-      ['latest_state_root', ['u8', 32]]
+      ['high_local_block', 'u32']
     ]
   }]
 ]);
@@ -372,7 +331,8 @@ const executionSummarySchema = new Map([
   [ExecutionSummary, {
     kind: 'struct',
     fields: [
-      ['high_local_execution_block', 'u32']
+      ['high_local_execution_block', 'u32'],
+      ['latest_state_root', ['u8', 32]]
     ]
   }]
 ]);
@@ -390,14 +350,6 @@ const buildBlock = (
   block: Block
 ): string => {
   const buf = serialize(blockSchema, block);
-
-  return baseEncode(buf);
-};
-
-const buildContract = (
-  contract: Contract
-): string => {
-  const buf = serialize(contractSchema, contract);
 
   return baseEncode(buf);
 };
@@ -507,12 +459,6 @@ const parseBlock = (
   return deserialize(blockSchema, Block, baseDecode(buf));
 };
 
-const parseContract = (
-  buf: string
-): Contract => {
-  return deserialize(contractSchema, Contract, baseDecode(buf));
-};
-
 const parseShard = (
   buf: string
 ): Shard => {
@@ -553,7 +499,6 @@ export {
   Outcome, outcomeSchema, buildOutcome, parseOutcome,
   Outcomes, outcomesSchema, buildOutcomes, parseOutcomes,
   Block, blockSchema, buildBlock, parseBlock,
-  Contract, contractSchema, buildContract, parseContract,
   Shard, shardSchema, buildShard, parseShard,
   ShardMetadata, shardMetadataSchema, buildShardMetadata, parseShardMetadata,
   LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
