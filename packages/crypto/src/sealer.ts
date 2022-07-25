@@ -1,14 +1,8 @@
 // Copyright 2021-2022 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { AsymmetricEncryption } from '.';
-
-export interface Sealer {
-  unlock(key: Uint8Array): void
-  decrypt(encryptedMessage: Uint8Array): Uint8Array
-  encrypt(message: Uint8Array, recipient: Uint8Array): Uint8Array
-  getAuthorKey(): Uint8Array
-}
+import { AsymmetricEncryption } from './asymmetric';
+import { Sealer } from './interface';
 
 // the DefaultSealer uses Curve25519 provided by Tweetnacl for sealing
 export class DefaultSealer implements Sealer {

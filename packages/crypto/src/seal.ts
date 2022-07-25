@@ -6,7 +6,7 @@ import type { EncryptionSchema } from './encryptionSchema';
 
 import { getLogger, u8aToHex } from '@skyekiwi/util';
 
-import { Sealer } from '.';
+import { Sealer } from './interface';
 
 export class Seal {
   /**

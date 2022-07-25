@@ -16,9 +16,7 @@
     "lint": "skyekiwi-dev-run-lint",
     "clean": "skyekiwi-dev-clean-build",
     "postinstall": "skyekiwi-dev-yarn-only",
-    "test": "skyekiwi-dev-run-test --coverage --runInBand",
-    "test:one": "skyekiwi-dev-run-test --runInBand",
-    "test:now": "skyekiwi-dev-run-test"
+    "test": "skyekiwi-dev-run-test --coverage --runInBand"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -29,6 +27,6 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   },
-  "version": "0.7.7-4",
+  "version": "0.8.1",
   "packageManager": "yarn@3.0.1"
 }

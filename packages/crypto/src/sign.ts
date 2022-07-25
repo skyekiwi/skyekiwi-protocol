@@ -7,11 +7,7 @@ import { ethers } from 'ethers';
 
 import { hexToU8a } from '@skyekiwi/util';
 
-export interface Sign {
-  getPublicKey(key: Uint8Array): Uint8Array
-  generateSignature(key: Uint8Array, message: Uint8Array): Promise<Signature>,
-  verifySignature(signature: Signature): boolean
-}
+import { Sign } from './interface';
 
 export class EthereumSign implements Sign {
   /**

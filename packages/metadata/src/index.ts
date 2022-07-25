@@ -6,7 +6,8 @@ import type { ChunkList, PreSealData, SealedMetadata } from './types';
 
 import { randomBytes } from 'tweetnacl';
 
-import { EncryptionSchema, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
+import { EncryptionSchema, Seal, SymmetricEncryption } from '@skyekiwi/crypto';
+import { Sealer } from '@skyekiwi/crypto/interface';
 import { IPFS } from '@skyekiwi/ipfs';
 import { stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 

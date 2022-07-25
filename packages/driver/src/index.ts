@@ -4,7 +4,8 @@
 import type { Signature } from '@skyekiwi/crypto/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
 
-import { EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
+import { EncryptionSchema, EthereumSign, Seal, SymmetricEncryption } from '@skyekiwi/crypto';
+import { Sealer } from '@skyekiwi/crypto/interface';
 import { File } from '@skyekiwi/file';
 import { IPFS } from '@skyekiwi/ipfs';
 import { Metadata, SKYEKIWI_VERSION } from '@skyekiwi/metadata';

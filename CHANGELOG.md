@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.8.1 Jul 25, 2022
+
+Write most blobs to Preimage instead of IPFS
+Fix Rollup issues
+
 ## 0.7.1 Feb 09, 2022
 
 `s-contract` package now only contains the pre-defined borsh schema

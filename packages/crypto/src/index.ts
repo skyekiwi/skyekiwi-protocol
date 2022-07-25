@@ -4,15 +4,15 @@
 import { AsymmetricEncryption } from './asymmetric';
 import { EncryptionSchema } from './encryptionSchema';
 import { Seal } from './seal';
-import { DefaultSealer, Sealer } from './sealer';
-import { EthereumSign, Sign } from './sign';
+import { DefaultSealer } from './sealer';
+import { EthereumSign } from './sign';
 import { SymmetricEncryption } from './symmetric';
 
 export {
   AsymmetricEncryption,
   SymmetricEncryption,
 
-  Sealer, DefaultSealer, Seal,
+  DefaultSealer, Seal,
 
-  EncryptionSchema, Sign, EthereumSign
+  EncryptionSchema, EthereumSign
 };

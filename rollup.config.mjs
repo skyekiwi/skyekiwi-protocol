@@ -6,6 +6,14 @@ import path from 'path';
 import { createBundle } from '@skyekiwi/dev/config/rollup.js';
 
 const pkgs = [
+  '@skyekiwi/crypto',
+  '@skyekiwi/diff',
+  '@skyekiwi/driver',
+  '@skyekiwi/file',
+  '@skyekiwi/ipfs',
+  '@skyekiwi/metadata',
+  '@skyekiwi/s-contract',
+  '@skyekiwi/secret-registry',
   '@skyekiwi/util'
 ];
 
