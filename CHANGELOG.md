@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.8.1 Jul 25, 2022
+## 0.8.3 Jul 25, 2022
 
 Write most blobs to Preimage instead of IPFS
 Fix Rollup issues
