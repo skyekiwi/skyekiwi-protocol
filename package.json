@@ -27,6 +27,10 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   },
+<<<<<<< HEAD
   "version": "0.8.1",
+=======
+  "version": "0.7.7-5",
+>>>>>>> cbda7fd30fb55401be8d9faac51054a10ec627ad
   "packageManager": "yarn@3.0.1"
 }
