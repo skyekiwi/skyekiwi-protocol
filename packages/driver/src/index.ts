@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Signature } from '@skyekiwi/crypto/types';
-import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { PreSealData } from '@skyekiwi/metadata/types';
 
 import { EncryptionSchema, EthereumSign, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
@@ -18,15 +17,14 @@ export class Driver {
     * @param {File} file content to be uploaded
     * @param {Sealer} sealer a collection of sealer functions to be used
     * @param {EncryptionSchema} encryptionSchema blueprint for the secret
-    * @param {Crust} storage storage blockchain network connector
-    * @param {WASMContract} registry secret registry connector to be used
+    * @param {Function} callback callback function, pass in the sealedData as Uint8Array
     * @returns {Promise<void>} None.
   */
   public static async upstream (
     file: File | Uint8Array,
     sealer: Sealer,
     encryptionSchema: EncryptionSchema,
-    callback: (cid: string) => Promise<void>
+    callback: (sealedData: Uint8Array) => Promise<void>
   ): Promise<void> {
     const logger = getLogger('Driver.upstream');
 
@@ -51,22 +49,11 @@ export class Driver {
       );
     }
 
-    const cidList: IPFSResult[] = metadata.getCIDList();
-
     logger.info('CID List extraction success');
 
-    const sealedData: string = await metadata.generateSealedMetadata(encryptionSchema);
+    const sealedData = await metadata.generateSealedMetadata(encryptionSchema);
 
     logger.info('file metadata sealed');
-
-    const result = await IPFS.add(sealedData);
-
-    logger.info('sealed metadata uploaded to IPFS');
-
-    cidList.push({
-      cid: result.cid,
-      size: result.size
-    });
 
     // we are using the Crust Web3 Auth Gateway ... placing Crust orders can be skipped
     // const storageResult = await storage.placeBatchOrderWithCIDList(cidList);
@@ -74,7 +61,7 @@ export class Driver {
 
     logger.info('Submitting Crust Order Skipped. Using Crust Web3 Auth Gateway');
 
-    await callback(result.cid);
+    await callback(sealedData);
   }
 
   /**
@@ -115,15 +102,15 @@ export class Driver {
     logger.info(`chunk encryption success for ${chunkId}`);
 
     // 4. upload to IPFS
-    const IPFS_CID = await IPFS.add(u8aToHex(chunk));
+    const ipfsCid = await IPFS.add(u8aToHex(chunk));
 
     logger.info(`chunk uploaded to ipfs for ${chunkId}`);
 
     // 5. write to chunkMetadata
     metadata.writeChunkResult({
       chunkId: chunkId,
-      ipfsCID: IPFS_CID.cid.toString(),
-      ipfsChunkSize: IPFS_CID.size,
+      ipfsCID: ipfsCid.cid.toString(),
+      ipfsChunkSize: ipfsCid.size,
       rawChunkSize: rawChunkSize
     });
     logger.info(`chunk metadata stored for ${chunkId}`);
@@ -148,11 +135,7 @@ export class Driver {
     // 1. fetch the IPFS CID of the sealedData from registry
     await registry.init();
 
-    const metadataCID = await registry.getMetadata(secretId);
-
-    if (metadataCID === '0000000000000000000000000000000000000000000000') {
-      return null;
-    }
+    const rawMetadata = await registry.getMetadata(secretId);
 
     if (!keys || !sealer) {
       throw new Error('keys and sealer are required');
@@ -161,7 +144,7 @@ export class Driver {
     logger.info('querying registry success');
 
     // 2. fetch the sealedData from IPFS
-    const metadata = Metadata.decodeSealedData(await IPFS.cat(metadataCID));
+    const metadata = Metadata.decodeSealedData(rawMetadata);
 
     logger.info('prase sealed metadata success');
 
@@ -268,7 +251,7 @@ export class Driver {
     keys: Uint8Array[],
     registry: SecretRegistry,
     sealer: Sealer,
-    callback: (cid: string) => Promise<void>
+    callback: (sealedData: Uint8Array) => Promise<void>
   ): Promise<void> {
     // 1. get the preSealData from VaultId
     const unsealed = await this.getPreSealDataByVaultId(secretId, registry, keys, sealer);
@@ -286,9 +269,7 @@ export class Driver {
       version: SKYEKIWI_VERSION
     });
 
-    const result = await IPFS.add(sealedMetadata);
-
-    await callback(result.cid);
+    await callback(sealedMetadata);
   }
 
   /**

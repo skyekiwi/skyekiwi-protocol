@@ -45,9 +45,9 @@ describe('@skyekiwi/driver', function () {
     encryptionSchema.addMember(sealer.getAuthorKey());
 
     await Driver.upstream(
-      file, sealer, encryptionSchema, async (cid: string) => {
+      file, sealer, encryptionSchema, async (metadata: Uint8Array) => {
         await registry.init();
-        const res = await registry.registerSecret(cid);
+        const res = await registry.registerSecret(metadata);
 
         expect(res).not.toBeNull();
         vaultId1 = res;
@@ -117,9 +117,9 @@ describe('@skyekiwi/driver', function () {
 
     await Driver.updateEncryptionSchema(
       vaultId1, encryptionSchema, [mnemonicToMiniSecret(mnemonic)], registry, sealer,
-      async (cid: string) => {
+      async (metadata: Uint8Array) => {
         await registry.init();
-        const res = await registry.updateMetadata(vaultId1, cid);
+        const res = await registry.updateMetadata(vaultId1, metadata);
 
         expect(res).toEqual(true);
       }

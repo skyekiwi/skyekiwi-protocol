@@ -8,7 +8,7 @@ import { randomBytes } from 'tweetnacl';
 
 import { EncryptionSchema, Seal, Sealer, SymmetricEncryption } from '@skyekiwi/crypto';
 import { IPFS } from '@skyekiwi/ipfs';
-import { hexToU8a, stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
+import { stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 // version code in Uint8Array
 export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 1, 1]);
@@ -89,7 +89,7 @@ export class Metadata {
     * @param {EncryptionSchema} encryptionSchema the blueprint of the secret
     * @returns {string} return the packed sealed metadata
   */
-  public async generateSealedMetadata (encryptionSchema: EncryptionSchema): Promise<string> {
+  public async generateSealedMetadata (encryptionSchema: EncryptionSchema): Promise<Uint8Array> {
     // 1. encrypt and upload a list of all CIDs of chunks
     await this.uploadCIDList();
 
@@ -113,27 +113,6 @@ export class Metadata {
       sealed: sealed,
       version: SKYEKIWI_VERSION
     });
-  }
-
-  /**
-    * get a list of CIDs of chunks
-    * @returns {IPFSResult[]} the list of CIDs of all chunks
-  */
-  public getCIDList (): IPFSResult[] {
-    const cids: IPFSResult[] = [];
-
-    for (const chunksId in this.#chunkList) {
-      cids.push({
-        cid: this.#chunkList[chunksId].ipfsCID,
-        size: this.#chunkList[chunksId].ipfsChunkSize
-      } as IPFSResult);
-    }
-
-    if (this.#chunkListCID) {
-      cids.push(this.#chunkListCID);
-    }
-
-    return cids;
   }
 
   /**
@@ -162,8 +141,7 @@ export class Metadata {
     * decode an encoded SealedMetadata
     * @returns {SealedMetadata} the decoded SealedMetadata
   */
-  public static decodeSealedData (hex: string): SealedMetadata {
-    const sealedMetadata = hexToU8a(hex);
+  public static decodeSealedData (sealedMetadata: Uint8Array): SealedMetadata {
     const isPublic = sealedMetadata.slice(0, 2)[0] === 0x1;
 
     return {
@@ -239,7 +217,7 @@ export class Metadata {
     * encode an raw SealedMetadata
     * @returns {string} the encoded SealedMetadata
   */
-  public static encodeSealedMetadta (sealedData: SealedMetadata): string {
+  public static encodeSealedMetadta (sealedData: SealedMetadata): Uint8Array {
     const result = new Uint8Array(2 + sealedData.sealed.cipher.length + 4);
 
     if (sealedData.sealed.isPublic) {
@@ -251,6 +229,6 @@ export class Metadata {
     result.set(sealedData.sealed.cipher, 2);
     result.set(sealedData.version, 2 + sealedData.sealed.cipher.length);
 
-    return u8aToHex(result);
+    return result;
   }
 }

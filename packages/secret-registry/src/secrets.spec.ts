@@ -11,14 +11,13 @@ describe('@skyekiwi/secret-registry', () => {
 
   test('register secrets & update metadata', async () => {
     const registry = new SecretRegistry(mnemonic, {});
-    const metadata = 'QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLm';
-    const metadata2 = 'QmdaJf2gTKEzKpzNTJWcQVsrQVEaSAanPTrYhmsF12qgLQ';
+    const metadata = new Uint8Array([0, 1, 2]);
+    const metadata2 = new Uint8Array([0, 1, 2, 3]);
 
     await registry.init();
 
     const nextSecretId = await registry.nextSecretId();
     const contractResult = await registry.registerSecret(metadata);
-
     const remoteMetadata = await registry.getMetadata(nextSecretId);
 
     expect(contractResult).toEqual(nextSecretId);

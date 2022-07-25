@@ -10,7 +10,7 @@ import { AnyJson, RegistryTypes } from '@polkadot/types/types';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { waitReady } from '@polkadot/wasm-crypto';
 
-import { getLogger, hexToU8a, sendTx, u8aToString } from '@skyekiwi/util';
+import { getLogger, hexToU8a, sendTx, u8aToHex } from '@skyekiwi/util';
 
 export class SecretRegistry {
   public api: ApiPromise
@@ -101,9 +101,10 @@ export class SecretRegistry {
    * @param {string} metadata metadata to be stored by the blockchain module
    * @returns {Promise<number | null>} the secret id assigned, or null if failed
   */
-  async registerSecret (metadata: string): Promise<number | null> {
-    const extrinsic = this.api.tx.secrets.registerSecret(metadata);
-    const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
+  async registerSecret (metadata: Uint8Array): Promise<number | null> {
+    const registerSecret = this.api.tx.secrets.registerSecret('0x' + u8aToHex(metadata));
+
+    const txResult = await sendTx(registerSecret, this.#sender, this.#signer);
 
     if (txResult) {
       // time to get the secretId of the newly registered secret
@@ -119,8 +120,8 @@ export class SecretRegistry {
    * @param {string} metadata metadata to be stored by the blockchain module
    * @returns {Promise<number | null>} the secret id assigned, or null if failed
   */
-  async updateMetadata (secretId: number, metadata: string): Promise<boolean> {
-    const extrinsic = this.api.tx.secrets.updateMetadata(secretId, metadata);
+  async updateMetadata (secretId: number, metadata: Uint8Array): Promise<boolean> {
+    const extrinsic = this.api.tx.secrets.updateMetadata(secretId, '0x' + u8aToHex(metadata));
     const txResult = await sendTx(extrinsic, this.#sender, this.#signer);
 
     if (txResult) {
@@ -147,10 +148,13 @@ export class SecretRegistry {
    * @param {number} secretId secretId of the secret to be queryed
    * @returns {Promise<String>} secret metadata in form of IPFS CID
   */
-  async getMetadata (secretId: number): Promise<string> {
-    const result = await this.api.query.secrets.metadata(secretId);
+  async getMetadata (secretId: number): Promise<Uint8Array> {
+    const metadataHashRaw = await this.api.query.secrets.metadata(secretId);
+    const metadataHash = hexToU8a(metadataHashRaw.toString().substring(2));
 
-    // result is the CID in hex form
-    return u8aToString(hexToU8a(result.toString().substring(2)));
+    const preimageRaw = await this.api.query.preimage.preimageFor(metadataHash);
+    const preimageHex = preimageRaw.toJSON().toString().substring(2);
+
+    return hexToU8a(preimageHex);
   }
 }
