@@ -126,8 +126,17 @@ export class File {
   public static writeFile (
     content: ArrayBuffer,
     filePath: string,
-    flags: string
+    flags: string,
+    extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
+    if (extFilters && extFilters.length > 0) {
+      const fileExt = filePath.split('.').pop().toLowerCase();
+
+      if (!extFilters.includes(fileExt)) {
+        throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      }
+    }
+
     return new Promise((resolve, reject) => {
       const stream = fs.createWriteStream(filePath, { flags: flags });
 
@@ -139,7 +148,7 @@ export class File {
   }
 
   /**
-    * save and download a file in Browser
+    * save and download a file in **Browser**
     * @param {Uint8Array} content content to be written
     * @param {string} fileName name of the file
     * @param {string} fileType type of the file
@@ -150,14 +159,18 @@ export class File {
     fileName?: string,
     fileType?: string
   ): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      try {
-        FileSaver.saveAs(
-          new Blob([content], { type: fileType }),
-          fileName
-        );
-        resolve(true);
-      } catch (err) { reject(err); }
-    });
+    if (new Blob()) {
+      return new Promise((resolve, reject) => {
+        try {
+          FileSaver.saveAs(
+            new Blob([content], { type: fileType }),
+            fileName
+          );
+          resolve(true);
+        } catch (err) { reject(err); }
+      });
+    } else {
+      throw new Error('FileSaver is not supported - File.saveAs');
+    }
   }
 }

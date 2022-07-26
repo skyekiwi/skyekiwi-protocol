@@ -43,6 +43,47 @@ describe('@skyekiwi/file', function () {
 
     await cleanup();
   });
+
+  it('File: writeFile correctly filter on file ext', async () => {
+    const content = [1, 2, 3];
+
+    await File.writeFile(
+      Buffer.from(content),
+      file1Path + 'tmp.good',
+      'w'
+    );
+
+    try {
+      await File.writeFile(
+        Buffer.from(content),
+        file1Path + 'tmp.good',
+        'w',
+
+        ['png', 'jpg', 'jpeg']
+      );
+
+    /* eslint-disable */
+    } catch (err) {
+      // @ts-ignore
+      expect(err.message).toBe('file extension good is not allowed - File.writeFile');
+    }
+    /* eslint-enable */
+  });
+
+  it('File: saveAs should reject operate in Nodejs', async () => {
+    try {
+      await File.saveAs(
+        new Uint8Array(10),
+        'tmp.file1'
+      );
+
+    /* eslint-disable */
+    } catch (err) {
+      // @ts-ignore
+      expect(err.message).toBe('FileSaver is not supported - File.saveAs');
+    }
+    /* eslint-enable */
+  });
 });
 
 const setup = async (): Promise<File> => {
