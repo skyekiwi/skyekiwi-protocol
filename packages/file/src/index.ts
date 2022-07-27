@@ -20,7 +20,7 @@ export class File {
    * @param {string} fileName name of the file
    * @param {readStream} readStream a readStream to the file content
   */
-  constructor (config: {
+  constructor(config: {
     fileName: string,
     readStream: ReadStream
   }) {
@@ -32,7 +32,7 @@ export class File {
     * get the file ReadStream
     * @returns {ReadStream} the file ReadStream
   */
-  public getReadStream (): ReadStream {
+  public getReadStream(): ReadStream {
     return this.readStream;
   }
 
@@ -42,7 +42,7 @@ export class File {
     * THE FILE MUST ALSO BE UTF8 ENCODED
     * @returns {string} the whole file content
    */
-  public async readAll (): Promise<string> {
+  public async readAll(): Promise<string> {
     let content = '';
 
     for await (const chunk of this.readStream) {
@@ -57,7 +57,7 @@ export class File {
     * @param {Uint8Array} chunk the chunk to be calculated
     * @returns {Promise<Uint8Array>} the resulting hash
   */
-  public static async getChunkHash (chunk: Uint8Array): Promise<Uint8Array> {
+  public static async getChunkHash(chunk: Uint8Array): Promise<Uint8Array> {
     if (typeof window === undefined) {
       /* browser mode */
       return new Uint8Array(await window.crypto.subtle.digest('SHA-256', chunk));
@@ -76,7 +76,7 @@ export class File {
     * @param {Uint8Array} chunk the chunk to be calculated
     * @returns {Promise<Uint8Array>} the resulting hash
   */
-  public static async getCombinedChunkHash (previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
+  public static async getCombinedChunkHash(previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
     // the hash of the previous chunk(s) and the current chunk is used to ensure the sequencing of all chunks are correct
 
     if (previousHash.length !== 32) {
@@ -98,7 +98,7 @@ export class File {
     * @param {Uint8Array} chunk the chunk to be deflated
     * @returns {Uint8Array} the deflated chunk
   */
-  public static deflateChunk (chunk: Uint8Array): Uint8Array {
+  public static deflateChunk(chunk: Uint8Array): Uint8Array {
     // pako is cross platform, it can be used on both nodejs and browsers
     return pako.deflate(chunk);
   }
@@ -108,7 +108,7 @@ export class File {
     * @param {Uint8Array} deflatedChunk an deflated chunk
     * @returns {Uint8Array} the inflated chunk
   */
-  public static inflatDeflatedChunk (deflatedChunk: Uint8Array): Uint8Array {
+  public static inflatDeflatedChunk(deflatedChunk: Uint8Array): Uint8Array {
     try {
       return pako.inflate(deflatedChunk);
     } catch (err) {
@@ -123,19 +123,18 @@ export class File {
     * @param {string} flag the writeStream flag, usually 'a' so that the file can be written in chunks
     * @returns {Promise<boolean>} whether the file writting is successful
   */
-  public static writeFile (
+  public static writeFile(
     content: ArrayBuffer,
     filePath: string,
     flags: string,
     extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
-    if (extFilters && extFilters.length > 0) {
-      const fileExt = filePath.split('.').pop().toLowerCase();
+    const fileExt = filePath.split('.').pop().toLowerCase();
 
-      if (!extFilters.includes(fileExt)) {
-        throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
-      }
+    if (!extFilters.includes(fileExt)) {
+      throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
     }
+    // nodejs   File.writeFile('xxx', 'y.js', 'w', ['jpg', 'png', 'gif'])
 
     return new Promise((resolve, reject) => {
       const stream = fs.createWriteStream(filePath, { flags: flags });
@@ -154,23 +153,29 @@ export class File {
     * @param {string} fileType type of the file
     * @returns {Promise<boolean>} whether the file writting is successful
   */
-  public static saveAs (
+  public static saveAs(
     content: Uint8Array,
     fileName?: string,
-    fileType?: string
+    fileType?: string,
+    extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
-    if (new Blob()) {
-      return new Promise((resolve, reject) => {
-        try {
-          FileSaver.saveAs(
-            new Blob([content], { type: fileType }),
-            fileName
-          );
-          resolve(true);
-        } catch (err) { reject(err); }
-      });
-    } else {
-      throw new Error('FileSaver is not supported - File.saveAs');
+    const fileExt = fileName.split('.').pop().toLowerCase();
+
+    if (!extFilters.includes(fileExt)) {
+      throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
     }
+    // nextjs  File.saveAs('abc2', 'a.gif', "text/plain;charset=utf-8", ['jpg', 'png']);//
+
+    return new Promise((resolve, reject) => {
+      try {
+        FileSaver.saveAs(
+          new Blob([content], { type: fileType }),
+          fileName
+        );
+        resolve(true);
+      } catch (err) { reject(err); }
+    });
+
+
   }
 }
