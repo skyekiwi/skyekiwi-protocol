@@ -10,7 +10,7 @@ import { File } from '.';
 
 const file1Path = '/tmp/file.file1';
 
-describe('@skyekiwi/file', function () {
+describe('@skyekiwi/file nodejs', function () {
   it('File: chunk hash calculation works', async () => {
     const file1 = await setup();
     const stream1 = file1.getReadStream();
@@ -61,13 +61,11 @@ describe('@skyekiwi/file', function () {
 
         ['png', 'jpg', 'jpeg']
       );
-
-    /* eslint-disable */
     } catch (err) {
-      // @ts-ignore
-      expect(err.message).toBe('file extension good is not allowed - File.writeFile');
+      const e = err as Error;
+
+      expect(e.message).toBe('file extension good is not allowed - File.writeFile');
     }
-    /* eslint-enable */
   });
 
   it('File: saveAs should reject operate in Nodejs', async () => {
@@ -76,13 +74,11 @@ describe('@skyekiwi/file', function () {
         new Uint8Array(10),
         'tmp.file1'
       );
-
-    /* eslint-disable */
     } catch (err) {
-      // @ts-ignore
-      expect(err.message).toBe('FileSaver is not supported - File.saveAs');
+      const e = err as Error;
+
+      expect(e.message).toBe('FileSaver is not supported - File.saveAs');
     }
-    /* eslint-enable */
   });
 });
 

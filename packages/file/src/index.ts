@@ -4,8 +4,6 @@
 import type { ReadStream } from 'fs';
 
 import crypto from 'crypto';
-import FileSaver from 'file-saver';
-import fs from 'fs';
 import pako from 'pako';
 
 import { u8aToString } from '@skyekiwi/util';
@@ -20,7 +18,7 @@ export class File {
    * @param {string} fileName name of the file
    * @param {readStream} readStream a readStream to the file content
   */
-  constructor(config: {
+  constructor (config: {
     fileName: string,
     readStream: ReadStream
   }) {
@@ -32,7 +30,7 @@ export class File {
     * get the file ReadStream
     * @returns {ReadStream} the file ReadStream
   */
-  public getReadStream(): ReadStream {
+  public getReadStream (): ReadStream {
     return this.readStream;
   }
 
@@ -42,7 +40,7 @@ export class File {
     * THE FILE MUST ALSO BE UTF8 ENCODED
     * @returns {string} the whole file content
    */
-  public async readAll(): Promise<string> {
+  public async readAll (): Promise<string> {
     let content = '';
 
     for await (const chunk of this.readStream) {
@@ -57,7 +55,7 @@ export class File {
     * @param {Uint8Array} chunk the chunk to be calculated
     * @returns {Promise<Uint8Array>} the resulting hash
   */
-  public static async getChunkHash(chunk: Uint8Array): Promise<Uint8Array> {
+  public static async getChunkHash (chunk: Uint8Array): Promise<Uint8Array> {
     if (typeof window === undefined) {
       /* browser mode */
       return new Uint8Array(await window.crypto.subtle.digest('SHA-256', chunk));
@@ -76,11 +74,10 @@ export class File {
     * @param {Uint8Array} chunk the chunk to be calculated
     * @returns {Promise<Uint8Array>} the resulting hash
   */
-  public static async getCombinedChunkHash(previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
+  public static async getCombinedChunkHash (previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
     // the hash of the previous chunk(s) and the current chunk is used to ensure the sequencing of all chunks are correct
 
     if (previousHash.length !== 32) {
-      console.log(previousHash);
       throw new Error('previousHash not valid - File.getCombinedChunkHash');
     }
 
@@ -98,7 +95,7 @@ export class File {
     * @param {Uint8Array} chunk the chunk to be deflated
     * @returns {Uint8Array} the deflated chunk
   */
-  public static deflateChunk(chunk: Uint8Array): Uint8Array {
+  public static deflateChunk (chunk: Uint8Array): Uint8Array {
     // pako is cross platform, it can be used on both nodejs and browsers
     return pako.deflate(chunk);
   }
@@ -108,7 +105,7 @@ export class File {
     * @param {Uint8Array} deflatedChunk an deflated chunk
     * @returns {Uint8Array} the inflated chunk
   */
-  public static inflatDeflatedChunk(deflatedChunk: Uint8Array): Uint8Array {
+  public static inflatDeflatedChunk (deflatedChunk: Uint8Array): Uint8Array {
     try {
       return pako.inflate(deflatedChunk);
     } catch (err) {
@@ -118,31 +115,40 @@ export class File {
 
   /**
     * write file to a path (used in Node.js)
-    * @param {ArrayBuffer} content content to be written
+    * @param {Uint8Array} content content to be written
     * @param {string} filePath path to the output path
     * @param {string} flag the writeStream flag, usually 'a' so that the file can be written in chunks
     * @returns {Promise<boolean>} whether the file writting is successful
   */
-  public static writeFile(
-    content: ArrayBuffer,
+  public static writeFile (
+    content: Uint8Array,
     filePath: string,
     flags: string,
     extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
-    const fileExt = filePath.split('.').pop().toLowerCase();
+    if (extFilters && extFilters.length > 0) {
+      const fileExt = filePath.split('.').pop().toLowerCase();
 
-    if (!extFilters.includes(fileExt)) {
-      throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      if (!extFilters.includes(fileExt)) {
+        throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      }
+      // nodejs   File.writeFile('xxx', 'y.js', 'w', ['jpg', 'png', 'gif'])
     }
-    // nodejs   File.writeFile('xxx', 'y.js', 'w', ['jpg', 'png', 'gif'])
 
     return new Promise((resolve, reject) => {
-      const stream = fs.createWriteStream(filePath, { flags: flags });
+      try {
+        /* eslint-disable */
+        const { createWriteStream } = require('fs');
+        const stream: NodeJS.ReadStream = createWriteStream(filePath, { flags: flags });
 
-      stream.write(content);
-      stream.end();
-      stream.on('finish', () => resolve(true));
-      stream.on('error', (err) => reject(err));
+        stream.write(content);
+        stream.end();
+        stream.on('finish', () => resolve(true));
+        stream.on('error', (err: Error) => reject(err));
+        /* eslint-enable */
+      } catch (err) {
+        reject(new Error('File.writeFile is not avalaible in browser - File.writeFile'));
+      }
     });
   }
 
@@ -153,29 +159,34 @@ export class File {
     * @param {string} fileType type of the file
     * @returns {Promise<boolean>} whether the file writting is successful
   */
-  public static saveAs(
+  public static saveAs (
     content: Uint8Array,
     fileName?: string,
     fileType?: string,
     extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
-    const fileExt = fileName.split('.').pop().toLowerCase();
+    if (extFilters && extFilters.length > 0) {
+      const fileExt = fileName.split('.').pop().toLowerCase();
 
-    if (!extFilters.includes(fileExt)) {
-      throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      if (!extFilters.includes(fileExt)) {
+        throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      }
+      // nextjs  File.saveAs('abc2', 'a.gif', "text/plain;charset=utf-8", ['jpg', 'png']);//
     }
-    // nextjs  File.saveAs('abc2', 'a.gif', "text/plain;charset=utf-8", ['jpg', 'png']);//
 
     return new Promise((resolve, reject) => {
       try {
+        /* eslint-disable */
+        const FileSaver = require('file-saver');
         FileSaver.saveAs(
-          new Blob([content], { type: fileType }),
+          new window.Blob([content], { type: fileType }),
           fileName
         );
+        /* eslint-enable */
         resolve(true);
-      } catch (err) { reject(err); }
+      } catch (err) {
+        reject(new Error('FileSaver is not supported - File.saveAs'));
+      }
     });
-
-
   }
 }
