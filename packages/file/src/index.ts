@@ -4,8 +4,6 @@
 import type { ReadStream } from 'fs';
 
 import crypto from 'crypto';
-import FileSaver from 'file-saver';
-import fs from 'fs';
 import pako from 'pako';
 
 import { u8aToString } from '@skyekiwi/util';
@@ -80,7 +78,6 @@ export class File {
     // the hash of the previous chunk(s) and the current chunk is used to ensure the sequencing of all chunks are correct
 
     if (previousHash.length !== 32) {
-      console.log(previousHash);
       throw new Error('previousHash not valid - File.getCombinedChunkHash');
     }
 
@@ -118,28 +115,45 @@ export class File {
 
   /**
     * write file to a path (used in Node.js)
-    * @param {ArrayBuffer} content content to be written
+    * @param {Uint8Array} content content to be written
     * @param {string} filePath path to the output path
     * @param {string} flag the writeStream flag, usually 'a' so that the file can be written in chunks
     * @returns {Promise<boolean>} whether the file writting is successful
   */
   public static writeFile (
-    content: ArrayBuffer,
+    content: Uint8Array,
     filePath: string,
-    flags: string
+    flags: string,
+    extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      const stream = fs.createWriteStream(filePath, { flags: flags });
+    if (extFilters && extFilters.length > 0) {
+      const fileExt = filePath.split('.').pop().toLowerCase();
 
-      stream.write(content);
-      stream.end();
-      stream.on('finish', () => resolve(true));
-      stream.on('error', (err) => reject(err));
+      if (!extFilters.includes(fileExt)) {
+        throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      }
+      // nodejs   File.writeFile('xxx', 'y.js', 'w', ['jpg', 'png', 'gif'])
+    }
+
+    return new Promise((resolve, reject) => {
+      try {
+        /* eslint-disable */
+        const { createWriteStream } = require('fs');
+        const stream: NodeJS.ReadStream = createWriteStream(filePath, { flags: flags });
+
+        stream.write(content);
+        stream.end();
+        stream.on('finish', () => resolve(true));
+        stream.on('error', (err: Error) => reject(err));
+        /* eslint-enable */
+      } catch (err) {
+        reject(new Error('File.writeFile is not avalaible in browser - File.writeFile'));
+      }
     });
   }
 
   /**
-    * save and download a file in Browser
+    * save and download a file in **Browser**
     * @param {Uint8Array} content content to be written
     * @param {string} fileName name of the file
     * @param {string} fileType type of the file
@@ -148,16 +162,31 @@ export class File {
   public static saveAs (
     content: Uint8Array,
     fileName?: string,
-    fileType?: string
+    fileType?: string,
+    extFilters?: string[] // whitelist of file extensions
   ): Promise<boolean> {
+    if (extFilters && extFilters.length > 0) {
+      const fileExt = fileName.split('.').pop().toLowerCase();
+
+      if (!extFilters.includes(fileExt)) {
+        throw new Error(`file extension ${fileExt} is not allowed - File.writeFile`);
+      }
+      // nextjs  File.saveAs('abc2', 'a.gif', "text/plain;charset=utf-8", ['jpg', 'png']);//
+    }
+
     return new Promise((resolve, reject) => {
       try {
+        /* eslint-disable */
+        const FileSaver = require('file-saver');
         FileSaver.saveAs(
-          new Blob([content], { type: fileType }),
+          new window.Blob([content], { type: fileType }),
           fileName
         );
+        /* eslint-enable */
         resolve(true);
-      } catch (err) { reject(err); }
+      } catch (err) {
+        reject(new Error('FileSaver is not supported - File.saveAs'));
+      }
     });
   }
 }

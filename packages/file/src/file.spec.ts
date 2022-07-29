@@ -10,7 +10,7 @@ import { File } from '.';
 
 const file1Path = '/tmp/file.file1';
 
-describe('@skyekiwi/file', function () {
+describe('@skyekiwi/file nodejs', function () {
   it('File: chunk hash calculation works', async () => {
     const file1 = await setup();
     const stream1 = file1.getReadStream();
@@ -42,6 +42,43 @@ describe('@skyekiwi/file', function () {
     }
 
     await cleanup();
+  });
+
+  it('File: writeFile correctly filter on file ext', async () => {
+    const content = [1, 2, 3];
+
+    await File.writeFile(
+      Buffer.from(content),
+      file1Path + 'tmp.good',
+      'w'
+    );
+
+    try {
+      await File.writeFile(
+        Buffer.from(content),
+        file1Path + 'tmp.good',
+        'w',
+
+        ['png', 'jpg', 'jpeg']
+      );
+    } catch (err) {
+      const e = err as Error;
+
+      expect(e.message).toBe('file extension good is not allowed - File.writeFile');
+    }
+  });
+
+  it('File: saveAs should reject operate in Nodejs', async () => {
+    try {
+      await File.saveAs(
+        new Uint8Array(10),
+        'tmp.file1'
+      );
+    } catch (err) {
+      const e = err as Error;
+
+      expect(e.message).toBe('FileSaver is not supported - File.saveAs');
+    }
   });
 });
 
