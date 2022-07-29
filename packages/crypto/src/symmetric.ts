@@ -1,7 +1,9 @@
 // Copyright 2021-2022 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { randomBytes, secretbox } from 'tweetnacl';
+import tweetnacl from 'tweetnacl';
+
+const { randomBytes, secretbox } = tweetnacl;
 
 export class SymmetricEncryption {
   /**

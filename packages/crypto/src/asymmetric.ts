@@ -1,7 +1,9 @@
 // Copyright 2021-2022 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { box, randomBytes } from 'tweetnacl';
+import tweetnacl from 'tweetnacl';
+
+const { box, randomBytes } = tweetnacl;
 
 export class AsymmetricEncryption {
   /**

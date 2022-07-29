@@ -4,12 +4,14 @@
 import type { IPFSResult } from '@skyekiwi/ipfs/types';
 import type { ChunkList, PreSealData, SealedMetadata } from './types';
 
-import { randomBytes } from 'tweetnacl';
+import tweetnacl from 'tweetnacl';
 
 import { EncryptionSchema, Seal, SymmetricEncryption } from '@skyekiwi/crypto';
 import { Sealer } from '@skyekiwi/crypto/interface';
 import { IPFS } from '@skyekiwi/ipfs';
 import { stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
+
+const { randomBytes } = tweetnacl;
 
 // version code in Uint8Array
 export const SKYEKIWI_VERSION = new Uint8Array([0, 0, 1, 1]);
