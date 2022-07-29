@@ -1,9 +1,7 @@
 // Copyright 2021-2022 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import borsh from 'borsh';
-
-const { baseDecode, baseEncode, deserialize, serialize } = borsh;
+import { baseDecode, baseEncode, deserialize, serialize } from 'borsh';
 
 /* eslint-disable sort-keys, camelcase */
 class Call {
