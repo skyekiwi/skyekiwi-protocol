@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/metadata",
-  "version": "0.8.4-1",
+  "version": "0.8.4-2",
   "type": "module",
   "description": "core metadata handler for @skyekiwi protocol",
   "main": "index.js",
@@ -20,9 +20,9 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/crypto": "0.8.4-1",
-    "@skyekiwi/ipfs": "0.8.4-1",
-    "@skyekiwi/util": "0.8.4-1",
+    "@skyekiwi/crypto": "0.8.4-2",
+    "@skyekiwi/ipfs": "0.8.4-2",
+    "@skyekiwi/util": "0.8.4-2",
     "tweetnacl": "^1.0.3"
   }
 }
