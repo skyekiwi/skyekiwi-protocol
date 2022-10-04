@@ -20,7 +20,7 @@ describe('@skyekiwi/ipfs', function () {
       expect(cids[i].size).toBeGreaterThanOrEqual(10000 * 2);
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       const content = await IPFS.cat(cids[i].cid);
 
       expect(content).toEqual(u8aToHex(data[i]));
