@@ -11,11 +11,11 @@ import { u8aToHex } from '@skyekiwi/util';
 
 // https://gw.crustapps.net/ipfs/QmeALtHnjohoKnNmFfxjbuPwhiaHS2SmTaVXyigb5SfBW9
 const crustGateways = [
-  'https://ipfs-gw.dkskcloud.com'
+  // 'https://ipfs-gw.dkskcloud.com'
 //  'https://gw.crustapps.net',
-  // 'https://crustwebsites.net',
-  // 'https://crustipfs.xyz',
-  // 'https://ipfs-gw.decloud.foundation'
+  'https://crustwebsites.net',
+  'https://crustipfs.xyz',
+  'https://ipfs-gw.decloud.foundation'
 ];
 
 // WIP - the IPFS connector might go through lots of changes

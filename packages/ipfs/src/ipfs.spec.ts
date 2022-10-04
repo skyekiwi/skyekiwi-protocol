@@ -12,7 +12,7 @@ describe('@skyekiwi/ipfs', function () {
     const cids = [];
     const data = [];
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       data.push(randomBytes(10000));
       const hex = u8aToHex(data[i]);
 

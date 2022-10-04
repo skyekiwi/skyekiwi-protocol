@@ -27,7 +27,7 @@
     "@skyekiwi/util": "0.8.4-0"
   },
   "devDependencies": {
-    "@polkadot/util-crypto": "^10.1.1",
+    "@polkadot/util-crypto": "^10.1.9",
     "dotenv": "^10.0.0"
   }
 }
