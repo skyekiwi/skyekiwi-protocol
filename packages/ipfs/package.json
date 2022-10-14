@@ -20,8 +20,8 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/keyring": "^10.1.9",
-    "@polkadot/util-crypto": "^10.1.9",
+    "@polkadot/keyring": "^10.1.10",
+    "@polkadot/util-crypto": "^10.1.10",
     "@skyekiwi/util": "0.8.4-2",
     "superagent": "^7.1.1",
     "tweetnacl": "^1.0.3"

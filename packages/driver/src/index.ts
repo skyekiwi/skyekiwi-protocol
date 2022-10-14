@@ -209,6 +209,15 @@ export class Driver {
       throw new Error('file hash does not match: Driver.downstreamChunkProcessingPipeLine');
     }
   }
+
+  public static reEncryption (
+    sealed: Sealed, keys: SecretKey[], newReceipients: PublicKey[]
+  ): Sealed {
+    const preSealed = Driver.recoverFromSealedData(sealed, keys);
+    const newSealed = Driver.generateSealedData(preSealed, newReceipients, sealed.isPublic);
+
+    return Sealed.combineSealedData(sealed, newSealed);
+  }
 }
 
 export { progressText };

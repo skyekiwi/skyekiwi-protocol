@@ -65,7 +65,7 @@ describe('@skyekiwi/driver', function () {
     return null;
   });
 
-  it('driver for mixed key type', async () => {
+  it('driver for mixed key type & re-encryption', async () => {
     await initWASMInterface();
 
     const pairs = [];
@@ -104,6 +104,12 @@ describe('@skyekiwi/driver', function () {
     const r3 = Driver.recoverFromSealedData(sealed, [pairs[2][1]], progress);
 
     expect(r3.serialize()).toEqual(org);
+
+    const newPair = generatePair('sr25519');
+    const sd = Driver.reEncryption(sealed, [pairs[0][1]], [newPair[0]]);
+    const r4 = Driver.recoverFromSealedData(sd, [newPair[1]]);
+
+    expect(r4.serialize()).toEqual(org);
 
     await cleanup();
   });
