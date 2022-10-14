@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/metadata",
-  "version": "0.8.4-1",
+  "version": "0.8.4-2",
   "type": "module",
   "description": "core metadata handler for @skyekiwi protocol",
   "main": "index.js",
