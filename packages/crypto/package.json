@@ -20,9 +20,9 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
+    "@noble/secp256k1": "^1.7.0",
     "@skyekiwi/metadata": "0.8.4-1",
     "@skyekiwi/util": "0.8.4-1",
-    "ethers": "^5.5.4",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {

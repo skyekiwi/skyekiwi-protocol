@@ -1,10 +1,14 @@
 // Copyright 2021-2022 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { KeypairType } from './types';
+
+import { getPublicKey, getSharedSecret, utils as secpUtils } from '@noble/secp256k1';
 import { convertPublicKeyToCurve25519, convertSecretKeyToCurve25519, sr25519Agreement, sr25519PairFromSeed } from '@polkadot/util-crypto';
 import tweetnacl from 'tweetnacl';
 
 import { SymmetricEncryption } from './symmetric';
+import { secureGenerateRandomKey, sha256Hash } from '.';
 
 const { box, randomBytes } = tweetnacl;
 
@@ -29,7 +33,7 @@ export class AsymmetricEncryption {
     message: Uint8Array,
     receiverPublicKey: Uint8Array
   ): Uint8Array {
-    const ephmeralKey = randomBytes(32);
+    const ephmeralKey = secureGenerateRandomKey();
     const authorKey = AsymmetricEncryption.getPublicKey(ephmeralKey);
 
     const nonce = randomBytes(box.nonceLength);
@@ -78,12 +82,16 @@ export class AsymmetricEncryption {
     * @returns {Uint8Array} encrypted message
   */
   public static encryptWithCurveType (
-    keyType: 'sr25519' | 'ed25519',
+    keyType: KeypairType,
     message: Uint8Array,
     publicKey: Uint8Array
   ): Uint8Array {
     if (keyType === 'sr25519') {
-      const ephmeralKey = randomBytes(32);
+      if (publicKey.length !== 32) {
+        throw new Error(`wrong publicKey size. Expect 32 but got ${publicKey.length}.`);
+      }
+
+      const ephmeralKey = secureGenerateRandomKey();
       const pair = sr25519PairFromSeed(ephmeralKey);
       const ecdhKey = sr25519Agreement(pair.secretKey, publicKey);
       const noncePlusEncrypted = SymmetricEncryption.encrypt(ecdhKey, message);
@@ -97,10 +105,34 @@ export class AsymmetricEncryption {
 
       return res;
     } else if (keyType === 'ed25519') {
+      if (publicKey.length !== 32) {
+        throw new Error(`wrong publicKey size. Expect 32 but got ${publicKey.length}.`);
+      }
+
       // For ed25519 - we convert all keys on curve25519, and process ecdh with curve25519
       const theirPublicKey = convertPublicKeyToCurve25519(publicKey);
 
       return AsymmetricEncryption.encrypt(message, theirPublicKey);
+    } else if (keyType === 'ecdsa' || keyType === 'ethereum') {
+      if (publicKey.length !== 33) {
+        throw new Error(`wrong publicKey size. Expect 33 but got ${publicKey.length}.`);
+      }
+
+      const ephmeralKey = secureGenerateRandomKey();
+
+      secpUtils.precompute();
+      const pk = getPublicKey(ephmeralKey, true);
+      const ecdhKey = sha256Hash(getSharedSecret(ephmeralKey, publicKey, true));
+      const noncePlusEncrypted = SymmetricEncryption.encrypt(ecdhKey, message);
+
+      const res = new Uint8Array(33 + // ephmeral public key
+        noncePlusEncrypted.length
+      );
+
+      res.set(pk, 0);
+      res.set(noncePlusEncrypted, 33);
+
+      return res;
     } else {
       throw new Error('unsupported curve type - AsymmetricEncryption.encryptWithCurveType');
     }
@@ -115,10 +147,14 @@ export class AsymmetricEncryption {
     * @returns {Uint8Array} decrypted message
   */
   public static decryptWithCurveType (
-    keyType: 'sr25519' | 'ed25519',
+    keyType: KeypairType,
     secretKey: Uint8Array,
     message: Uint8Array
   ): Uint8Array {
+    if (secretKey.length !== 32) {
+      throw new Error(`wrong secretKey size. Expect 32 but got ${secretKey.length}.`);
+    }
+
     if (keyType === 'sr25519') {
       const theirPublicKey = message.slice(0, 32);
 
@@ -131,6 +167,11 @@ export class AsymmetricEncryption {
       const ourSecretKey = convertSecretKeyToCurve25519(secretKey);
 
       return AsymmetricEncryption.decrypt(ourSecretKey, message);
+    } else if (keyType === 'ecdsa' || keyType === 'ethereum') {
+      const theirPublicKey = message.slice(0, 33);
+      const ecdhKey = sha256Hash(getSharedSecret(secretKey, theirPublicKey, true));
+
+      return SymmetricEncryption.decrypt(ecdhKey, message.slice(33));
     } else {
       throw new Error('unsupported curve type - AsymmetricEncryption.decryptWithCurveType');
     }
@@ -138,19 +179,24 @@ export class AsymmetricEncryption {
 
   /**
     * get public key on a curve type
-    * NOT RECOMMANDED TO BE USED!
     * @param {string} keyType type of the curve 'sr25519' or 'ed25519'
     * @param {Uint8Array} secretKey a 32 bytes secretKey of the receipient on the same curve as @keyType
     * @returns {Uint8Array} public key
   */
   public static getPublicKeyWithCurveType (
-    keyType: 'sr25519' | 'ed25519',
+    keyType: KeypairType,
     secretKey: Uint8Array
   ): Uint8Array {
+    if (secretKey.length !== 32) {
+      throw new Error(`wrong secretKey size. Expect 32 but got ${secretKey.length}.`);
+    }
+
     if (keyType === 'sr25519') {
       return sr25519PairFromSeed(secretKey).publicKey;
     } else if (keyType === 'ed25519') {
       return tweetnacl.sign.keyPair.fromSeed(secretKey).publicKey;
+    } else if (keyType === 'ecdsa' || keyType === 'ethereum') {
+      return getPublicKey(secretKey, true);
     } else {
       throw new Error('unsupported curve type - AsymmetricEncryption.getPublicKeyWithCurveType');
     }
