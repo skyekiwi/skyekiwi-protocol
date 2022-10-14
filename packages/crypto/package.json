@@ -21,11 +21,10 @@
   },
   "dependencies": {
     "@noble/secp256k1": "^1.7.0",
+    "@polkadot/keyring": "^10.1.10",
     "@skyekiwi/metadata": "0.8.4-2",
     "@skyekiwi/util": "0.8.4-2",
+    "ethers": "^5.7.1",
     "tweetnacl": "^1.0.3"
-  },
-  "devDependencies": {
-    "@polkadot/keyring": "^10.1.10"
   }
 }

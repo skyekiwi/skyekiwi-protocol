@@ -1,4 +1,4 @@
-// Copyright 2021-2022 @skyekiwi/metadata authors & contributors
+// Copyright 2021-2022 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
 import type { KeypairType, PublicKey, SecretKey } from './types';
@@ -7,7 +7,7 @@ import { AsymmetricEncryption, initWASMInterface, secureGenerateRandomKey } from
 
 import { Cipher } from './cipher';
 
-describe('@skyekiwi/metadata/cipher', function () {
+describe('@skyekiwi/crypto/cipher', function () {
   ['sr25519', 'ed25519', 'ethereum'].map((type) => {
     test(`build and parse ${type}`, async () => {
       await initWASMInterface();
