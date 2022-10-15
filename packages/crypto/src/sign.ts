@@ -48,6 +48,7 @@ export class Sign {
     }
 
     const wallet = new ethers.Wallet(key.key);
+
     return hexToU8a((await wallet.signMessage(message)).substring(2));
   }
 
