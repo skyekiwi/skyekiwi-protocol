@@ -35,7 +35,11 @@ export class Sign {
     return s.isValid;
   }
 
-  // TODO: why ehtersjs sig is not matching polkadotjs??
+  // TODO: ethersjs does not match singature result of polkadotjs
+  // PolkadotJS uses @noble/secp256k1 and encode in DER
+  // EthersJs does not and follow standard by eth rpc & uses elliptic lib for encoding
+  // We might revisit this later but won't spend time to deal with it now
+
   /**
     * sign a message with @noble/secp256k1
     * @param {SecretKey} key a secretKey
