@@ -3,9 +3,9 @@
 
 import type { ReadStream } from 'fs';
 
-import crypto from 'crypto';
 import pako from 'pako';
 
+import { sha256Hash } from '@skyekiwi/crypto';
 import { u8aToString } from '@skyekiwi/util';
 
 export class File {
@@ -53,41 +53,10 @@ export class File {
   /**
     * get the checksum hash of a signle Chunk
     * @param {Uint8Array} chunk the chunk to be calculated
-    * @returns {Promise<Uint8Array>} the resulting hash
+    * @returns {Uint8Array} the resulting hash
   */
-  public static async getChunkHash (chunk: Uint8Array): Promise<Uint8Array> {
-    if (typeof window === undefined) {
-      /* browser mode */
-      return new Uint8Array(await window.crypto.subtle.digest('SHA-256', chunk));
-    }
-
-    const hashSum = crypto.createHash('sha256');
-
-    hashSum.update(chunk);
-
-    return hashSum.digest();
-  }
-
-  /**
-    * get the checksum hash of the previousHash combined with the current chunk
-    * @param {Uint8Array} previousHash hash of all previous chunk(s)
-    * @param {Uint8Array} chunk the chunk to be calculated
-    * @returns {Promise<Uint8Array>} the resulting hash
-  */
-  public static async getCombinedChunkHash (previousHash: Uint8Array, chunk: Uint8Array): Promise<Uint8Array> {
-    // the hash of the previous chunk(s) and the current chunk is used to ensure the sequencing of all chunks are correct
-
-    if (previousHash.length !== 32) {
-      throw new Error('previousHash not valid - File.getCombinedChunkHash');
-    }
-
-    // size: 32bytes for previousHash + chunk size
-    const combined = new Uint8Array(32 + chunk.length);
-
-    combined.set(previousHash, 0);
-    combined.set(chunk, 32);
-
-    return await File.getChunkHash(combined);
+  public static getChunkHash (chunk: Uint8Array): Uint8Array {
+    return sha256Hash(chunk);
   }
 
   /**
