@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/util",
-  "version": "0.8.4-1",
+  "version": "1.0.1",
   "type": "module",
   "description": "a collection of utility functions for @skyekiwi",
   "main": "index.js",
@@ -20,9 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@polkadot/api": "^9.4.3",
-    "@polkadot/keyring": "^10.1.9",
-    "pino": "^7.6.5",
-    "pino-pretty": "^7.5.1"
+    "@polkadot/api": "^9.5.1",
+    "@polkadot/keyring": "^10.1.10"
   }
 }

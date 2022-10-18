@@ -1,22 +1,22 @@
 // Copyright 2021-2022 @skyekiwi/crypto authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import type { KeypairType } from './types';
+
 import { decodeAddress, Keyring } from '@polkadot/keyring';
-import { cryptoWaitReady } from '@polkadot/util-crypto';
-import { randomBytes } from 'tweetnacl';
 
 import { stringToU8a, u8aToString } from '@skyekiwi/util';
 
-import { AsymmetricEncryption, SymmetricEncryption } from '.';
+import { AsymmetricEncryption, initWASMInterface, secureGenerateRandomKey, SymmetricEncryption } from '.';
 
 describe('@skyekiwi/crypto', () => {
-  const key: Uint8Array = randomBytes(32);
+  const key: Uint8Array = secureGenerateRandomKey();
 
   const message = '123456780123456';
   const _message = stringToU8a(message);
 
   beforeAll(async () => {
-    await cryptoWaitReady();
+    await initWASMInterface();
   });
 
   test('Symmetric: Encryption & Decryption Works', () => {
@@ -28,7 +28,7 @@ describe('@skyekiwi/crypto', () => {
   });
 
   test('Asymmetric: Encryption & Decryption Works', () => {
-    const receiverPrivateKey = randomBytes(32);
+    const receiverPrivateKey = secureGenerateRandomKey();
     const receiverPublicKey = AsymmetricEncryption.getPublicKey(receiverPrivateKey);
     const encrypted = AsymmetricEncryption.encrypt(_message, receiverPublicKey);
 
@@ -39,7 +39,7 @@ describe('@skyekiwi/crypto', () => {
   });
 
   test('Symmetric: Decryption Fails w/Wrong Key', () => {
-    const wrongKey = randomBytes(32);
+    const wrongKey = secureGenerateRandomKey();
     const encrypted = SymmetricEncryption.encrypt(key, _message);
 
     expect(() => SymmetricEncryption.decrypt(wrongKey, encrypted)).toThrow(
@@ -48,54 +48,42 @@ describe('@skyekiwi/crypto', () => {
   });
 
   test('Asymmetric: Decryption Fails w/Wrong Key', () => {
-    const receiverPrivateKey = randomBytes(32);
+    const receiverPrivateKey = secureGenerateRandomKey();
     const receiverPublicKey = AsymmetricEncryption.getPublicKey(receiverPrivateKey);
     const encrypted = AsymmetricEncryption.encrypt(_message, receiverPublicKey);
 
     // wrong receiver's private key
-    const wrongPrivateKey = randomBytes(32);
+    const wrongPrivateKey = secureGenerateRandomKey();
 
     expect(() => AsymmetricEncryption.decrypt(wrongPrivateKey, encrypted)).toThrow(
       'decryption failed - Box.decrypt'
     );
   });
 
-  ['sr25519', 'ed25519'].map((type) => {
-    test(`Asymmetric: Encrypt/Decrypt with Curve Type ${type}`, () => {
+  ['sr25519', 'ed25519', 'ethereum'].map((type) => {
+    const keyType = type as KeypairType;
+
+    test(`Asymmetric: Encrypt/Decrypt with Curve Type ${keyType}`, () => {
       // 1. generate a keyPair
-      const receiverPrivateKey = randomBytes(32);
-      const receiverPublicKey = AsymmetricEncryption.getPublicKeyWithCurveType(
-        type as 'sr25519' | 'ed25519'
-        , receiverPrivateKey);
-      const encrypted = AsymmetricEncryption.encryptWithCurveType(
-        type as 'sr25519' | 'ed25519',
-        _message,
-        receiverPublicKey
-      );
-      const decrypted = AsymmetricEncryption.decryptWithCurveType(
-        type as 'sr25519' | 'ed25519',
-        receiverPrivateKey,
-        encrypted
-      );
+      const receiverPrivateKey = secureGenerateRandomKey();
+      const receiverPublicKey = AsymmetricEncryption.getPublicKeyWithCurveType(keyType, receiverPrivateKey);
+      const encrypted = AsymmetricEncryption.encryptWithCurveType(keyType, _message, receiverPublicKey);
+      const decrypted = AsymmetricEncryption.decryptWithCurveType(keyType, receiverPrivateKey, encrypted);
 
       expect(decrypted).toEqual(_message);
     });
 
-    /* eslint-disable @typescript-eslint/ban-ts-comment */
-    test(`Asymmetric: Share Between Polkadot Addresses of ${type}`, () => {
-      const seed = randomBytes(32);
+    if (type !== 'ethereum') {
+      test(`Asymmetric: Share Between Polkadot Addresses of ${type}`, () => {
+        const seed = secureGenerateRandomKey();
 
-      // @ts-ignore
-      const address = (new Keyring({ type })).addFromSeed(seed).address;
+        const address = (new Keyring({ type: keyType })).addFromSeed(seed).address;
+        const encrypted = AsymmetricEncryption.encryptWithCurveType(keyType, _message, decodeAddress(address));
+        const msg = AsymmetricEncryption.decryptWithCurveType(keyType, seed, encrypted);
 
-      // @ts-ignore
-      const encrypted = AsymmetricEncryption.encryptWithCurveType(type, _message, decodeAddress(address));
-
-      // @ts-ignore
-      const msg = AsymmetricEncryption.decryptWithCurveType(type, seed, encrypted);
-
-      expect(msg).toEqual(_message);
-    });
+        expect(msg).toEqual(_message);
+      });
+    }
 
     return null;
   });
