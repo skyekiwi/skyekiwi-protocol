@@ -43,7 +43,7 @@ describe('@skyekiwi/driver', function () {
       const file = await setup(content);
 
       // Upstream
-      const ps = await Driver.generatePreSealedData(file, progress);
+      const ps = await Driver.generatePreSealedData(file, null, progress);
       const sealed = Driver.generateSealedData(ps, [pk], false, progress);
 
       // Downstream
@@ -52,7 +52,7 @@ describe('@skyekiwi/driver', function () {
 
       await Driver.recoverFileFromPreSealedData(recoveredPs, (chunk) => {
         downstreamContent = new Uint8Array([...downstreamContent, ...chunk]);
-      }, progress);
+      }, null, progress);
 
       expect(Buffer.compare(
         downstreamContent,
@@ -86,7 +86,7 @@ describe('@skyekiwi/driver', function () {
 
     const file = await setup(content);
 
-    const ps = await Driver.generatePreSealedData(file, progress);
+    const ps = await Driver.generatePreSealedData(file, null, progress);
     const sealed = Driver.generateSealedData(ps, [
       pairs[0][0], pairs[1][0], pairs[2][0]
     ], false, progress);

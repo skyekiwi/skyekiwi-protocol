@@ -25,6 +25,7 @@ export class Driver {
   */
   public static async generatePreSealedData (
     file: File | Uint8Array,
+    ipfsEndpoint?: string,
     progress?: EventEmitter
   ): Promise<PreSealed> {
     const cidList: IPFSResult[] = [];
@@ -40,12 +41,12 @@ export class Driver {
 
       // main loop - the main upstreaming pipeline
       for await (const chunk of readStream) {
-        const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(chunk, sealingKey, chunkCount++, progress);
+        const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(chunk, sealingKey, chunkCount++, ipfsEndpoint, progress);
 
         cidList.push(cid); hashes.push(hash);
       }
     } else {
-      const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(file, sealingKey, chunkCount++, progress);
+      const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(file, sealingKey, chunkCount++, ipfsEndpoint, progress);
 
       cidList.push(cid); hashes.push(hash);
     }
@@ -63,10 +64,7 @@ export class Driver {
     if (progress) progress.emit('progress', 'GENERATE_PRESEALED_DATA_UPLOAD_CID_LIST_SUCCESS', null);
 
     const hash = hashes.reduce((p, c) => {
-      const t = new Uint8Array(64);
-
-      t.set(p, 0);
-      t.set(c, 32);
+      const t = new Uint8Array([...p, ...c]);
 
       return sha256Hash(t);
     }, new Uint8Array(32));
@@ -85,7 +83,7 @@ export class Driver {
     * @returns {Promise<[IPFSResult, Uint8Array]>} resulting IPFS cid & file hash
   */
   private static async upstreamChunkProcessingPipeLine (
-    chunk: Uint8Array, sealingKey: Uint8Array, chunkId: number, progress?: EventEmitter
+    chunk: Uint8Array, sealingKey: Uint8Array, chunkId: number, ipfsEndpoint?: string, progress?: EventEmitter
   ): Promise<[IPFSResult, Uint8Array]> {
     if (sealingKey.length !== 32) {
       throw new Error('wrong sealingKey size - Driver.upstreamChunkProcessingPipeLine');
@@ -109,7 +107,7 @@ export class Driver {
 
     if (progress) progress.emit('progress', 'UPSTREAM_ENCRYPT_CHUNK_SUCCESS', chunkId);
     // 4. upload to IPFS
-    const ipfsCid = await IPFS.add(u8aToHex(chunk));
+    const ipfsCid = await IPFS.add(u8aToHex(chunk), ipfsEndpoint);
 
     if (progress) progress.emit('progress', 'UPSTREAM_UPLOADING_IPFS_SUCCESS', chunkId);
 
@@ -165,6 +163,7 @@ export class Driver {
   public static async recoverFileFromPreSealedData (
     preSealed: PreSealed,
     write: (chunk: Uint8Array) => void,
+    ipfsEndpoint?: string,
     progress?: EventEmitter
   ): Promise<void> {
     if (progress) progress.emit('progress', 'RECOVER_FILE_FROM_PRESEALED_DATA_INIT', null);
@@ -187,7 +186,7 @@ export class Driver {
 
     for (const chunkCID of chunksList) {
       if (progress) progress.emit('progress', 'RECOVER_FILE_FROM_PRESEALED_DATA_DOWNLOAD_CHUNK', chunkId);
-      const chunk = File.inflatDeflatedChunk(SymmetricEncryption.decrypt(preSealed.sealingKey, hexToU8a(await IPFS.cat(chunkCID))));
+      const chunk = File.inflatDeflatedChunk(SymmetricEncryption.decrypt(preSealed.sealingKey, hexToU8a(await IPFS.cat(chunkCID, ipfsEndpoint))));
 
       if (progress) progress.emit('progress', 'RECOVER_FILE_FROM_PRESEALED_DATA_DOWNLOAD_CHUNK_SUCCESS', chunkId);
       hashes.push(File.getChunkHash(chunk));
@@ -197,10 +196,7 @@ export class Driver {
     }
 
     const hash = hashes.reduce((p, c) => {
-      const t = new Uint8Array(64);
-
-      t.set(p, 0);
-      t.set(c, 32);
+      const t = new Uint8Array([...p, ...c]);
 
       return sha256Hash(t);
     }, new Uint8Array(32));

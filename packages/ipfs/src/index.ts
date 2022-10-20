@@ -10,13 +10,14 @@ import superagent from 'superagent';
 import { u8aToHex } from '@skyekiwi/util';
 
 // https://gw.crustapps.net/ipfs/QmeALtHnjohoKnNmFfxjbuPwhiaHS2SmTaVXyigb5SfBW9
-const crustGateways = [
-  // 'https://ipfs-gw.dkskcloud.com'
+const crustGateway = 'https://gw.crustapps.net';
+// const crustGateways = [
+// 'https://ipfs-gw.dkskcloud.com'
 //  'https://gw.crustapps.net',
-  'https://crustwebsites.net',
-  'https://crustipfs.xyz',
-  'https://ipfs-gw.decloud.foundation'
-];
+// 'https://crustwebsites.net',
+// 'https://crustipfs.xyz',
+// 'https://ipfs-gw.decloud.foundation'
+// ];
 
 // WIP - the IPFS connector might go through lots of changes
 export class IPFS {
@@ -36,32 +37,16 @@ export class IPFS {
     return res.statusCode === 200;
   }
 
-  private static async upload (authHeader: string, content: string): Promise<IPFSResult> {
-    const req = [];
-
-    for (const endpoint of crustGateways) {
-      req.push(
-        superagent
-          .post(`${endpoint}/api/v0/add`)
-          .timeout({
-            deadline: 60000, // but allow 1 minute for the file to finish loading.
-            response: 10000 // Wait 10 seconds for the server to start sending,
-          })
-          .set('Authorization', `Basic ${authHeader}`)
-          .type('form')
-          .field('file', content)
-      );
-    }
-
-    const res = await (async () => {
-      for (const r of req) {
-        try {
-          return await r;
-        } catch (e) { }
-      }
-
-      return null;
-    })();
+  private static async upload (authHeader: string, content: string, endpoint: string): Promise<IPFSResult> {
+    const res = await superagent
+      .post(`${endpoint}/api/v0/add`)
+      .timeout({
+        deadline: 60000, // but allow 1 minute for the file to finish loading.
+        response: 10000 // Wait 10 seconds for the server to start sending,
+      })
+      .set('Authorization', `Basic ${authHeader}`)
+      .type('form')
+      .field('file', content);
 
     if (!res) {
       return null;
@@ -88,30 +73,14 @@ export class IPFS {
     return r.text;
   }
 
-  private static async download (authHeader: string, cid: string): Promise<string> {
-    const req = [];
-
-    for (const endpoint of crustGateways) {
-      req.push(
-        superagent
-          .get(`${endpoint}/ipfs/${cid}`)
-          .timeout({
-            deadline: 120000, // but allow 2 minute for the file to finish loading.
-            response: 60000 // Wait 1 minute for the server to start sending,
-          })
-          // .set('Authorization', `Basic ${authHeader}`)
-      );
-    }
-
-    const res = await (async () => {
-      for (const r of req) {
-        try {
-          return await r;
-        } catch (e) { }
-      }
-
-      return null;
-    })();
+  private static async download (cid: string, endpoint: string): Promise<string> {
+    const res = await superagent
+      .get(`${endpoint}/ipfs/${cid}`)
+      .timeout({
+        deadline: 120000, // but allow 2 minute for the file to finish loading.
+        response: 60000 // Wait 1 minute for the server to start sending,
+      });
+    // .set('Authorization', `Basic ${authHeader}`)
 
     if (!res) {
       return null;
@@ -120,14 +89,14 @@ export class IPFS {
     return res.text;
   }
 
-  public static async add (content: string, authHeader?: string): Promise<IPFSResult> {
+  public static async add (content: string, endpoint?: string, authHeader?: string): Promise<IPFSResult> {
     const auth = authHeader || this.generateRandomAuthHeader();
     let reTries = 3;
     let res;
 
     while (reTries >= 0) {
       try {
-        res = await this.upload(auth, content);
+        res = await this.upload(auth, content, endpoint || crustGateway);
       } catch (e) {}
 
       if (res) break;
@@ -149,15 +118,13 @@ export class IPFS {
     return res;
   }
 
-  public static async cat (cid: string, authHeader?: string): Promise<string> {
-    const auth = authHeader || this.generateRandomAuthHeader();
-
+  public static async cat (cid: string, endpoint?: string): Promise<string> {
     let reTries = 3;
     let res;
 
     while (reTries >= 0) {
       try {
-        res = await this.download(auth, cid);
+        res = await this.download(cid, endpoint || crustGateway);
       } catch (e) {}
 
       if (res) break;
