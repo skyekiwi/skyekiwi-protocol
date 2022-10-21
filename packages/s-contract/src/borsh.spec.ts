@@ -1,9 +1,6 @@
 // Copyright 2021-2022 @skyekiwi/s-contract authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { encodeAddress } from '@polkadot/keyring';
-import { baseEncode } from 'borsh';
-
 import { hexToU8a, stringToU8a, u8aToHex, u8aToString } from '@skyekiwi/util';
 
 import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCalls, buildExecutionSummary, buildLocalMetadata, buildOutcome, buildOutcomes, buildShard, buildShardMetadata, Call, Calls, ExecutionSummary, LocalMetadata, Outcome, Outcomes, parseBlock,
@@ -21,19 +18,19 @@ import { Block, BlockSummary, buildBlock, buildBlockSummary, buildCall, buildCal
 describe('@skyekiwi/s-contract/borsh', function () {
   test('adhoc', () => {
     //    const raw = new Uint8Array([12, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 64, 66, 15, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 16, 94, 105, 63, 188, 171, 146, 189, 67, 163, 237, 82, 61, 28, 214, 130, 146, 136, 1, 76, 142, 110, 185, 66, 195, 111, 66, 61, 114, 10, 211, 30, 0, 4, 1, 1, 0, 0, 0, 1, 90, 0, 0, 0, 47, 85, 115, 101, 114, 115, 47, 115, 111, 110, 103, 122, 104, 111, 117, 47, 68, 101, 115, 107, 116, 111, 112, 47, 115, 107, 121, 101, 107, 105, 119, 105, 45, 110, 101, 116, 119, 111, 114, 107, 47, 109, 111, 99, 107, 45, 101, 110, 99, 108, 97, 118, 101, 47, 119, 97, 115, 109, 47, 115, 116, 97, 116, 117, 115, 95, 109, 101, 115, 115, 97, 103, 101, 95, 99, 111, 108, 108, 101, 99, 116, 105, 111, 110, 115, 46, 119, 97, 115, 109, 0, 0, 0, 0, 0, 0, 0,]);
-    const raw = hexToU8a('010000006d6f646c73636f6e747261630000000000000000000000000000000000000000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d000001e8030000000000000000000139000000');
+    // const raw = hexToU8a('010000006d6f646c73636f6e747261630000000000000000000000000000000000000000d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d000001e8030000000000000000000139000000');
 
-    const b = baseEncode(raw);
-    const c = parseCalls(b);
+    // const b = baseEncode(raw);
+    // const c = parseCalls(b);
 
-    const sender = new Uint8Array(c.ops[0].origin_public_key);
-    const receiver = new Uint8Array(c.ops[0].receipt_public_key);
+    // const sender = new Uint8Array(c.ops[0].origin_public_key);
+    // const receiver = new Uint8Array(c.ops[0].receipt_public_key);
 
-    expect(encodeAddress(sender)).toEqual('5EYCAe5jKbSe4DzkVVriG3QW13WG4j9gy4zmUxjqT8czBuyu');
-    expect(encodeAddress(receiver)).toEqual('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
-    expect(JSON.stringify(c)).toEqual(
-      '{"ops":[{"origin_public_key":[109,111,100,108,115,99,111,110,116,114,97,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"receipt_public_key":[212,53,147,199,21,253,211,28,97,20,26,189,4,169,159,214,130,44,133,88,133,76,205,227,154,86,132,231,165,109,162,125],"encrypted_egress":false,"transaction_action":0,"amount":1000}],"shard_id":0,"block_number":57}'
-    );
+    // expect(encodeAddress(sender)).toEqual('5EYCAe5jKbSe4DzkVVriG3QW13WG4j9gy4zmUxjqT8czBuyu');
+    // expect(encodeAddress(receiver)).toEqual('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+    // expect(JSON.stringify(c)).toEqual(
+    //   '{"ops":[{"origin_public_key":[109,111,100,108,115,99,111,110,116,114,97,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"receipt_public_key":[212,53,147,199,21,253,211,28,97,20,26,189,4,169,159,214,130,44,133,88,133,76,205,227,154,86,132,231,165,109,162,125],"encrypted_egress":false,"transaction_action":0,"amount":1000}],"shard_id":0,"block_number":57}'
+    // );
     // console.log(encodeAddress(sender), encodeAddress(receiver));
     // console.log(JSON.stringify(c));
   });
@@ -46,9 +43,10 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
       transaction_action: 1,
       amount: 10,
-      contract_name: stringToU8a('/fakepath/wasm_blob.wasm'),
+      contract_name: stringToU8a('some_contract'),
       method: undefined,
-      args: undefined
+      args: undefined,
+      wasm_code: new Uint8Array(10000)
     });
 
     const buf = buildCall(call);
@@ -66,6 +64,8 @@ describe('@skyekiwi/s-contract/borsh', function () {
       new Uint8Array(call.contract_name)));
     expect(parsedCall.method).toEqual(call.method);
     expect(parsedCall.args).toEqual(call.args);
+    expect(u8aToHex(parsedCall.wasm_code)).toEqual(u8aToHex(call.wasm_code));
+
   });
 
   test('encode/decode batch calls works', () => {
@@ -77,9 +77,10 @@ describe('@skyekiwi/s-contract/borsh', function () {
       transaction_action: 1,
 
       amount: 100,
-      contract_name: stringToU8a('/fakepath/wasm_blob.wasm'),
+      contract_name: stringToU8a('some_contract'),
       method: undefined,
-      args: undefined
+      args: undefined,
+      wasm_code: new Uint8Array(10000)
     });
 
     const call2 = new Call({
@@ -92,7 +93,8 @@ describe('@skyekiwi/s-contract/borsh', function () {
       amount: 100,
       contract_name: undefined,
       method: stringToU8a('some_method'),
-      args: undefined
+      args: undefined,
+      wasm_code: undefined,
     });
 
     const calls = new Calls({
@@ -116,6 +118,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
         new Uint8Array(new Uint8Array(calls.ops[0].contract_name))));
     expect(parsedCalls.ops[0].method).toEqual(undefined);
     expect(parsedCalls.ops[0].args).toEqual(undefined);
+    expect(u8aToHex(parsedCalls.ops[0].wasm_code)).toEqual(u8aToHex(calls.ops[0].wasm_code));
 
     expect(u8aToHex(parsedCalls.ops[1].origin_public_key)).toEqual(u8aToHex(calls.ops[1].origin_public_key));
     expect(u8aToHex(parsedCalls.ops[1].receipt_public_key)).toEqual(u8aToHex(calls.ops[1].receipt_public_key));
@@ -125,9 +128,11 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedCalls.ops[1].amount).toEqual(calls.ops[1].amount);
     expect(parsedCalls.ops[1].contract_name).toEqual(undefined);
     expect(u8aToString(
-      new Uint8Array(parsedCalls.ops[0].method))).toEqual(u8aToString(
-      new Uint8Array(calls.ops[0].method)));
+      new Uint8Array(parsedCalls.ops[1].method))).toEqual(u8aToString(
+      new Uint8Array(calls.ops[1].method)));
     expect(parsedCalls.ops[1].args).toEqual(undefined);
+    expect(parsedCalls.ops[1].wasm_code).toBeUndefined();
+
   });
 
   test('encode/decode outcome works', () => {
@@ -137,7 +142,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       view_error: undefined,
 
       outcome_logs: [],
-      outcome_receipt_ids: [],
       outcome_token_burnt: 10,
       outcome_status: hexToU8a('0123456789abcdef')
     });
@@ -151,7 +155,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
         new Uint8Array(outcome.view_result_log[0])));
     expect(u8aToHex(parsedOutcome.view_result)).toEqual(u8aToHex(outcome.view_result));
     expect(parsedOutcome.outcome_logs).toEqual(outcome.outcome_logs);
-    expect(parsedOutcome.outcome_receipt_ids).toEqual(outcome.outcome_receipt_ids);
     expect(parsedOutcome.outcome_token_burnt).toEqual(outcome.outcome_token_burnt);
     expect(u8aToHex(parsedOutcome.outcome_status)).toEqual(u8aToHex(outcome.outcome_status));
   });
@@ -163,7 +166,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       view_error: undefined,
 
       outcome_logs: [],
-      outcome_receipt_ids: [],
       outcome_token_burnt: 10,
       outcome_status: hexToU8a('0123456789abcdef')
     });
@@ -174,13 +176,14 @@ describe('@skyekiwi/s-contract/borsh', function () {
       view_error: undefined,
 
       outcome_logs: [],
-      outcome_receipt_ids: [],
       outcome_token_burnt: 10,
       outcome_status: hexToU8a('0123456789abcdef')
     });
 
     const outcomes = new Outcomes({
       ops: [outcome1, outcome2],
+      call_ids: [0, 1],
+      signatures: [new Uint8Array(64), new Uint8Array(64)],
       state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     });
     const buf = buildOutcomes(outcomes);
@@ -192,18 +195,20 @@ describe('@skyekiwi/s-contract/borsh', function () {
         new Uint8Array(outcomes.ops[0].view_result_log[0])));
     expect(u8aToHex(parsedOutcomes.ops[0].view_result)).toEqual(u8aToHex(outcomes.ops[0].view_result));
     expect(parsedOutcomes.ops[0].outcome_logs).toEqual(outcomes.ops[0].outcome_logs);
-    expect(parsedOutcomes.ops[0].outcome_receipt_ids).toEqual(outcomes.ops[0].outcome_receipt_ids);
     expect(parsedOutcomes.ops[0].outcome_token_burnt).toEqual(outcomes.ops[0].outcome_token_burnt);
     expect(u8aToHex(parsedOutcomes.ops[0].outcome_status)).toEqual(u8aToHex(outcomes.ops[0].outcome_status));
 
     expect(u8aToHex(parsedOutcomes.ops[1].view_result_log[0])).toEqual(u8aToHex(outcomes.ops[1].view_result_log[0]));
     expect(u8aToHex(parsedOutcomes.ops[1].view_result)).toEqual(u8aToHex(outcomes.ops[1].view_result));
     expect(parsedOutcomes.ops[1].outcome_logs).toEqual(outcomes.ops[1].outcome_logs);
-    expect(parsedOutcomes.ops[1].outcome_receipt_ids).toEqual(outcomes.ops[1].outcome_receipt_ids);
     expect(parsedOutcomes.ops[1].outcome_token_burnt).toEqual(outcomes.ops[1].outcome_token_burnt);
     expect(u8aToHex(parsedOutcomes.ops[1].outcome_status)).toEqual(u8aToHex(outcomes.ops[1].outcome_status));
 
     expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
+    expect(parsedOutcomes.call_ids).toEqual([0, 1]);
+    expect(parsedOutcomes.signatures.length).toEqual(2)
+    expect(u8aToHex(parsedOutcomes.signatures[0])).toEqual(u8aToHex(new Uint8Array(64)));
+    expect(u8aToHex(parsedOutcomes.signatures[1])).toEqual(u8aToHex(new Uint8Array(64)));
   });
 
   test('encode/decode block works', () => {

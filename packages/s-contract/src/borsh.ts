@@ -16,6 +16,7 @@ class Call {
   public contract_name: Uint8Array | null
   public method: Uint8Array | null
   public args: Uint8Array | null
+  public wasm_code: Uint8Array | null
 
   constructor (config: {
     origin_public_key: Uint8Array,
@@ -28,6 +29,7 @@ class Call {
     contract_name: Uint8Array | null,
     method: Uint8Array | null,
     args: Uint8Array | null,
+    wasm_code: Uint8Array | null,
   }) {
     this.origin_public_key = config.origin_public_key;
     this.receipt_public_key = config.receipt_public_key;
@@ -39,6 +41,7 @@ class Call {
     this.contract_name = config.contract_name;
     this.method = config.method;
     this.args = config.args;
+    this.wasm_code = config.wasm_code;
   }
 }
 
@@ -63,7 +66,6 @@ class Outcome {
   public view_error: Uint8Array | null
 
   public outcome_logs: Uint8Array[]
-  public outcome_receipt_ids: Uint8Array[]
   public outcome_token_burnt: number
   public outcome_status: Uint8Array | null
 
@@ -73,7 +75,6 @@ class Outcome {
     view_error: Uint8Array | null,
 
     outcome_logs: Uint8Array[],
-    outcome_receipt_ids: Uint8Array[],
     outcome_token_burnt: number,
     outcome_status: Uint8Array | null,
   }) {
@@ -82,7 +83,6 @@ class Outcome {
     this.view_error = config.view_error;
 
     this.outcome_logs = config.outcome_logs;
-    this.outcome_receipt_ids = config.outcome_receipt_ids;
     this.outcome_token_burnt = config.outcome_token_burnt;
     this.outcome_status = config.outcome_status;
   }
@@ -90,30 +90,20 @@ class Outcome {
 
 class Outcomes {
   public ops: Outcome[]
+  public call_ids: number[]
+  public signatures: Uint8Array[]
   public state_root: Uint8Array
 
   constructor (config: {
     ops: Outcome[],
-    state_root: Uint8Array
-  }) {
-    this.ops = config.ops;
-    this.state_root = config.state_root;
-  }
-}
-
-class RawOutcomes {
-  public ops: Outcome[]
-  public state_root: Uint8Array
-  public state_patch: Uint8Array
-
-  constructor (config: {
-    ops: Outcome[],
+    call_ids: number[],
+    signatures: Uint8Array[],
     state_root: Uint8Array,
-    state_patch: Uint8Array,
   }) {
     this.ops = config.ops;
+    this.call_ids = config.call_ids;
+    this.signatures = config.signatures;
     this.state_root = config.state_root;
-    this.state_patch = config.state_patch;
   }
 }
 
@@ -246,7 +236,8 @@ const callSchema = new Map([
       ['amount', { kind: 'option', type: 'u32' }],
       ['contract_name', { kind: 'option', type: ['u8'] }],
       ['method', { kind: 'option', type: ['u8'] }],
-      ['args', { kind: 'option', type: ['u8'] }]
+      ['args', { kind: 'option', type: ['u8'] }],
+      ['wasm_code', {kind: 'option', type: ['u8']}],
     ]
   }]
 ]);
@@ -270,7 +261,6 @@ const outcomeSchema = new Map([[Outcome, {
     ['view_error', { kind: 'option', type: ['u8'] }],
 
     ['outcome_logs', [['u8']]],
-    ['outcome_receipt_ids', [['u8', 32]]],
     ['outcome_token_burnt', 'u32'],
     ['outcome_status', { kind: 'option', type: ['u8'] }]
   ]
@@ -281,22 +271,12 @@ outcomesSchema.set(Outcomes, {
   kind: 'struct',
   fields: [
     ['ops', [Outcome]],
+    ['call_ids', ['u32']],
+    ['signatures', [['u8']]],
     ['state_root', ['u8', 32]]
   ]
 });
 outcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
-
-const rawOutcomesSchema = new Map();
-
-rawOutcomesSchema.set(RawOutcomes, {
-  kind: 'struct',
-  fields: [
-    ['ops', [Outcome]],
-    ['state_root', ['u8', 32]],
-    ['state_patch', ['u8']]
-  ]
-});
-rawOutcomesSchema.set(Outcome, outcomeSchema.get(Outcome));
 
 const shardMetadataSchema = new Map([
   [ShardMetadata, {
@@ -412,12 +392,6 @@ const buildBlockSummary = (a: BlockSummary): string => {
   return baseEncode(buf);
 };
 
-const buildRawOutcomes = (a: RawOutcomes): string => {
-  const buf = serialize(rawOutcomesSchema, a);
-
-  return baseEncode(buf);
-};
-
 // de
 const parseCall = (
   buf: string
@@ -487,12 +461,6 @@ const parseBlockSummary = (
   return deserialize(blockSummarySchema, BlockSummary, baseDecode(buf));
 };
 
-const parseRawOutcomes = (
-  buf: string
-): RawOutcomes => {
-  return deserialize(rawOutcomesSchema, RawOutcomes, baseDecode(buf));
-};
-
 export {
   Call, callSchema, buildCall, parseCall,
   Calls, callsSchema, buildCalls, parseCalls,
@@ -504,7 +472,6 @@ export {
   LocalMetadata, localMetadataSchema, buildLocalMetadata, parseLocalMetadata,
   ExecutionSummary, executionSummarySchema, buildExecutionSummary, parseExecutionSummary,
   BlockSummary, blockSummarySchema, buildBlockSummary, parseBlockSummary,
-  RawOutcomes, rawOutcomesSchema, buildRawOutcomes, parseRawOutcomes,
 
   baseEncode, baseDecode
 };
