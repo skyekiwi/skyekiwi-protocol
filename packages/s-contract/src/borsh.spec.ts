@@ -180,9 +180,9 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     const outcomes = new Outcomes({
       ops: [outcome1, outcome2],
-      call_ids: [0, 1],
-      signatures: [new Uint8Array(64), new Uint8Array(64)],
-      state_root: new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+      call_id: 1,
+      signature: new Uint8Array(64),
+      state_root: new Uint8Array(32)
     });
     const buf = buildOutcomes(outcomes);
     const parsedOutcomes = parseOutcomes(buf);
@@ -203,10 +203,9 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(u8aToHex(parsedOutcomes.ops[1].outcome_status)).toEqual(u8aToHex(outcomes.ops[1].outcome_status));
 
     expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
-    expect(parsedOutcomes.call_ids).toEqual([0, 1]);
-    expect(parsedOutcomes.signatures.length).toEqual(2);
-    expect(u8aToHex(parsedOutcomes.signatures[0])).toEqual(u8aToHex(new Uint8Array(64)));
-    expect(u8aToHex(parsedOutcomes.signatures[1])).toEqual(u8aToHex(new Uint8Array(64)));
+    expect(parsedOutcomes.call_id).toEqual(1);
+    expect(parsedOutcomes.signature.length).toEqual(64);
+    expect(u8aToHex(parsedOutcomes.signature)).toEqual(u8aToHex(new Uint8Array(64)));
   });
 
   test('encode/decode block works', () => {

@@ -90,19 +90,19 @@ class Outcome {
 
 class Outcomes {
   public ops: Outcome[]
-  public call_ids: number[]
-  public signatures: Uint8Array[]
+  public call_id: number
+  public signature: Uint8Array
   public state_root: Uint8Array
 
   constructor (config: {
     ops: Outcome[],
-    call_ids: number[],
-    signatures: Uint8Array[],
+    call_id: number,
+    signature: Uint8Array,
     state_root: Uint8Array,
   }) {
     this.ops = config.ops;
-    this.call_ids = config.call_ids;
-    this.signatures = config.signatures;
+    this.call_id = config.call_id;
+    this.signature = config.signature;
     this.state_root = config.state_root;
   }
 }
@@ -271,8 +271,8 @@ outcomesSchema.set(Outcomes, {
   kind: 'struct',
   fields: [
     ['ops', [Outcome]],
-    ['call_ids', ['u32']],
-    ['signatures', [['u8']]],
+    ['call_id', 'u32'],
+    ['signature', ['u8', 64]],
     ['state_root', ['u8', 32]]
   ]
 });
