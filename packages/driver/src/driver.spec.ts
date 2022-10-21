@@ -3,21 +3,21 @@
 
 import type { KeypairType, PublicKey, SecretKey } from '@skyekiwi/crypto/types';
 
-import fs from 'fs';
-import path from 'path';
+// import fs from 'fs';
+// import path from 'path';
 import { EventEmitter } from 'stream';
-import { randomBytes } from 'tweetnacl';
 
+// import { randomBytes } from 'tweetnacl';
 import { AsymmetricEncryption, initWASMInterface, secureGenerateRandomKey } from '@skyekiwi/crypto';
-import { File } from '@skyekiwi/file';
 
+// import { File } from '@skyekiwi/file';
 import { Driver, progressText } from '.';
 
-const filePath = path.join(__dirname, '../mock/file.file');
-const downstreamPath = path.join(__dirname, '../mock/down.file');
+// const filePath = path.join(__dirname, '../mock/file.file');
+// const downstreamPath = path.join(__dirname, '../mock/down.file');
 
 describe('@skyekiwi/driver', function () {
-  const content = randomBytes(120_000);
+  // const content = randomBytes(120_000);
   const progress = new EventEmitter();
 
   progress.on('progress', (name: string, chunkId?: number) => {
@@ -40,7 +40,8 @@ describe('@skyekiwi/driver', function () {
         keyType: keyType
       };
 
-      const file = await setup(content);
+      // const file = await setup(content);
+      const file = new Uint8Array(1000);
 
       // Upstream
       const ps = await Driver.generatePreSealedData(file, null, progress);
@@ -54,12 +55,13 @@ describe('@skyekiwi/driver', function () {
         downstreamContent = new Uint8Array([...downstreamContent, ...chunk]);
       }, null, progress);
 
+      console.log(file, downstreamContent);
       expect(Buffer.compare(
         downstreamContent,
-        Buffer.from(content)
+        Buffer.from(file)
       )).toEqual(0);
 
-      await cleanup();
+      // await cleanup();
     });
 
     return null;
@@ -84,7 +86,8 @@ describe('@skyekiwi/driver', function () {
     pairs.push(generatePair('ed25519'));
     pairs.push(generatePair('ethereum'));
 
-    const file = await setup(content);
+    // const file = await setup(content);
+    const file = new Uint8Array(1000);
 
     const ps = await Driver.generatePreSealedData(file, null, progress);
     const sealed = Driver.generateSealedData(ps, [
@@ -111,37 +114,37 @@ describe('@skyekiwi/driver', function () {
 
     expect(r4.serialize()).toEqual(org);
 
-    await cleanup();
+    // await cleanup();
   });
 });
 
-const setup = async (content: Uint8Array): Promise<File> => {
-  await File.writeFile(content, filePath, 'w');
+// const setup = async (content: Uint8Array): Promise<File> => {
+//   await File.writeFile(content, filePath, 'w');
 
-  const file1 = new File({
-    fileName: 'tmp.file',
-    readStream: fs.createReadStream(filePath, {
-      highWaterMark: 1 * (10 ** 5)
-    })
-  });
+//   const file1 = new File({
+//     fileName: 'tmp.file',
+//     readStream: fs.createReadStream(filePath, {
+//       highWaterMark: 1 * (10 ** 5)
+//     })
+//   });
 
-  return file1;
-};
+//   return file1;
+// };
 
-const cleanup = async () => {
-  const unlink = (filePath: string): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      fs.unlink(filePath, (err) => {
-        if (err) reject(err);
-        resolve(true);
-      });
-    });
-  };
+// const cleanup = async () => {
+//   const unlink = (filePath: string): Promise<boolean> => {
+//     return new Promise((resolve, reject) => {
+//       fs.unlink(filePath, (err) => {
+//         if (err) reject(err);
+//         resolve(true);
+//       });
+//     });
+//   };
 
-  try {
-    await unlink(filePath);
-    await unlink(downstreamPath);
-  } catch (err) {
-    // pass
-  }
-};
+//   try {
+//     await unlink(filePath);
+//     await unlink(downstreamPath);
+//   } catch (err) {
+//     // pass
+//   }
+// };

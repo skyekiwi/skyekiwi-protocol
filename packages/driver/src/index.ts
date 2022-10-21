@@ -24,7 +24,7 @@ export class Driver {
     * @returns {Promise<Uint8Array>} serialized PreSealed data
   */
   public static async generatePreSealedData (
-    file: File | Uint8Array,
+    file: Uint8Array,
     ipfsEndpoint?: string,
     progress?: EventEmitter
   ): Promise<PreSealed> {
@@ -36,16 +36,18 @@ export class Driver {
 
     if (progress) progress.emit('progress', 'GENERATE_PRESEALED_DATA_INIT', null);
 
-    if (file instanceof File) {
-      const readStream = file.getReadStream();
+    // if (file instanceof File) {
+    //   const readStream = file.getReadStream();
 
-      // main loop - the main upstreaming pipeline
-      for await (const chunk of readStream) {
-        const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(chunk, sealingKey, chunkCount++, ipfsEndpoint, progress);
+    //   // main loop - the main upstreaming pipeline
+    //   for await (const chunk of readStream) {
+    //     const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(chunk, sealingKey, chunkCount++, ipfsEndpoint, progress);
 
-        cidList.push(cid); hashes.push(hash);
-      }
-    } else {
+    //     cidList.push(cid); hashes.push(hash);
+    //   }
+    // } else
+
+    if (file.length !== 0) {
       const [cid, hash] = await Driver.upstreamChunkProcessingPipeLine(file, sealingKey, chunkCount++, ipfsEndpoint, progress);
 
       cidList.push(cid); hashes.push(hash);
