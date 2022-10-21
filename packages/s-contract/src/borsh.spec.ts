@@ -65,7 +65,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
     expect(parsedCall.method).toEqual(call.method);
     expect(parsedCall.args).toEqual(call.args);
     expect(u8aToHex(parsedCall.wasm_code)).toEqual(u8aToHex(call.wasm_code));
-
   });
 
   test('encode/decode batch calls works', () => {
@@ -94,7 +93,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
       contract_name: undefined,
       method: stringToU8a('some_method'),
       args: undefined,
-      wasm_code: undefined,
+      wasm_code: undefined
     });
 
     const calls = new Calls({
@@ -132,7 +131,6 @@ describe('@skyekiwi/s-contract/borsh', function () {
       new Uint8Array(calls.ops[1].method)));
     expect(parsedCalls.ops[1].args).toEqual(undefined);
     expect(parsedCalls.ops[1].wasm_code).toBeUndefined();
-
   });
 
   test('encode/decode outcome works', () => {
@@ -206,7 +204,7 @@ describe('@skyekiwi/s-contract/borsh', function () {
 
     expect(u8aToHex(parsedOutcomes.state_root)).toEqual(u8aToHex(outcomes.state_root));
     expect(parsedOutcomes.call_ids).toEqual([0, 1]);
-    expect(parsedOutcomes.signatures.length).toEqual(2)
+    expect(parsedOutcomes.signatures.length).toEqual(2);
     expect(u8aToHex(parsedOutcomes.signatures[0])).toEqual(u8aToHex(new Uint8Array(64)));
     expect(u8aToHex(parsedOutcomes.signatures[1])).toEqual(u8aToHex(new Uint8Array(64)));
   });

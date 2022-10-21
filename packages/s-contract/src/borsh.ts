@@ -237,7 +237,7 @@ const callSchema = new Map([
       ['contract_name', { kind: 'option', type: ['u8'] }],
       ['method', { kind: 'option', type: ['u8'] }],
       ['args', { kind: 'option', type: ['u8'] }],
-      ['wasm_code', {kind: 'option', type: ['u8']}],
+      ['wasm_code', { kind: 'option', type: ['u8'] }]
     ]
   }]
 ]);
