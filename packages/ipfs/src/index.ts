@@ -45,7 +45,6 @@ export class IPFS {
         response: 10000 // Wait 10 seconds for the server to start sending,
       })
       .set('Authorization', `Basic ${authHeader}`)
-      .type('form')
       .field('file', content);
 
     if (!res) {
