@@ -69,7 +69,7 @@ class Outcome {
   public outcome_token_burnt: number
   public outcome_status: Uint8Array | null
 
-  public encrypted: Uint8Array
+  public encrypted: Uint8Array | null
 
   constructor (config: {
     view_result_log: Uint8Array[],
@@ -80,7 +80,7 @@ class Outcome {
     outcome_token_burnt: number,
     outcome_status: Uint8Array | null,
 
-    encrypted: Uint8Array,
+    encrypted: Uint8Array | null,
   }) {
     this.view_result_log = config.view_result_log;
     this.view_result = config.view_result;
@@ -164,7 +164,7 @@ outcomesSchema.set(Outcomes, {
   fields: [
     ['ops', [Outcome]],
     ['call_index', 'u32'],
-    ['signature', ['u8', 64]],
+    ['signature', ['u8']],
     ['state_root', ['u8', 32]]
   ]
 });
