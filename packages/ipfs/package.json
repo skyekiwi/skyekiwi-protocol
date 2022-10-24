@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/ipfs",
-  "version": "1.0.2-2",
+  "version": "1.0.2-3",
   "type": "module",
   "description": "ipfs wrapper for @skyekiwi",
   "main": "index.js",
@@ -22,7 +22,7 @@
   "dependencies": {
     "@polkadot/keyring": "^10.1.10",
     "@polkadot/util-crypto": "^10.1.10",
-    "@skyekiwi/util": "1.0.2-2",
+    "@skyekiwi/util": "1.0.2-3",
     "superagent": "^7.1.1",
     "tweetnacl": "^1.0.3"
   },
