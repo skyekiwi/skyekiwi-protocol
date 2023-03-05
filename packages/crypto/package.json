@@ -24,7 +24,7 @@
     "@polkadot/keyring": "^10.1.10",
     "@skyekiwi/metadata": "1.0.2-4",
     "@skyekiwi/util": "1.0.2-4",
-    "ethers": "^5.7.1",
+    "ethers": "^6.0.8",
     "tweetnacl": "^1.0.3"
   }
 }

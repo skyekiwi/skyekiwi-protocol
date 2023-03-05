@@ -5,7 +5,7 @@ import type { PublicKey, SecretKey } from './types';
 
 import { Keyring } from '@polkadot/keyring';
 import { encodeAddress, ethereumEncode, signatureVerify } from '@polkadot/util-crypto';
-import { ethers } from 'ethers';
+import { verifyMessage, Wallet } from 'ethers';
 
 import { hexToU8a, u8aToHex } from '@skyekiwi/util';
 
@@ -51,7 +51,7 @@ export class Sign {
       throw new Error('only ethereum');
     }
 
-    const wallet = new ethers.Wallet(key.key);
+    const wallet = new Wallet(`0x${u8aToHex(key.key)}`);
 
     return hexToU8a((await wallet.signMessage(message)).substring(2));
   }
@@ -68,6 +68,6 @@ export class Sign {
       throw new Error('only ethereum');
     }
 
-    return ethereumEncode(key.key) === ethers.utils.verifyMessage(message, '0x' + u8aToHex(signature));
+    return ethereumEncode(key.key) === verifyMessage(message, '0x' + u8aToHex(signature));
   }
 }
