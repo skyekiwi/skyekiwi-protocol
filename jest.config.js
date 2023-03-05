@@ -28,6 +28,6 @@ module.exports = Object.assign({}, config, {
   ],
   testTimeout: 3_000_000,
   transformIgnorePatterns: [
-    '/node_modules/(?!@polkadot|@babel/runtime/helpers/esm/)'
+    '/node_modules/(?!@polkadot|@adraffy|@babel/runtime/helpers/esm/)'
   ]
 });

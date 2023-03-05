@@ -10,7 +10,8 @@ import superagent from 'superagent';
 import { u8aToHex } from '@skyekiwi/util';
 
 // https://gw.crustapps.net/ipfs/QmeALtHnjohoKnNmFfxjbuPwhiaHS2SmTaVXyigb5SfBW9
-const crustGateway = 'https://gw.crustapps.net';
+const crustGateway = 'https://gw.crustfiles.app';
+const downloadGateway = 'https://ipfs.io';
 // const crustGateways = [
 // 'https://ipfs-gw.dkskcloud.com'
 //  'https://gw.crustapps.net',
@@ -123,7 +124,7 @@ export class IPFS {
 
     while (reTries >= 0) {
       try {
-        res = await this.download(cid, endpoint || crustGateway);
+        res = await this.download(cid, endpoint || downloadGateway);
       } catch (e) {}
 
       if (res) break;
