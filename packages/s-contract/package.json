@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/s-contract",
-  "version": "1.0.2-5",
+  "version": "1.0.2-6",
   "type": "module",
   "description": "secret contract host env based on SkyeKiwi Protocol",
   "main": "src/index.ts",
@@ -20,7 +20,7 @@
     "url": "https://github.com/skyekiwi/skyekiwi-protocol.git "
   },
   "dependencies": {
-    "@skyekiwi/util": "1.0.2-5",
+    "@skyekiwi/util": "1.0.2-6",
     "borsh": "^0.7.0"
   }
 }

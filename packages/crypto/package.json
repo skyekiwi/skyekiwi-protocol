@@ -1,6 +1,6 @@
 {
   "name": "@skyekiwi/crypto",
-  "version": "1.0.2-5",
+  "version": "1.0.2-6",
   "type": "module",
   "description": "cryptographic wrapper for @skyekiwi",
   "main": "index.js",
@@ -22,8 +22,8 @@
   "dependencies": {
     "@noble/secp256k1": "^1.7.0",
     "@polkadot/keyring": "^10.1.10",
-    "@skyekiwi/metadata": "1.0.2-5",
-    "@skyekiwi/util": "1.0.2-5",
+    "@skyekiwi/metadata": "1.0.2-6",
+    "@skyekiwi/util": "1.0.2-6",
     "ethers": "^6.0.8",
     "tweetnacl": "^1.0.3"
   }
